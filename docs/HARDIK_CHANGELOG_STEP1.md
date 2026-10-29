@@ -67,3 +67,4 @@ All 8 tests passed covering summary math, rack occupancy, status bubbling, searc
    - Connect `ApiDashboardService` to the central ASP.NET Core Web API.
    - Implement Goods Receipt Note (GRN) inward workflow with supplier PO verification.
    - Wire SignalR hub for live multi-computer workstation updates.
+

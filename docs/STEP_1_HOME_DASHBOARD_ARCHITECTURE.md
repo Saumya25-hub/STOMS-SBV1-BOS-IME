@@ -97,3 +97,4 @@ $$\text{Warehouse} \longrightarrow \text{Rack} \longrightarrow \text{Section (Sh
   - If capacity is defined: $\text{Occupancy \%} = \frac{\text{Occupied}}{\text{Max Capacity}} \times 100$
   - If capacity is `null` or unconfigured: UI shows `"Capacity not configured"` (no fabricated percentages).
   - Empty shelf tiers display clear operational status: *"Empty Storage Tier (Available for Goods Inward allocation)"*.
+
