@@ -1,0 +1,58 @@
+<UserControl x:Class="STOMS_SBV1_BOS_IME.Views.PlaceholderView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" 
+             d:DesignHeight="600" d:DesignWidth="900">
+    <Grid Margin="32">
+        <Border Style="{StaticResource IndustrialCard}" MaxWidth="720" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="32">
+            <StackPanel>
+                <!-- Badge -->
+                <Border Background="{DynamicResource Theme.Badge.Background}" 
+                        BorderBrush="{DynamicResource Theme.Border}" 
+                        BorderThickness="1" 
+                        CornerRadius="4" 
+                        Padding="10,4" 
+                        HorizontalAlignment="Left" 
+                        Margin="0,0,0,16">
+                    <StackPanel Orientation="Horizontal">
+                        <Path Data="{StaticResource Icon.Alert}" Fill="{StaticResource WarningBrush}" Width="14" Height="14" Stretch="Uniform" Margin="0,0,8,0"/>
+                        <TextBlock Text="{Binding PlannedRelease}" FontWeight="SemiBold" FontSize="12" Foreground="{DynamicResource Theme.Text.Secondary}"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Title & Code -->
+                <TextBlock Text="{Binding ModuleName}" FontSize="24" FontWeight="Bold" Margin="0,0,0,4"/>
+                <TextBlock Text="{Binding ModuleCode, StringFormat='Module Identifier: {0}'}" FontSize="13" Foreground="{DynamicResource Theme.Text.Muted}" Margin="0,0,0,16"/>
+
+                <TextBlock Text="{Binding Description}" FontSize="14" TextWrapping="Wrap" Foreground="{DynamicResource Theme.Text.Secondary}" Margin="0,0,0,24" LineHeight="20"/>
+
+                <!-- Upcoming Capabilities -->
+                <TextBlock Text="Target Architecture Deliverables:" FontWeight="SemiBold" FontSize="13" Margin="0,0,0,12"/>
+                <ItemsControl ItemsSource="{Binding UpcomingFeatures}" Margin="0,0,0,28">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Grid Margin="0,4">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="20"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Path Data="{StaticResource Icon.ChevronRight}" Fill="{StaticResource BrandAccentBrush}" Width="10" Height="10" Stretch="Uniform" VerticalAlignment="Center"/>
+                                <TextBlock Grid.Column="1" Text="{Binding}" FontSize="13" Foreground="{DynamicResource Theme.Text.Secondary}"/>
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <!-- Action to return -->
+                <Button Style="{StaticResource PrimaryButton}" 
+                        Content="← Return to Home Dashboard" 
+                        Command="{Binding ReturnToDashboardCommand}" 
+                        HorizontalAlignment="Left"
+                        Padding="18,10"/>
+            </StackPanel>
+        </Border>
+    </Grid>
+</UserControl>
+

@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
@@ -8,5 +8,11 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="STOMS-SBV1-BOS-IME.Tests\**" />
+    <EmbeddedResource Remove="STOMS-SBV1-BOS-IME.Tests\**" />
+    <None Remove="STOMS-SBV1-BOS-IME.Tests\**" />
+  </ItemGroup>
 
 </Project>
