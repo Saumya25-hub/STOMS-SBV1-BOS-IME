@@ -1,0 +1,2 @@
+like ! 2 log ke alag branch he !
+jenil and hardik dono ! alag kaam but ab dono ke kaam ko first dekhna he ! and fir marge karna he dono ne kya new kaam kiya he and fir mujhe bol ke ! kya bnaya he and branch ke hisab se samjha and fir marge karna he pure soffwtare mea fir mea ! dono ke ! kaam ko marge kar ke ! firr push karna he version control like ! tag bna ! and ! and fir final main ! stable branh ! buus like waha code samjh raha he code mix nho hona chaye

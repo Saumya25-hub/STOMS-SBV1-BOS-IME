@@ -122,6 +122,7 @@ namespace STOMS_SBV1_BOS_IME.ViewModels
 
             _navigationService.NavigationChanged += (s, key) => NavigateToModule(key);
             _themeService.ThemeChanged += (s, isDark) => IsDarkMode = isDark;
+            _authService.AuthStateChanged += (s, user) => OnPropertyChanged(nameof(CurrentUser));
         }
 
         private void ExecuteGlobalSearch()

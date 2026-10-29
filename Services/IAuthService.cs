@@ -8,6 +8,7 @@ namespace STOMS_SBV1_BOS_IME.Services
         UserProfile CurrentUser { get; }
         bool IsAuthenticated { get; }
         event EventHandler<UserProfile?>? AuthStateChanged;
+        void SetCurrentUser(UserProfile user);
         void Logout();
     }
 
@@ -37,6 +38,12 @@ namespace STOMS_SBV1_BOS_IME.Services
             };
         }
 
+        public void SetCurrentUser(UserProfile user)
+        {
+            _currentUser = user ?? throw new ArgumentNullException(nameof(user));
+            AuthStateChanged?.Invoke(this, user);
+        }
+
         public void Logout()
         {
             // Clean logout handling for UI
@@ -44,4 +51,3 @@ namespace STOMS_SBV1_BOS_IME.Services
         }
     }
 }
-

@@ -7,9 +7,11 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
+    <ApplicationTitle>STOMS Business Operating System — Inventory Management Engine (BOS-IME)</ApplicationTitle>
   </PropertyGroup>
 
   <ItemGroup>
+    <Resource Include="Assets\**\*" />
     <Compile Remove="STOMS-SBV1-BOS-IME.Tests\**" />
     <EmbeddedResource Remove="STOMS-SBV1-BOS-IME.Tests\**" />
     <None Remove="STOMS-SBV1-BOS-IME.Tests\**" />
