@@ -7,3 +7,4 @@ namespace STOMS_SBV1_BOS_IME.Services
         Task<(bool Success, string Message, OperatorSession? Session)> AuthenticateAsync(string username, string password, string warehouseLocation);
     }
 }
+

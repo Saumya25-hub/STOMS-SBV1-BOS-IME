@@ -6,8 +6,8 @@
         xmlns:vm="clr-namespace:STOMS_SBV1_BOS_IME.ViewModels"
         mc:Ignorable="d"
         Title="IMS — Inventor Management System | Operator Login"
-        Height="640"
-        Width="1020"
+        Height="650"
+        Width="1030"
         WindowStartupLocation="CenterScreen"
         WindowStyle="None"
         AllowsTransparency="True"
@@ -21,7 +21,7 @@
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis" />
 
-        <!-- Electric Blue Modern Button Style -->
+        <!-- Electric Blue Primary Action Button -->
         <Style x:Key="PrimaryActionBtn" TargetType="Button">
             <Setter Property="Background">
                 <Setter.Value>
@@ -45,7 +45,7 @@
                                 Background="{TemplateBinding Background}"
                                 CornerRadius="8">
                             <Border.Effect>
-                                <DropShadowEffect Color="#0066FF" BlurRadius="12" ShadowDepth="2" Opacity="0.3" />
+                                <DropShadowEffect Color="#0066FF" BlurRadius="14" ShadowDepth="2" Opacity="0.32" />
                             </Border.Effect>
                             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
                         </Border>
@@ -77,13 +77,13 @@
             <Setter Property="Foreground" Value="#64748B" />
             <Setter Property="Width" Value="38" />
             <Setter Property="Height" Value="32" />
-            <Setter Property="FontSize" Value="14" />
+            <Setter Property="FontSize" Value="13.5" />
             <Setter Property="BorderThickness" Value="0" />
             <Setter Property="Cursor" Value="Hand" />
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
-                        <Border x:Name="btnBorder" Background="{TemplateBinding Background}" CornerRadius="4">
+                        <Border x:Name="btnBorder" Background="{TemplateBinding Background}" CornerRadius="6">
                             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
                         </Border>
                         <ControlTemplate.Triggers>
@@ -166,340 +166,501 @@
                 </Setter.Value>
             </Setter>
         </Style>
+
+        <!-- Ambient Continuous Gradient Movement Storyboard -->
+        <Storyboard x:Key="AmbientGradientStoryboard" RepeatBehavior="Forever" AutoReverse="True">
+            <!-- Animate Base Gradient Start/End Points diagonally across the panel -->
+            <PointAnimation Storyboard.TargetName="BaseGradientBrush"
+                            Storyboard.TargetProperty="StartPoint"
+                            From="0.0, 0.0" To="0.25, 0.35"
+                            Duration="0:0:11">
+                <PointAnimation.EasingFunction>
+                    <SineEase EasingMode="EaseInOut" />
+                </PointAnimation.EasingFunction>
+            </PointAnimation>
+
+            <PointAnimation Storyboard.TargetName="BaseGradientBrush"
+                            Storyboard.TargetProperty="EndPoint"
+                            From="1.0, 1.0" To="0.75, 0.65"
+                            Duration="0:0:11">
+                <PointAnimation.EasingFunction>
+                    <SineEase EasingMode="EaseInOut" />
+                </PointAnimation.EasingFunction>
+            </PointAnimation>
+
+            <!-- Slow Secondary Bloom Ambient Drift -->
+            <DoubleAnimation Storyboard.TargetName="AmbientBloomTransform"
+                             Storyboard.TargetProperty="X"
+                             From="-40" To="60"
+                             Duration="0:0:13">
+                <DoubleAnimation.EasingFunction>
+                    <SineEase EasingMode="EaseInOut" />
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+
+            <DoubleAnimation Storyboard.TargetName="AmbientBloomTransform"
+                             Storyboard.TargetProperty="Y"
+                             From="40" To="-50"
+                             Duration="0:0:13">
+                <DoubleAnimation.EasingFunction>
+                    <SineEase EasingMode="EaseInOut" />
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+
+            <!-- Flowing Light Wave Sway -->
+            <DoubleAnimation Storyboard.TargetName="WaveTransform"
+                             Storyboard.TargetProperty="X"
+                             From="-60" To="40"
+                             Duration="0:0:10">
+                <DoubleAnimation.EasingFunction>
+                    <SineEase EasingMode="EaseInOut" />
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+
+            <DoubleAnimation Storyboard.TargetName="WaveTransform"
+                             Storyboard.TargetProperty="Y"
+                             From="30" To="-40"
+                             Duration="0:0:10">
+                <DoubleAnimation.EasingFunction>
+                    <SineEase EasingMode="EaseInOut" />
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+        </Storyboard>
     </Window.Resources>
 
-    <!-- Outer Shadow Container -->
-    <Grid Margin="20" MouseDown="OnWindowDrag">
-        <Border Background="#FFFFFF"
-                CornerRadius="16"
-                BorderBrush="#E2E8F0"
+    <!-- Outer Window Padding for Antialiased Elevation Shadow -->
+    <Grid Margin="22">
+        <!-- Unified Professionally Rounded Outer Window Card -->
+        <Border x:Name="OuterWindowCard"
+                CornerRadius="20"
+                Background="#FFFFFF"
+                BorderBrush="#CBD5E1"
                 BorderThickness="1"
                 ClipToBounds="True">
+            
             <Border.Effect>
                 <DropShadowEffect Color="#0F172A"
-                                  BlurRadius="30"
-                                  ShadowDepth="6"
-                                  Opacity="0.16" />
+                                  BlurRadius="34"
+                                  ShadowDepth="8"
+                                  Opacity="0.18" />
             </Border.Effect>
 
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <!-- Left: Brand Showcase (42%) -->
-                    <ColumnDefinition Width="420" />
-                    <!-- Right: Login Form & Dashboard (58%) -->
+                    <!-- Left: Interactive Animated Gradient Showcase (43%) -->
+                    <ColumnDefinition Width="430" />
+                    <!-- Right: Enterprise Login Form & Status (57%) -->
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
 
-                <!-- ================= LEFT BRAND PANEL ================= -->
-                <Border Grid.Column="0">
-                    <Border.Background>
-                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                            <GradientStop Color="#0A1E4A" Offset="0.0" />
-                            <GradientStop Color="#082A6E" Offset="0.4" />
-                            <GradientStop Color="#034B9E" Offset="0.8" />
-                            <GradientStop Color="#0066FF" Offset="1.0" />
-                        </LinearGradientBrush>
-                    </Border.Background>
+                <!-- ================= LEFT INTERACTIVE ANIMATED GRADIENT PANEL ================= -->
+                <Border x:Name="LeftGradientHost"
+                        Grid.Column="0"
+                        CornerRadius="19,0,0,19"
+                        ClipToBounds="True"
+                        Background="#07132B"
+                        MouseMove="OnLeftPanelMouseMove"
+                        MouseEnter="OnLeftPanelMouseEnter"
+                        MouseLeave="OnLeftPanelMouseLeave"
+                        MouseDown="OnLeftPanelMouseDown">
 
-                    <Grid Margin="36,40,36,36">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="*" />
-                            <RowDefinition Height="Auto" />
-                        </Grid.RowDefinitions>
+                    <Grid>
+                        <!-- Layer 1: Ambient Flowing Diagonal Gradient -->
+                        <Rectangle IsHitTestVisible="False">
+                            <Rectangle.Fill>
+                                <LinearGradientBrush x:Name="BaseGradientBrush" StartPoint="0.0,0.0" EndPoint="1.0,1.0">
+                                    <GradientStop Color="#081A42" Offset="0.0" />
+                                    <GradientStop Color="#0A2868" Offset="0.32" />
+                                    <GradientStop Color="#0052CC" Offset="0.68" />
+                                    <GradientStop Color="#0066FF" Offset="0.9" />
+                                    <GradientStop Color="#0284C7" Offset="1.0" />
+                                </LinearGradientBrush>
+                            </Rectangle.Fill>
+                        </Rectangle>
 
-                        <!-- IMS Brand Header -->
-                        <StackPanel Grid.Row="0">
-                            <!-- Logo Emblem -->
-                            <Border Width="82" Height="82" HorizontalAlignment="Left" CornerRadius="12">
-                                <Border.Effect>
-                                    <DropShadowEffect Color="#38BDF8" BlurRadius="20" ShadowDepth="0" Opacity="0.5" />
-                                </Border.Effect>
-                                <Viewbox Width="80" Height="80" Stretch="Uniform">
-                                    <Canvas Width="100" Height="100">
-                                        <!-- Isometric Cube Top Face -->
-                                        <Path Data="M 50 12 L 84 32 L 50 52 L 16 32 Z">
-                                            <Path.Fill>
-                                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                                                    <GradientStop Color="#38BDF8" Offset="0.0" />
-                                                    <GradientStop Color="#0066FF" Offset="1.0" />
-                                                </LinearGradientBrush>
-                                            </Path.Fill>
-                                        </Path>
-                                        <Path Data="M 50 24 L 62 31 L 50 38 L 38 31 Z" Fill="#FFFFFF" Opacity="0.95" />
-                                        <!-- Left Face -->
-                                        <Path Data="M 16 32 L 50 52 L 50 88 L 16 68 Z">
-                                            <Path.Fill>
-                                                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                                                    <GradientStop Color="#0047AB" Offset="0.0" />
-                                                    <GradientStop Color="#0A1E4A" Offset="1.0" />
-                                                </LinearGradientBrush>
-                                            </Path.Fill>
-                                        </Path>
-                                        <!-- Right Face -->
-                                        <Path Data="M 50 52 L 84 32 L 84 68 L 50 88 Z">
-                                            <Path.Fill>
-                                                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                                                    <GradientStop Color="#0066FF" Offset="0.0" />
-                                                    <GradientStop Color="#0284C7" Offset="1.0" />
-                                                </LinearGradientBrush>
-                                            </Path.Fill>
-                                        </Path>
-                                        <!-- Shelving Tiers -->
-                                        <Path Data="M 16 50 L 50 70 L 84 50" Stroke="#E0F2FE" StrokeThickness="1.8" Opacity="0.85" />
-                                        <Path Data="M 50 52 L 50 88" Stroke="#FFFFFF" StrokeThickness="2.0" Opacity="0.9" />
-                                        <Path Data="M 50 12 L 84 32 L 84 68 L 50 88 L 16 68 L 16 32 Z" Stroke="#38BDF8" StrokeThickness="1.8" />
-                                    </Canvas>
-                                </Viewbox>
+                        <!-- Layer 2: Slow-Moving Secondary Ambient Light Bloom -->
+                        <Canvas IsHitTestVisible="False">
+                            <Ellipse Width="380" Height="380" Margin="-80,80,0,0" Opacity="0.38">
+                                <Ellipse.RenderTransform>
+                                    <TranslateTransform x:Name="AmbientBloomTransform" X="0" Y="0" />
+                                </Ellipse.RenderTransform>
+                                <Ellipse.Fill>
+                                    <RadialGradientBrush Center="0.5,0.5" GradientOrigin="0.5,0.5" RadiusX="0.5" RadiusY="0.5">
+                                        <GradientStop Color="#0066FF" Offset="0.0" />
+                                        <GradientStop Color="#00D2FF" Offset="0.45" />
+                                        <GradientStop Color="#00000000" Offset="1.0" />
+                                    </RadialGradientBrush>
+                                </Ellipse.Fill>
+                            </Ellipse>
+                        </Canvas>
+
+                        <!-- Layer 3: Flowing Translucent Light Wave Ribbon -->
+                        <Canvas IsHitTestVisible="False">
+                            <Path Opacity="0.16"
+                                  Data="M -100 200 C 50 120, 220 350, 500 260 L 500 440 C 260 480, 80 280, -100 360 Z">
+                                <Path.RenderTransform>
+                                    <TranslateTransform x:Name="WaveTransform" X="0" Y="0" />
+                                </Path.RenderTransform>
+                                <Path.Fill>
+                                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                        <GradientStop Color="#38BDF8" Offset="0.0" />
+                                        <GradientStop Color="#0066FF" Offset="0.6" />
+                                        <GradientStop Color="#00000000" Offset="1.0" />
+                                    </LinearGradientBrush>
+                                </Path.Fill>
+                            </Path>
+                        </Canvas>
+
+                        <!-- Layer 4: REAL INTERACTIVE MOUSE-FOLLOWING LIGHT BLOOM -->
+                        <Canvas IsHitTestVisible="False">
+                            <Border x:Name="MouseLightBloom"
+                                    Width="340"
+                                    Height="340"
+                                    Opacity="0"
+                                    IsHitTestVisible="False">
+                                <Border.RenderTransform>
+                                    <TranslateTransform x:Name="MouseLightTransform" X="45" Y="150" />
+                                </Border.RenderTransform>
+
+                                <Ellipse Width="340" Height="340">
+                                    <Ellipse.Fill>
+                                        <RadialGradientBrush Center="0.5,0.5" GradientOrigin="0.5,0.5" RadiusX="0.5" RadiusY="0.5">
+                                            <!-- Soft luminous cyan highlight at core -->
+                                            <GradientStop Color="#60A5FA" Offset="0.0" />
+                                            <GradientStop Color="#38BDF8" Offset="0.22" />
+                                            <GradientStop Color="#0066FF" Offset="0.52" />
+                                            <GradientStop Color="#0A2463" Offset="0.78" />
+                                            <GradientStop Color="#00000000" Offset="1.0" />
+                                        </RadialGradientBrush>
+                                    </Ellipse.Fill>
+                                </Ellipse>
                             </Border>
+                        </Canvas>
 
-                            <TextBlock Text="IMS"
-                                       FontSize="28"
-                                       FontWeight="Bold"
-                                       Foreground="#FFFFFF"
-                                       Margin="0,16,0,2" />
+                        <!-- Layer 5: Foreground Content (Preserved with High Contrast) -->
+                        <Grid Margin="36,40,36,36">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
 
-                            <TextBlock Text="I N V E N T O R   M A N A G E M E N T   S Y S T E M"
-                                       FontSize="10.5"
-                                       FontWeight="Bold"
-                                       Foreground="#38BDF8" />
+                            <!-- IMS Brand Header -->
+                            <StackPanel Grid.Row="0">
+                                <!-- Logo Emblem -->
+                                <Border Width="82" Height="82" HorizontalAlignment="Left" CornerRadius="12">
+                                    <Border.Effect>
+                                        <DropShadowEffect Color="#38BDF8" BlurRadius="22" ShadowDepth="0" Opacity="0.55" />
+                                    </Border.Effect>
+                                    <Viewbox Width="80" Height="80" Stretch="Uniform">
+                                        <Canvas Width="100" Height="100">
+                                            <!-- Isometric Cube Top Face -->
+                                            <Path Data="M 50 12 L 84 32 L 50 52 L 16 32 Z">
+                                                <Path.Fill>
+                                                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                                        <GradientStop Color="#38BDF8" Offset="0.0" />
+                                                        <GradientStop Color="#0066FF" Offset="1.0" />
+                                                    </LinearGradientBrush>
+                                                </Path.Fill>
+                                            </Path>
+                                            <Path Data="M 50 24 L 62 31 L 50 38 L 38 31 Z" Fill="#FFFFFF" Opacity="0.95" />
+                                            <!-- Left Face -->
+                                            <Path Data="M 16 32 L 50 52 L 50 88 L 16 68 Z">
+                                                <Path.Fill>
+                                                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                                        <GradientStop Color="#0047AB" Offset="0.0" />
+                                                        <GradientStop Color="#0A1E4A" Offset="1.0" />
+                                                    </LinearGradientBrush>
+                                                </Path.Fill>
+                                            </Path>
+                                            <!-- Right Face -->
+                                            <Path Data="M 50 52 L 84 32 L 84 68 L 50 88 Z">
+                                                <Path.Fill>
+                                                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                                        <GradientStop Color="#0066FF" Offset="0.0" />
+                                                        <GradientStop Color="#0284C7" Offset="1.0" />
+                                                    </LinearGradientBrush>
+                                                </Path.Fill>
+                                            </Path>
+                                            <!-- Shelving Tiers -->
+                                            <Path Data="M 16 50 L 50 70 L 84 50" Stroke="#E0F2FE" StrokeThickness="1.8" Opacity="0.85" />
+                                            <Path Data="M 50 52 L 50 88" Stroke="#FFFFFF" StrokeThickness="2.0" Opacity="0.9" />
+                                            <Path Data="M 50 12 L 84 32 L 84 68 L 50 88 L 16 68 L 16 32 Z" Stroke="#38BDF8" StrokeThickness="1.8" />
+                                        </Canvas>
+                                    </Viewbox>
+                                </Border>
 
-                            <TextBlock Text="Smart Inventory. Seamless Management."
-                                       FontSize="12"
-                                       Foreground="#CBD5E1"
-                                       Margin="0,8,0,0" />
-                        </StackPanel>
+                                <TextBlock Text="IMS"
+                                           FontSize="28"
+                                           FontWeight="Bold"
+                                           Foreground="#FFFFFF"
+                                           Margin="0,16,0,2" />
 
-                        <!-- Core Features List -->
-                        <StackPanel Grid.Row="1" VerticalAlignment="Center" Margin="0,20,0,0">
-                            <!-- Feature 1 -->
-                            <Border Margin="0,0,0,14" Background="#14FFFFFF" CornerRadius="8" Padding="12,10">
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="📊" FontSize="16" Margin="0,0,12,0" VerticalAlignment="Center" />
-                                    <StackPanel>
-                                        <TextBlock Text="Real-Time Stock Engine" Foreground="#FFFFFF" FontWeight="SemiBold" FontSize="12.5" />
-                                        <TextBlock Text="Multi-warehouse inward, outward &amp; ledger" Foreground="#94A3B8" FontSize="11" />
+                                <TextBlock Text="I N V E N T O R   M A N A G E M E N T   S Y S T E M"
+                                           FontSize="10.5"
+                                           FontWeight="Bold"
+                                           Foreground="#38BDF8" />
+
+                                <TextBlock Text="Smart Inventory. Seamless Management."
+                                           FontSize="12"
+                                           Foreground="#CBD5E1"
+                                           Margin="0,8,0,0" />
+                            </StackPanel>
+
+                            <!-- Core Features List -->
+                            <StackPanel Grid.Row="1" VerticalAlignment="Center" Margin="0,20,0,0">
+                                <!-- Feature 1 -->
+                                <Border Margin="0,0,0,14"
+                                        Background="#18FFFFFF"
+                                        BorderBrush="#24FFFFFF"
+                                        BorderThickness="1"
+                                        CornerRadius="10"
+                                        Padding="14,11">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="📊" FontSize="16" Margin="0,0,12,0" VerticalAlignment="Center" />
+                                        <StackPanel>
+                                            <TextBlock Text="Real-Time Stock Engine" Foreground="#FFFFFF" FontWeight="SemiBold" FontSize="12.5" />
+                                            <TextBlock Text="Multi-warehouse inward, outward &amp; ledger" Foreground="#94A3B8" FontSize="11" />
+                                        </StackPanel>
                                     </StackPanel>
-                                </StackPanel>
-                            </Border>
+                                </Border>
 
-                            <!-- Feature 2 -->
-                            <Border Margin="0,0,0,14" Background="#14FFFFFF" CornerRadius="8" Padding="12,10">
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="⚡" FontSize="16" Margin="0,0,12,0" VerticalAlignment="Center" />
-                                    <StackPanel>
-                                        <TextBlock Text="Rapid SKU &amp; Barcode Integration" Foreground="#FFFFFF" FontWeight="SemiBold" FontSize="12.5" />
-                                        <TextBlock Text="Fast batch tracking &amp; barcode allocation" Foreground="#94A3B8" FontSize="11" />
+                                <!-- Feature 2 -->
+                                <Border Margin="0,0,0,14"
+                                        Background="#18FFFFFF"
+                                        BorderBrush="#24FFFFFF"
+                                        BorderThickness="1"
+                                        CornerRadius="10"
+                                        Padding="14,11">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="⚡" FontSize="16" Margin="0,0,12,0" VerticalAlignment="Center" />
+                                        <StackPanel>
+                                            <TextBlock Text="Rapid SKU &amp; Barcode Integration" Foreground="#FFFFFF" FontWeight="SemiBold" FontSize="12.5" />
+                                            <TextBlock Text="Fast batch tracking &amp; barcode allocation" Foreground="#94A3B8" FontSize="11" />
+                                        </StackPanel>
                                     </StackPanel>
-                                </StackPanel>
-                            </Border>
+                                </Border>
 
-                            <!-- Feature 3 -->
-                            <Border Background="#14FFFFFF" CornerRadius="8" Padding="12,10">
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="🛡" FontSize="16" Margin="0,0,12,0" VerticalAlignment="Center" />
-                                    <StackPanel>
-                                        <TextBlock Text="Air-Gapped Offline Data Safety" Foreground="#FFFFFF" FontWeight="SemiBold" FontSize="12.5" />
-                                        <TextBlock Text="Relational data safety with instant verification" Foreground="#94A3B8" FontSize="11" />
+                                <!-- Feature 3 -->
+                                <Border Background="#18FFFFFF"
+                                        BorderBrush="#24FFFFFF"
+                                        BorderThickness="1"
+                                        CornerRadius="10"
+                                        Padding="14,11">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="🛡" FontSize="16" Margin="0,0,12,0" VerticalAlignment="Center" />
+                                        <StackPanel>
+                                            <TextBlock Text="Air-Gapped Offline Data Safety" Foreground="#FFFFFF" FontWeight="SemiBold" FontSize="12.5" />
+                                            <TextBlock Text="Relational data safety with instant verification" Foreground="#94A3B8" FontSize="11" />
+                                        </StackPanel>
                                     </StackPanel>
-                                </StackPanel>
-                            </Border>
-                        </StackPanel>
+                                </Border>
+                            </StackPanel>
 
-                        <!-- Engineering Credits -->
-                        <StackPanel Grid.Row="2">
-                            <Border Height="1" Background="#26FFFFFF" Margin="0,0,0,12" />
-                            <TextBlock Text="STOMS Engineering Architecture" Foreground="#94A3B8" FontSize="10" FontWeight="SemiBold" />
-                            <TextBlock Text="Saumya Chaudhari • Jenil • Hardik" Foreground="#E2E8F0" FontSize="11" Margin="0,2,0,0" />
-                        </StackPanel>
+                            <!-- Engineering Credits -->
+                            <StackPanel Grid.Row="2">
+                                <Border Height="1" Background="#26FFFFFF" Margin="0,0,0,12" />
+                                <TextBlock Text="STOMS Engineering Architecture" Foreground="#94A3B8" FontSize="10" FontWeight="SemiBold" />
+                                <TextBlock Text="Saumya Chaudhari • Jenil • Hardik" Foreground="#E2E8F0" FontSize="11" Margin="0,2,0,0" />
+                            </StackPanel>
+                        </Grid>
                     </Grid>
                 </Border>
 
                 <!-- ================= RIGHT LOGIN / WORKSPACE PANEL ================= -->
-                <Grid Grid.Column="1" Background="#FFFFFF">
-                    <Grid.RowDefinitions>
-                        <!-- Top Window Navigation Bar -->
-                        <RowDefinition Height="46" />
-                        <!-- Content Body -->
-                        <RowDefinition Height="*" />
-                    </Grid.RowDefinitions>
+                <Border Grid.Column="1"
+                        CornerRadius="0,19,19,0"
+                        Background="#FFFFFF"
+                        ClipToBounds="True">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <!-- Top Window Navigation Bar -->
+                            <RowDefinition Height="48" />
+                            <!-- Content Body -->
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
 
-                    <!-- Top Bar with Window Controls -->
-                    <Grid Grid.Row="0" Margin="16,6,12,0">
-                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                            <Border Background="#EFF6FF" CornerRadius="4" Padding="8,3">
-                                <TextBlock Text="BOS Suite • v1.0.0" Foreground="#0066FF" FontSize="10.5" FontWeight="SemiBold" />
-                            </Border>
-                        </StackPanel>
+                        <!-- Top Bar with Window Controls & Version Badge -->
+                        <Grid Grid.Row="0" Margin="18,8,14,0" MouseDown="OnWindowDrag">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <Border Background="#EFF6FF"
+                                        BorderBrush="#DBEAFE"
+                                        BorderThickness="1"
+                                        CornerRadius="6"
+                                        Padding="10,3.5">
+                                    <TextBlock Text="BOS Suite • v1.0.0" Foreground="#0066FF" FontSize="10.5" FontWeight="SemiBold" />
+                                </Border>
+                            </StackPanel>
 
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                            <Button Content="—" Style="{StaticResource WindowCtrlBtn}" Click="OnMinimizeClick" />
-                            <Button Content="✕" Style="{StaticResource WindowCloseBtn}" Click="OnCloseClick" />
-                        </StackPanel>
-                    </Grid>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                <Button Content="—" Style="{StaticResource WindowCtrlBtn}" Click="OnMinimizeClick" />
+                                <Button Content="✕" Style="{StaticResource WindowCloseBtn}" Click="OnCloseClick" />
+                            </StackPanel>
+                        </Grid>
 
-                    <!-- Login Form View (Visible when not yet logged in) -->
-                    <ScrollViewer Grid.Row="1"
-                                  VerticalScrollBarVisibility="Auto"
-                                  HorizontalScrollBarVisibility="Disabled"
-                                  Padding="44,20,44,28">
-                        <StackPanel MaxWidth="440" HorizontalAlignment="Left">
-                            <!-- Title -->
-                            <TextBlock Text="Operator Sign-In"
-                                       FontSize="24"
-                                       FontWeight="Bold"
-                                       Foreground="#0F172A" />
+                        <!-- Login Form View -->
+                        <ScrollViewer Grid.Row="1"
+                                      VerticalScrollBarVisibility="Auto"
+                                      HorizontalScrollBarVisibility="Disabled"
+                                      Padding="44,16,44,28">
+                            <StackPanel MaxWidth="440" HorizontalAlignment="Left">
+                                <!-- Title -->
+                                <TextBlock Text="Operator Sign-In"
+                                           FontSize="24"
+                                           FontWeight="Bold"
+                                           Foreground="#0F172A" />
 
-                            <TextBlock Text="Enter your STOMS Operator credentials to unlock the inventory engine."
-                                       FontSize="12.5"
-                                       Foreground="#64748B"
-                                       Margin="0,4,0,24" />
+                                <TextBlock Text="Enter your STOMS Operator credentials to unlock the inventory engine."
+                                           FontSize="12.5"
+                                           Foreground="#64748B"
+                                           Margin="0,4,0,24" />
 
-                            <!-- Status Notification Box -->
-                            <Border Background="#EFF6FF"
-                                    BorderBrush="#BFDBFE"
-                                    BorderThickness="1"
-                                    CornerRadius="8"
-                                    Padding="12,10"
-                                    Margin="0,0,0,18"
-                                    Visibility="{Binding StatusMessage, Converter={StaticResource BoolToVis}}">
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto" />
-                                        <ColumnDefinition Width="*" />
-                                    </Grid.ColumnDefinitions>
-                                    <TextBlock Text="ℹ" Foreground="#0066FF" FontSize="14" Margin="0,0,8,0" VerticalAlignment="Center" />
-                                    <TextBlock Grid.Column="1"
-                                               Text="{Binding StatusMessage}"
-                                               Foreground="#1E40AF"
-                                               FontSize="12"
-                                               TextWrapping="Wrap" />
-                                </Grid>
-                            </Border>
+                                <!-- Status Notification Box -->
+                                <Border Background="#EFF6FF"
+                                        BorderBrush="#BFDBFE"
+                                        BorderThickness="1"
+                                        CornerRadius="8"
+                                        Padding="12,10"
+                                        Margin="0,0,0,18"
+                                        Visibility="{Binding StatusMessage, Converter={StaticResource BoolToVis}}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Text="ℹ" Foreground="#0066FF" FontSize="14" Margin="0,0,8,0" VerticalAlignment="Center" />
+                                        <TextBlock Grid.Column="1"
+                                                   Text="{Binding StatusMessage}"
+                                                   Foreground="#1E40AF"
+                                                   FontSize="12"
+                                                   TextWrapping="Wrap" />
+                                    </Grid>
+                                </Border>
 
-                            <!-- Field 1: Operator ID / Username -->
-                            <TextBlock Text="Operator ID / Username"
-                                       FontSize="12"
-                                       FontWeight="SemiBold"
-                                       Foreground="#334155"
-                                       Margin="0,0,0,6" />
-                            <TextBox x:Name="txtUsername"
-                                     Text="{Binding Username, UpdateSourceTrigger=PropertyChanged}"
-                                     Style="{StaticResource ModernTextBox}"
-                                     Margin="0,0,0,16" />
-
-                            <!-- Field 2: Password -->
-                            <TextBlock Text="Access Password"
-                                       FontSize="12"
-                                       FontWeight="SemiBold"
-                                       Foreground="#334155"
-                                       Margin="0,0,0,6" />
-                            <PasswordBox x:Name="txtPassword"
-                                         Style="{StaticResource ModernPasswordBox}"
-                                         PasswordChanged="OnPasswordChanged"
+                                <!-- Field 1: Operator ID / Username -->
+                                <TextBlock Text="Operator ID / Username"
+                                           FontSize="12"
+                                           FontWeight="SemiBold"
+                                           Foreground="#334155"
+                                           Margin="0,0,0,6" />
+                                <TextBox x:Name="txtUsername"
+                                         Text="{Binding Username, UpdateSourceTrigger=PropertyChanged}"
+                                         Style="{StaticResource ModernTextBox}"
                                          Margin="0,0,0,16" />
 
-                            <!-- Field 3: Warehouse Location -->
-                            <TextBlock Text="Warehouse Facility Assignment"
-                                       FontSize="12"
-                                       FontWeight="SemiBold"
-                                       Foreground="#334155"
-                                       Margin="0,0,0,6" />
-                            <ComboBox ItemsSource="{Binding Warehouses}"
-                                      SelectedItem="{Binding SelectedWarehouse}"
-                                      Height="38"
-                                      FontSize="12.5"
-                                      Padding="8,4"
-                                      Margin="0,0,0,16" />
+                                <!-- Field 2: Password -->
+                                <TextBlock Text="Access Password"
+                                           FontSize="12"
+                                           FontWeight="SemiBold"
+                                           Foreground="#334155"
+                                           Margin="0,0,0,6" />
+                                <PasswordBox x:Name="txtPassword"
+                                             Style="{StaticResource ModernPasswordBox}"
+                                             PasswordChanged="OnPasswordChanged"
+                                             Margin="0,0,0,16" />
 
-                            <!-- Remember Me Checkbox -->
-                            <Grid Margin="0,0,0,20">
-                                <CheckBox Content="Remember operator session"
-                                          IsChecked="{Binding RememberMe}"
-                                          Foreground="#64748B"
-                                          FontSize="12"
-                                          VerticalAlignment="Center" />
-                                <TextBlock Text="Air-Gapped Offline Mode"
-                                           Foreground="#0284C7"
-                                           FontSize="11.5"
-                                           HorizontalAlignment="Right"
-                                           VerticalAlignment="Center" />
-                            </Grid>
+                                <!-- Field 3: Warehouse Location -->
+                                <TextBlock Text="Warehouse Facility Assignment"
+                                           FontSize="12"
+                                           FontWeight="SemiBold"
+                                           Foreground="#334155"
+                                           Margin="0,0,0,6" />
+                                <ComboBox ItemsSource="{Binding Warehouses}"
+                                          SelectedItem="{Binding SelectedWarehouse}"
+                                          Height="38"
+                                          FontSize="12.5"
+                                          Padding="8,4"
+                                          Margin="0,0,0,16" />
 
-                            <!-- Sign In Primary Button -->
-                            <Button Content="Sign In to IMS Engine"
-                                    Style="{StaticResource PrimaryActionBtn}"
-                                    Command="{Binding LoginCommand}"
-                                    Margin="0,0,0,20" />
+                                <!-- Remember Me Checkbox -->
+                                <Grid Margin="0,0,0,20">
+                                    <CheckBox Content="Remember operator session"
+                                              IsChecked="{Binding RememberMe}"
+                                              Foreground="#64748B"
+                                              FontSize="12"
+                                              VerticalAlignment="Center" />
+                                    <TextBlock Text="Air-Gapped Offline Mode"
+                                               Foreground="#0284C7"
+                                               FontSize="11.5"
+                                               HorizontalAlignment="Right"
+                                               VerticalAlignment="Center" />
+                                </Grid>
 
-                            <!-- Quick Demo Credential Helper -->
-                            <Border Background="#F8FAFC"
-                                    BorderBrush="#E2E8F0"
-                                    BorderThickness="1"
-                                    CornerRadius="8"
-                                    Padding="12,10">
-                                <StackPanel>
-                                    <TextBlock Text="Quick Test Credentials (STOMS Team):"
-                                               FontSize="11"
-                                               FontWeight="SemiBold"
-                                               Foreground="#475569"
-                                               Margin="0,0,0,6" />
-                                    <StackPanel Orientation="Horizontal">
-                                        <Button Content="Saumya (Architect)"
-                                                Padding="8,4"
-                                                FontSize="11"
-                                                Background="#E0E7FF"
-                                                Foreground="#3730A3"
-                                                BorderThickness="0"
-                                                Cursor="Hand"
-                                                Command="{Binding SetDemoRoleCommand}"
-                                                CommandParameter="architect"
-                                                Margin="0,0,6,0" />
-                                        <Button Content="Jenil (Lead Eng)"
-                                                Padding="8,4"
-                                                FontSize="11"
-                                                Background="#E0F2FE"
-                                                Foreground="#0369A1"
-                                                BorderThickness="0"
-                                                Cursor="Hand"
-                                                Command="{Binding SetDemoRoleCommand}"
-                                                CommandParameter="lead"
-                                                Margin="0,0,6,0" />
-                                        <Button Content="Hardik (Module Lead)"
-                                                Padding="8,4"
-                                                FontSize="11"
-                                                Background="#F0FDF4"
-                                                Foreground="#15803D"
-                                                BorderThickness="0"
-                                                Cursor="Hand"
-                                                Command="{Binding SetDemoRoleCommand}"
-                                                CommandParameter="module" />
+                                <!-- Sign In Primary Button -->
+                                <Button Content="Sign In to IMS Engine"
+                                        Style="{StaticResource PrimaryActionBtn}"
+                                        Command="{Binding LoginCommand}"
+                                        Margin="0,0,0,20" />
+
+                                <!-- Quick Demo Credential Helper -->
+                                <Border Background="#F8FAFC"
+                                        BorderBrush="#E2E8F0"
+                                        BorderThickness="1"
+                                        CornerRadius="8"
+                                        Padding="12,10">
+                                    <StackPanel>
+                                        <TextBlock Text="Quick Test Credentials (STOMS Team):"
+                                                   FontSize="11"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="#475569"
+                                                   Margin="0,0,0,6" />
+                                        <StackPanel Orientation="Horizontal">
+                                            <Button Content="Saumya (Architect)"
+                                                    Padding="8,4"
+                                                    FontSize="11"
+                                                    Background="#E0E7FF"
+                                                    Foreground="#3730A3"
+                                                    BorderThickness="0"
+                                                    Cursor="Hand"
+                                                    Command="{Binding SetDemoRoleCommand}"
+                                                    CommandParameter="architect"
+                                                    Margin="0,0,6,0" />
+                                            <Button Content="Jenil (Lead Eng)"
+                                                    Padding="8,4"
+                                                    FontSize="11"
+                                                    Background="#E0F2FE"
+                                                    Foreground="#0369A1"
+                                                    BorderThickness="0"
+                                                    Cursor="Hand"
+                                                    Command="{Binding SetDemoRoleCommand}"
+                                                    CommandParameter="lead"
+                                                    Margin="0,0,6,0" />
+                                            <Button Content="Hardik (Module Lead)"
+                                                    Padding="8,4"
+                                                    FontSize="11"
+                                                    Background="#F0FDF4"
+                                                    Foreground="#15803D"
+                                                    BorderThickness="0"
+                                                    Cursor="Hand"
+                                                    Command="{Binding SetDemoRoleCommand}"
+                                                    CommandParameter="module" />
+                                        </StackPanel>
                                     </StackPanel>
-                                </StackPanel>
-                            </Border>
+                                </Border>
 
-                            <!-- Authenticated Welcome Banner (Appears on successful sign-in) -->
-                            <Border Background="#F0FDF4"
-                                    BorderBrush="#BBF7D0"
-                                    BorderThickness="1"
-                                    CornerRadius="8"
-                                    Padding="14"
-                                    Margin="0,18,0,0"
-                                    Visibility="{Binding IsSuccess, Converter={StaticResource BoolToVis}}">
-                                <StackPanel>
-                                    <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
-                                        <TextBlock Text="✓" Foreground="#16A34A" FontWeight="Bold" FontSize="14" Margin="0,0,8,0" />
-                                        <TextBlock Text="Session Verified &amp; Active" Foreground="#15803D" FontWeight="Bold" FontSize="13" />
+                                <!-- Authenticated Welcome Banner -->
+                                <Border Background="#F0FDF4"
+                                        BorderBrush="#BBF7D0"
+                                        BorderThickness="1"
+                                        CornerRadius="8"
+                                        Padding="14"
+                                        Margin="0,18,0,0"
+                                        Visibility="{Binding IsSuccess, Converter={StaticResource BoolToVis}}">
+                                    <StackPanel>
+                                        <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                                            <TextBlock Text="✓" Foreground="#16A34A" FontWeight="Bold" FontSize="14" Margin="0,0,8,0" />
+                                            <TextBlock Text="Session Verified &amp; Active" Foreground="#15803D" FontWeight="Bold" FontSize="13" />
+                                        </StackPanel>
+                                        <TextBlock Text="{Binding Session.FullName, StringFormat='Operator: {0}'}" Foreground="#166534" FontSize="12" />
+                                        <TextBlock Text="{Binding Session.Role, StringFormat='Role: {0}'}" Foreground="#166534" FontSize="11.5" />
+                                        <TextBlock Text="{Binding Session.WarehouseLocation, StringFormat='Assigned Facility: {0}'}" Foreground="#166534" FontSize="11.5" />
+                                        <TextBlock Text="IMS Inventory workspace engine is online and operational." Foreground="#15803D" FontSize="11.5" Margin="0,6,0,0" FontStyle="Italic" />
                                     </StackPanel>
-                                    <TextBlock Text="{Binding Session.FullName, StringFormat='Operator: {0}'}" Foreground="#166534" FontSize="12" />
-                                    <TextBlock Text="{Binding Session.Role, StringFormat='Role: {0}'}" Foreground="#166534" FontSize="11.5" />
-                                    <TextBlock Text="{Binding Session.WarehouseLocation, StringFormat='Assigned Facility: {0}'}" Foreground="#166534" FontSize="11.5" />
-                                    <TextBlock Text="IMS Inventory workspace engine is online and operational." Foreground="#15803D" FontSize="11.5" Margin="0,6,0,0" FontStyle="Italic" />
-                                </StackPanel>
-                            </Border>
-                        </StackPanel>
-                    </ScrollViewer>
-                </Grid>
+                                </Border>
+                            </StackPanel>
+                        </ScrollViewer>
+                    </Grid>
+                </Border>
             </Grid>
         </Border>
     </Grid>

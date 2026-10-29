@@ -14,3 +14,4 @@ namespace STOMS_SBV1_BOS_IME.Models
         public bool IsAuthenticated => !string.IsNullOrEmpty(AuthToken);
     }
 }
+

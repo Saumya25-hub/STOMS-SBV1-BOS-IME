@@ -103,3 +103,4 @@ All 6 automated unit & lifecycle tests pass cleanly (`dotnet test`):
 - `Test_AuthenticationService_ValidAndInvalidCredentials` -> **PASSED**
 - `Test_LoginViewModel_Execution` -> **PASSED**
 - Visual headless rendering tests (`Render_SplashWindow_ToPng`, `Render_LoginWindow_ToPng`) -> **PASSED**
+
