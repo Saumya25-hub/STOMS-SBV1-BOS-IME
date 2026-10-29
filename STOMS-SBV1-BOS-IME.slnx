@@ -1,0 +1,6 @@
+<Solution>
+  <Folder Name="/Tests/">
+    <Project Path="Tests/STOMS-SBV1-BOS-IME.Tests.csproj" />
+  </Folder>
+  <Project Path="STOMS-SBV1-BOS-IME.csproj" />
+</Solution>

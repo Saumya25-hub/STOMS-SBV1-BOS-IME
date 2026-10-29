@@ -1,0 +1,579 @@
+<Window x:Class="STOMS_SBV1_BOS_IME.Views.SplashWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:STOMS_SBV1_BOS_IME.ViewModels"
+        mc:Ignorable="d"
+        Title="IMS — Initializing Workspace"
+        Height="470"
+        Width="680"
+        WindowStartupLocation="CenterScreen"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
+        ShowInTaskbar="False"
+        ResizeMode="NoResize"
+        TextOptions.TextFormattingMode="Display"
+        RenderOptions.ClearTypeHint="Enabled"
+        UseLayoutRounding="True"
+        SnapsToDevicePixels="True">
+
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis" />
+
+        <!-- Inverse Boolean To Visibility -->
+        <Style x:Key="InverseBoolToVisStyle" TargetType="FrameworkElement">
+            <Setter Property="Visibility" Value="Visible" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding HasFailed}" Value="True">
+                    <Setter Property="Visibility" Value="Collapsed" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Electric Blue Modern Button Style -->
+        <Style x:Key="ElectricBlueButton" TargetType="Button">
+            <Setter Property="Background" Value="#0066FF" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="FontSize" Value="12.5" />
+            <Setter Property="Padding" Value="18,8" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="btnBorder"
+                                Background="{TemplateBinding Background}"
+                                CornerRadius="8"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="btnBorder" Property="Background" Value="#0052CC" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="btnBorder" Property="Background" Value="#003D99" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Neutral Outline Button Style -->
+        <Style x:Key="NeutralOutlineButton" TargetType="Button">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="#64748B" />
+            <Setter Property="FontWeight" Value="Medium" />
+            <Setter Property="FontSize" Value="12.5" />
+            <Setter Property="Padding" Value="16,8" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="btnBorder"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="#CBD5E1"
+                                BorderThickness="1"
+                                CornerRadius="8"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="btnBorder" Property="Background" Value="#F1F5F9" />
+                                <Setter Property="Foreground" Value="#0F172A" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="btnBorder" Property="Background" Value="#E2E8F0" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Custom Slim Electric Blue ProgressBar Template -->
+        <Style x:Key="ElectricProgressBar" TargetType="ProgressBar">
+            <Setter Property="Height" Value="5" />
+            <Setter Property="Background" Value="#E2E8F0" />
+            <Setter Property="Foreground">
+                <Setter.Value>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                        <GradientStop Color="#0066FF" Offset="0.0" />
+                        <GradientStop Color="#00A3FF" Offset="0.7" />
+                        <GradientStop Color="#38BDF8" Offset="1.0" />
+                    </LinearGradientBrush>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ProgressBar">
+                        <Grid x:Name="Root">
+                            <!-- Track Background -->
+                            <Border Background="{TemplateBinding Background}" CornerRadius="2.5" />
+
+                            <!-- Animated Progress Track Fill -->
+                            <Border x:Name="PART_Indicator"
+                                    HorizontalAlignment="Left"
+                                    Background="{TemplateBinding Foreground}"
+                                    CornerRadius="2.5">
+                                <Border.Effect>
+                                    <DropShadowEffect Color="#0066FF" BlurRadius="6" ShadowDepth="0" Opacity="0.5" />
+                                </Border.Effect>
+                            </Border>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Main Window Entrance Storyboard -->
+        <Storyboard x:Key="EntranceStoryboard">
+            <!-- Window Container Fade-in -->
+            <DoubleAnimation Storyboard.TargetName="MainCard"
+                             Storyboard.TargetProperty="Opacity"
+                             From="0.0" To="1.0"
+                             Duration="0:0:0.4" />
+
+            <!-- Phase A & B: Logo Scale and Reveal -->
+            <DoubleAnimation Storyboard.TargetName="LogoContainer"
+                             Storyboard.TargetProperty="Opacity"
+                             From="0.0" To="1.0"
+                             BeginTime="0:0:0.15"
+                             Duration="0:0:0.5" />
+            
+            <DoubleAnimation Storyboard.TargetName="LogoContainer"
+                             Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[0].(ScaleTransform.ScaleX)"
+                             From="0.91" To="1.0"
+                             BeginTime="0:0:0.15"
+                             Duration="0:0:0.75">
+                <DoubleAnimation.EasingFunction>
+                    <CubicEase EasingMode="EaseOut" />
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+
+            <DoubleAnimation Storyboard.TargetName="LogoContainer"
+                             Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[0].(ScaleTransform.ScaleY)"
+                             From="0.91" To="1.0"
+                             BeginTime="0:0:0.15"
+                             Duration="0:0:0.75">
+                <DoubleAnimation.EasingFunction>
+                    <CubicEase EasingMode="EaseOut" />
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+
+            <DoubleAnimation Storyboard.TargetName="LogoContainer"
+                             Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[1].(TranslateTransform.Y)"
+                             From="10" To="0"
+                             BeginTime="0:0:0.15"
+                             Duration="0:0:0.65">
+                <DoubleAnimation.EasingFunction>
+                    <CubicEase EasingMode="EaseOut" />
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+
+            <DoubleAnimation Storyboard.TargetName="LogoContainer"
+                             Storyboard.TargetProperty="(UIElement.Effect).(DropShadowEffect.Opacity)"
+                             From="0.0" To="0.5"
+                             BeginTime="0:0:0.35"
+                             Duration="0:0:0.6" />
+
+            <!-- Phase C: Brand Reveal: Title IMS -->
+            <DoubleAnimation Storyboard.TargetName="TitleContainer"
+                             Storyboard.TargetProperty="Opacity"
+                             From="0.0" To="1.0"
+                             BeginTime="0:0:0.45"
+                             Duration="0:0:0.4" />
+
+            <DoubleAnimation Storyboard.TargetName="TitleContainer"
+                             Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.Y)"
+                             From="8" To="0"
+                             BeginTime="0:0:0.45"
+                             Duration="0:0:0.4">
+                <DoubleAnimation.EasingFunction>
+                    <CubicEase EasingMode="EaseOut" />
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+
+            <!-- Phase C: Brand Reveal: Subtitle -->
+            <DoubleAnimation Storyboard.TargetName="SubtitleContainer"
+                             Storyboard.TargetProperty="Opacity"
+                             From="0.0" To="1.0"
+                             BeginTime="0:0:0.65"
+                             Duration="0:0:0.4" />
+
+            <DoubleAnimation Storyboard.TargetName="SubtitleContainer"
+                             Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.Y)"
+                             From="8" To="0"
+                             BeginTime="0:0:0.65"
+                             Duration="0:0:0.4">
+                <DoubleAnimation.EasingFunction>
+                    <CubicEase EasingMode="EaseOut" />
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+
+            <!-- Phase C: Brand Reveal: Tagline -->
+            <DoubleAnimation Storyboard.TargetName="TaglineContainer"
+                             Storyboard.TargetProperty="Opacity"
+                             From="0.0" To="1.0"
+                             BeginTime="0:0:0.85"
+                             Duration="0:0:0.4" />
+
+            <DoubleAnimation Storyboard.TargetName="TaglineContainer"
+                             Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.Y)"
+                             From="6" To="0"
+                             BeginTime="0:0:0.85"
+                             Duration="0:0:0.4">
+                <DoubleAnimation.EasingFunction>
+                    <CubicEase EasingMode="EaseOut" />
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+
+            <!-- Phase D: Loading Section Reveal -->
+            <DoubleAnimation Storyboard.TargetName="LoadingSection"
+                             Storyboard.TargetProperty="Opacity"
+                             From="0.0" To="1.0"
+                             BeginTime="0:0:1.0"
+                             Duration="0:0:0.4" />
+        </Storyboard>
+
+        <!-- Exit Storyboard (Smooth Fade-Out to Next Window) -->
+        <Storyboard x:Key="ExitStoryboard">
+            <DoubleAnimation Storyboard.TargetName="MainCard"
+                             Storyboard.TargetProperty="Opacity"
+                             From="1.0" To="0.0"
+                             Duration="0:0:0.35">
+                <DoubleAnimation.EasingFunction>
+                    <QuadraticEase EasingMode="EaseIn" />
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+            <DoubleAnimation Storyboard.TargetName="MainCard"
+                             Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"
+                             From="1.0" To="0.97"
+                             Duration="0:0:0.35">
+                <DoubleAnimation.EasingFunction>
+                    <QuadraticEase EasingMode="EaseIn" />
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+            <DoubleAnimation Storyboard.TargetName="MainCard"
+                             Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"
+                             From="1.0" To="0.97"
+                             Duration="0:0:0.35">
+                <DoubleAnimation.EasingFunction>
+                    <QuadraticEase EasingMode="EaseIn" />
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+        </Storyboard>
+    </Window.Resources>
+
+    <!-- Outer Canvas/Grid for Floating Soft Shadow -->
+    <Grid Margin="24">
+        <!-- Main Splash Surface -->
+        <Border x:Name="MainCard"
+                Background="#FFFFFF"
+                BorderBrush="#E2E8F0"
+                BorderThickness="1"
+                CornerRadius="18"
+                ClipToBounds="True"
+                Opacity="0">
+            
+            <Border.RenderTransform>
+                <ScaleTransform x:Name="RootCardScale" CenterX="316" CenterY="211" />
+            </Border.RenderTransform>
+
+            <Border.Effect>
+                <DropShadowEffect Color="#0284C7"
+                                  BlurRadius="36"
+                                  ShadowDepth="8"
+                                  Opacity="0.14" />
+            </Border.Effect>
+
+            <Grid>
+                <!-- Subtle Ambient Radial Blue Gradient -->
+                <Rectangle IsHitTestVisible="False">
+                    <Rectangle.Fill>
+                        <RadialGradientBrush Center="0.5,0.22" GradientOrigin="0.5,0.22" RadiusX="0.85" RadiusY="0.85">
+                            <GradientStop Color="#140066FF" Offset="0.0" />
+                            <GradientStop Color="#0838BDF8" Offset="0.45" />
+                            <GradientStop Color="#00FFFFFF" Offset="1.0" />
+                        </RadialGradientBrush>
+                    </Rectangle.Fill>
+                </Rectangle>
+
+                <!-- Subtle Top Accent Electric Blue Bar -->
+                <Border Height="3.5" VerticalAlignment="Top" HorizontalAlignment="Stretch">
+                    <Border.Background>
+                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                            <GradientStop Color="#0052CC" Offset="0.0" />
+                            <GradientStop Color="#0066FF" Offset="0.3" />
+                            <GradientStop Color="#00D2FF" Offset="0.7" />
+                            <GradientStop Color="#38BDF8" Offset="1.0" />
+                        </LinearGradientBrush>
+                    </Border.Background>
+                </Border>
+
+                <!-- Watermark Subtle Geometric Nodes (Upper Right) -->
+                <Canvas IsHitTestVisible="False" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,15,20,0" Width="80" Height="80" Opacity="0.07">
+                    <Path Stroke="#0066FF" StrokeThickness="1.5" Data="M 10 10 L 40 10 L 55 35 L 25 35 Z M 40 10 L 70 10 L 85 35 L 55 35 Z M 25 35 L 55 35 L 40 60 L 10 60 Z" />
+                </Canvas>
+
+                <!-- Main Vertical Composition Layout -->
+                <Grid Margin="36,28,36,24">
+                    <Grid.RowDefinitions>
+                        <!-- Row 0: Logo & Brand Area -->
+                        <RowDefinition Height="*" />
+                        <!-- Row 1: Loading & Progress Area -->
+                        <RowDefinition Height="Auto" />
+                        <!-- Row 2: Footer Info -->
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <!-- TOP / CENTER: Animated Logo & Brand Identity -->
+                    <StackPanel Grid.Row="0"
+                                VerticalAlignment="Center"
+                                HorizontalAlignment="Center">
+
+                        <!-- LOGO CONTAINER -->
+                        <Border x:Name="LogoContainer"
+                                Width="118"
+                                Height="118"
+                                HorizontalAlignment="Center"
+                                RenderTransformOrigin="0.5,0.5"
+                                Opacity="0">
+                            <Border.RenderTransform>
+                                <TransformGroup>
+                                    <ScaleTransform x:Name="LogoScale" ScaleX="0.91" ScaleY="0.91" />
+                                    <TranslateTransform x:Name="LogoTranslate" Y="10" />
+                                </TransformGroup>
+                            </Border.RenderTransform>
+
+                            <Border.Effect>
+                                <DropShadowEffect x:Name="LogoGlow"
+                                                  Color="#0066FF"
+                                                  BlurRadius="22"
+                                                  ShadowDepth="0"
+                                                  Opacity="0" />
+                            </Border.Effect>
+
+                            <Grid>
+                                <!-- Ambient Pulse Ring -->
+                                <Ellipse Width="106" Height="106" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                    <Ellipse.Fill>
+                                        <RadialGradientBrush Center="0.5,0.5" GradientOrigin="0.5,0.5" RadiusX="0.5" RadiusY="0.5">
+                                            <GradientStop Color="#280066FF" Offset="0.0" />
+                                            <GradientStop Color="#1038BDF8" Offset="0.7" />
+                                            <GradientStop Color="#00FFFFFF" Offset="1.0" />
+                                        </RadialGradientBrush>
+                                    </Ellipse.Fill>
+                                </Ellipse>
+
+                                <!-- Vector-Sharp High-DPI IMS Inventory Mark -->
+                                <Viewbox Width="92" Height="92" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                    <Canvas Width="100" Height="100">
+                                        <!-- Isometric Cube Top Face -->
+                                        <Path Data="M 50 12 L 84 32 L 50 52 L 16 32 Z">
+                                            <Path.Fill>
+                                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                                    <GradientStop Color="#38BDF8" Offset="0.0" />
+                                                    <GradientStop Color="#0066FF" Offset="1.0" />
+                                                </LinearGradientBrush>
+                                            </Path.Fill>
+                                        </Path>
+                                        <!-- Top Core Node -->
+                                        <Path Data="M 50 24 L 62 31 L 50 38 L 38 31 Z" Fill="#FFFFFF" Opacity="0.95" />
+
+                                        <!-- Left Face (Dark Navy / Storage Subsystem) -->
+                                        <Path Data="M 16 32 L 50 52 L 50 88 L 16 68 Z">
+                                            <Path.Fill>
+                                                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                                    <GradientStop Color="#0047AB" Offset="0.0" />
+                                                    <GradientStop Color="#0A1E4A" Offset="1.0" />
+                                                </LinearGradientBrush>
+                                            </Path.Fill>
+                                        </Path>
+
+                                        <!-- Right Face (Electric Blue / Active Stock Engine) -->
+                                        <Path Data="M 50 52 L 84 32 L 84 68 L 50 88 Z">
+                                            <Path.Fill>
+                                                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                                    <GradientStop Color="#0066FF" Offset="0.0" />
+                                                    <GradientStop Color="#0284C7" Offset="1.0" />
+                                                </LinearGradientBrush>
+                                            </Path.Fill>
+                                        </Path>
+
+                                        <!-- Multi-Warehouse Shelving Tiers -->
+                                        <Path Data="M 16 50 L 50 70 L 84 50" Stroke="#E0F2FE" StrokeThickness="1.8" Opacity="0.85" />
+                                        <Path Data="M 50 52 L 50 88" Stroke="#FFFFFF" StrokeThickness="2.0" Opacity="0.9" />
+
+                                        <!-- Neon Edge Outline -->
+                                        <Path Data="M 50 12 L 84 32 L 84 68 L 50 88 L 16 68 L 16 32 Z" Stroke="#38BDF8" StrokeThickness="1.8" />
+                                    </Canvas>
+                                </Viewbox>
+                            </Grid>
+                        </Border>
+
+                        <!-- IMS Title -->
+                        <StackPanel x:Name="TitleContainer"
+                                    Margin="0,14,0,0"
+                                    Opacity="0"
+                                    HorizontalAlignment="Center">
+                            <StackPanel.RenderTransform>
+                                <TranslateTransform x:Name="TitleTranslate" Y="8" />
+                            </StackPanel.RenderTransform>
+
+                            <TextBlock Text="IMS"
+                                       FontSize="34"
+                                       FontWeight="ExtraBold"
+                                       Foreground="#0F172A"
+                                       FontFamily="Segoe UI, Inter"
+                                       HorizontalAlignment="Center" />
+                        </StackPanel>
+
+                        <!-- INVENTOR MANAGEMENT SYSTEM -->
+                        <StackPanel x:Name="SubtitleContainer"
+                                    Margin="0,4,0,0"
+                                    Opacity="0"
+                                    HorizontalAlignment="Center">
+                            <StackPanel.RenderTransform>
+                                <TranslateTransform x:Name="SubtitleTranslate" Y="8" />
+                            </StackPanel.RenderTransform>
+
+                            <TextBlock Text="I N V E N T O R   M A N A G E M E N T   S Y S T E M"
+                                       FontSize="11"
+                                       FontWeight="Bold"
+                                       Foreground="#0066FF"
+                                       FontFamily="Segoe UI"
+                                       HorizontalAlignment="Center" />
+                        </StackPanel>
+
+                        <!-- TAGLINE -->
+                        <StackPanel x:Name="TaglineContainer"
+                                    Margin="0,8,0,0"
+                                    Opacity="0"
+                                    HorizontalAlignment="Center">
+                            <StackPanel.RenderTransform>
+                                <TranslateTransform x:Name="TaglineTranslate" Y="6" />
+                            </StackPanel.RenderTransform>
+
+                            <TextBlock Text="{Binding Tagline}"
+                                       FontSize="12"
+                                       FontWeight="Normal"
+                                       Foreground="#64748B"
+                                       FontFamily="Segoe UI"
+                                       HorizontalAlignment="Center" />
+                        </StackPanel>
+                    </StackPanel>
+
+                    <!-- LOWER SECTION: Progress Indicator & Loading Status (Normal State) -->
+                    <StackPanel x:Name="LoadingSection"
+                                Grid.Row="1"
+                                Margin="16,0,16,18"
+                                Opacity="0"
+                                Style="{StaticResource InverseBoolToVisStyle}">
+
+                        <!-- Progress Bar & Status Line -->
+                        <Grid Margin="0,0,0,8">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <!-- Milestone Status Text -->
+                            <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                                <TextBlock Text="{Binding StatusText}"
+                                           Foreground="#334155"
+                                           FontSize="11.5"
+                                           FontWeight="Medium"
+                                           TextTrimming="CharacterEllipsis" />
+                            </StackPanel>
+
+                            <!-- Percentage Indicator -->
+                            <TextBlock Grid.Column="1"
+                                       Text="{Binding ProgressPercentage, StringFormat={}{0:0}%}"
+                                       Foreground="#0066FF"
+                                       FontSize="11.5"
+                                       FontWeight="Bold"
+                                       HorizontalAlignment="Right" />
+                        </Grid>
+
+                        <!-- Slim Electric Blue Progress Bar -->
+                        <ProgressBar x:Name="IndicatorProgressBar"
+                                     Style="{StaticResource ElectricProgressBar}"
+                                     Minimum="0"
+                                     Maximum="100"
+                                     Value="{Binding ProgressPercentage, Mode=OneWay}" />
+                    </StackPanel>
+
+                    <!-- ERROR STATE PANEL (Appears only on startup failure) -->
+                    <Border Grid.Row="1"
+                            Margin="16,0,16,14"
+                            Padding="16,12"
+                            Background="#FEF2F2"
+                            BorderBrush="#FECACA"
+                            BorderThickness="1"
+                            CornerRadius="10"
+                            Visibility="{Binding HasFailed, Converter={StaticResource BoolToVis}}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,3">
+                                    <TextBlock Text="⚠ " Foreground="#DC2626" FontSize="13" FontWeight="Bold" />
+                                    <TextBlock Text="Initialization Alert" Foreground="#991B1B" FontSize="12" FontWeight="Bold" />
+                                </StackPanel>
+                                <TextBlock Text="{Binding ErrorMessage}"
+                                           Foreground="#7F1D1D"
+                                           FontSize="11"
+                                           TextWrapping="Wrap"
+                                           MaxWidth="380" />
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="12,0,0,0">
+                                <Button Content="Retry"
+                                        Style="{StaticResource ElectricBlueButton}"
+                                        Command="{Binding RetryCommand}"
+                                        Margin="0,0,8,0" />
+                                <Button Content="Exit"
+                                        Style="{StaticResource NeutralOutlineButton}"
+                                        Command="{Binding ExitCommand}" />
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+
+                    <!-- FOOTER: Version & Architecture Governance -->
+                    <Grid Grid.Row="2" Margin="16,0,16,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Version Branding -->
+                        <TextBlock Grid.Column="0"
+                                   Text="{Binding VersionText}"
+                                   Foreground="#94A3B8"
+                                   FontSize="10.5"
+                                   VerticalAlignment="Center" />
+
+                        <!-- Engine State Indicator -->
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                            <Ellipse Width="6" Height="6" Fill="#10B981" Margin="0,0,6,0" />
+                            <TextBlock Text="Core Engine Ready"
+                                       Foreground="#64748B"
+                                       FontSize="10.5"
+                                       FontWeight="Medium" />
+                        </StackPanel>
+                    </Grid>
+                </Grid>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>
