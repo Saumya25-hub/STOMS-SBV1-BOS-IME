@@ -26,15 +26,19 @@
    - Orchestrated smooth, flicker-free window hand-off in `App.xaml.cs` managing `ShutdownMode` lifecycle safely.
 
 3. **Phase 2: Interactive Animated Gradient Login UI Upgrade:**
-   - **Continuous Ambient Gradient:** Replaced static gradient with a multi-stop flowing gradient (`#07132B` -> `#0A2868` -> `#0052CC` -> `#0066FF` -> `#0284C7`) oscillating in a smooth 11-second continuous cycle.
+   - **Continuous Ambient Gradient:** Flowing multi-stop gradient (`#07132B` -> `#0A2868` -> `#0052CC` -> `#0066FF` -> `#0284C7`) oscillating in a smooth 11-second continuous cycle.
    - **Flowing Wave Ribbon:** Embedded subtle flowing translucent light ribbons (`#38BDF8`) that glide organically across the panel.
-   - **Real Mouse-Following Light Bloom:** Implemented genuine cursor tracking that moves a 340×340 soft cyan/blue radial bloom with cubic-ease damping interpolation (`Duration="0:0:0.22"`).
-   - **Mouse Enter/Leave States:** Smooth fade-in (240ms) upon entering the panel, graceful fade-out (380ms) and automatic centering return upon leaving.
-   - **100% Fully Rounded Window Corners:** Eliminated the square corner clipping issue. The outer window card now features a unified `CornerRadius="20"`, with the left panel rounded at `20,0,0,20` and the right white panel rounded at `0,20,20,0`.
+   - **100% Fully Rounded Window Corners:** Eliminated square corner clipping. The outer window card features a unified `CornerRadius="20"`, with the left panel rounded at `20,0,0,20` and the right white panel rounded at `0,20,20,0`.
    - **Enterprise White Login Panel:** Enhanced typography, 40px input heights, focused electric blue borders, password box security, facility assignment dropdown, and one-click demo credentials.
-   - **Resource-Conscious Performance:** Window state listener pauses GPU animation loops when minimized, preventing unnecessary background resource usage.
+   - **Resource-Conscious Performance:** Window state listener pauses GPU animation loops when minimized.
 
-4. **Phase 3: Automated Testing & Verification:**
+4. **Phase 3: Urgent UI/UX Bugfixes & Performance Polish (Resolved):**
+   - **Bug 1 (Windows 98 Boot-Style Neon Progress Bar):** Replaced the empty white pipe with an authentic Windows 98 boot-inspired indeterminate progress bar engineered for the modern era. Features a sleek dark recessed track (`#071228`), continuous looping 4-block neon cyan/blue illuminated segment cluster, subtle light trail band, and real milestone progress underlay (`#0066FF` -> `#38BDF8`). Orchestrated via native WPF Storyboard `BootProgressBarStoryboard`.
+   - **Bug 2 (Eliminated Giant Circle UX Bug on Hover):** Removed the 340px harsh circular `Ellipse` and dark `#0A2463` ring stops that produced an unnatural dark bullseye. Replaced with an ultra-soft, seamless rectangular specular sheen (`560x560`) with purely translucent cyan/electric-blue gradients (`#4067E8F9`, `#2838BDF8`, `#120066FF`, `#00000000`). Zero visible circular rings.
+   - **Bug 3 (Eliminated Animation Lag & Performance Stutter):** Removed the UI-thread animation flooding where `DoubleAnimation` was instantiated on every single mouse event. Replaced with monitor-synchronized `CompositionTarget.Rendering` floating-point velocity lerp (`0.18` damping factor) with zero GC heap allocations. Unsubscribed automatically on mouse leave and window unload.
+   - **Bug 4 (Modern ComboBox & Universal ListBox Styling):** Fully replaced the legacy Windows Aero gray beveled dropdown with custom enterprise styles `ModernComboBoxItem`, `ComboBoxToggleButtonTemplate`, `ModernComboBox`, and universal `ListBox`/`ListBoxItem` styles featuring 40px height, 8px rounded corners, electric blue focus ring, modern SVG chevron arrow, and floating rounded popup cards (`CornerRadius="10"` with soft drop shadow).
+
+5. **Phase 4: Automated Testing & Verification:**
    - Built automated xUnit test suite (`Tests/STOMS-SBV1-BOS-IME.Tests.csproj`).
    - 8 automated tests covering milestone progress, failure simulation, retry mechanics, credential verification, and headless visual PNG rendering.
    - **100% Test Pass Rate (8/8 Passed).**
@@ -45,8 +49,8 @@
 
 | Directory / File | Description |
 | :--- | :--- |
-| `MainWindow.xaml` & `.cs` | Upgraded enterprise login window with interactive animated gradient, mouse-tracking light bloom, and 4-corner rounded boundaries. |
-| `Views/SplashWindow.xaml` & `.cs` | Dedicated premium animated splash screen with native WPF storyboards. |
+| `MainWindow.xaml` & `.cs` | Upgraded enterprise login window with interactive animated gradient, zero-lag mouse tracking, modern ComboBox/ListBox styles, and 4-corner rounded boundaries. |
+| `Views/SplashWindow.xaml` & `.cs` | Dedicated premium animated splash screen with Windows 98 boot-style neon segment progress bar and native WPF storyboards. |
 | `Assets/ims_logo.png` | 512×512 32-bit transparent RGBA isometric inventory cube logo. |
 | `Services/StartupService.cs` | Asynchronous real startup milestone coordinator. |
 | `Services/AuthenticationService.cs` | Operator authentication and session security provider. |
@@ -63,7 +67,7 @@
 All today's changes are isolated on your dedicated feature branch to keep the tree clean and avoid mixing with `main`:
 
 - **Branch Name:** `feature/jenil-animated-gradient-login`
-- **Release Tag:** `v1.1.0-animated-gradient-login`
+- **Release Tag:** `v1.2.0-boot-progressbar-ux-fixes`
 
 ### How to Push to GitHub:
 To push this dedicated branch and tag to GitHub:
@@ -72,19 +76,7 @@ To push this dedicated branch and tag to GitHub:
 git push -u origin feature/jenil-animated-gradient-login
 
 # Push the release tag
-git push origin v1.1.0-animated-gradient-login
-```
-
-### How to Merge into Main (When Approved):
-```bash
-# Switch to main
-git checkout main
-
-# Merge feature branch cleanly
-git merge feature/jenil-animated-gradient-login
-
-# Push to main
-git push origin main
+git push origin v1.2.0-boot-progressbar-ux-fixes
 ```
 
 ---

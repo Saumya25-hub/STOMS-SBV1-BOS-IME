@@ -97,40 +97,17 @@
             </Setter>
         </Style>
 
-        <!-- Custom Slim Electric Blue ProgressBar Template -->
-        <Style x:Key="ElectricProgressBar" TargetType="ProgressBar">
-            <Setter Property="Height" Value="5" />
-            <Setter Property="Background" Value="#E2E8F0" />
-            <Setter Property="Foreground">
-                <Setter.Value>
-                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
-                        <GradientStop Color="#0066FF" Offset="0.0" />
-                        <GradientStop Color="#00A3FF" Offset="0.7" />
-                        <GradientStop Color="#38BDF8" Offset="1.0" />
-                    </LinearGradientBrush>
-                </Setter.Value>
-            </Setter>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="ProgressBar">
-                        <Grid x:Name="Root">
-                            <!-- Track Background -->
-                            <Border Background="{TemplateBinding Background}" CornerRadius="2.5" />
-
-                            <!-- Animated Progress Track Fill -->
-                            <Border x:Name="PART_Indicator"
-                                    HorizontalAlignment="Left"
-                                    Background="{TemplateBinding Foreground}"
-                                    CornerRadius="2.5">
-                                <Border.Effect>
-                                    <DropShadowEffect Color="#0066FF" BlurRadius="6" ShadowDepth="0" Opacity="0.5" />
-                                </Border.Effect>
-                            </Border>
-                        </Grid>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
+        <!-- Windows 98 Boot-Style Continuous Segment Loop Storyboard -->
+        <Storyboard x:Key="BootProgressBarStoryboard" RepeatBehavior="Forever">
+            <DoubleAnimation Storyboard.TargetName="BootSegmentTranslate"
+                             Storyboard.TargetProperty="X"
+                             From="-130" To="570"
+                             Duration="0:0:1.75">
+                <DoubleAnimation.EasingFunction>
+                    <SineEase EasingMode="EaseInOut" />
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+        </Storyboard>
 
         <!-- Main Window Entrance Storyboard -->
         <Storyboard x:Key="EntranceStoryboard">
@@ -502,12 +479,93 @@
                                        HorizontalAlignment="Right" />
                         </Grid>
 
-                        <!-- Slim Electric Blue Progress Bar -->
-                        <ProgressBar x:Name="IndicatorProgressBar"
-                                     Style="{StaticResource ElectricProgressBar}"
-                                     Minimum="0"
-                                     Maximum="100"
-                                     Value="{Binding ProgressPercentage, Mode=OneWay}" />
+                        <!-- Modern Windows 98 Inspired Boot-Style Indeterminate Progress Bar with Electric-Blue Neon Glow -->
+                        <Border x:Name="BootTrackBorder"
+                                Height="13"
+                                Background="#071228"
+                                BorderBrush="#1E3A8A"
+                                BorderThickness="1"
+                                CornerRadius="6.5"
+                                ClipToBounds="True">
+                            <Grid>
+                                <!-- Milestone Progress Filled Underlay -->
+                                <Border x:Name="RealProgressFill"
+                                        HorizontalAlignment="Left"
+                                        Width="0"
+                                        Height="11"
+                                        CornerRadius="5"
+                                        Opacity="0.45">
+                                    <Border.Background>
+                                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                            <GradientStop Color="#003D99" Offset="0.0" />
+                                            <GradientStop Color="#0066FF" Offset="0.6" />
+                                            <GradientStop Color="#0284C7" Offset="1.0" />
+                                        </LinearGradientBrush>
+                                    </Border.Background>
+                                </Border>
+
+                                <!-- Moving Windows 98 Segment Cluster with Neon Glow and Subtle Light Trail -->
+                                <Canvas ClipToBounds="True" Height="11" IsHitTestVisible="False">
+                                    <StackPanel x:Name="BootSegmentsCluster"
+                                                Orientation="Horizontal"
+                                                Height="7"
+                                                VerticalAlignment="Center"
+                                                Margin="0,2,0,0">
+                                        <StackPanel.RenderTransform>
+                                            <TranslateTransform x:Name="BootSegmentTranslate" X="160" Y="0" />
+                                        </StackPanel.RenderTransform>
+
+                                        <!-- Subtle Trail Light Band -->
+                                        <Border Width="45" Height="5" CornerRadius="2.5" Margin="0,0,4,0">
+                                            <Border.Background>
+                                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                                    <GradientStop Color="#00000000" Offset="0.0" />
+                                                    <GradientStop Color="#180066FF" Offset="0.4" />
+                                                    <GradientStop Color="#5538BDF8" Offset="1.0" />
+                                                </LinearGradientBrush>
+                                            </Border.Background>
+                                        </Border>
+
+                                        <!-- Segment 1: Deep Electric Blue block -->
+                                        <Border Width="12" Height="7" CornerRadius="2" Margin="0,0,3,0" Background="#0052CC">
+                                            <Border.Effect>
+                                                <DropShadowEffect Color="#0052CC" BlurRadius="6" ShadowDepth="0" Opacity="0.75" />
+                                            </Border.Effect>
+                                        </Border>
+
+                                        <!-- Segment 2: Vibrant Electric Blue block -->
+                                        <Border Width="12" Height="7" CornerRadius="2" Margin="0,0,3,0" Background="#0066FF">
+                                            <Border.Effect>
+                                                <DropShadowEffect Color="#0066FF" BlurRadius="8" ShadowDepth="0" Opacity="0.85" />
+                                            </Border.Effect>
+                                        </Border>
+
+                                        <!-- Segment 3: Cyan block -->
+                                        <Border Width="12" Height="7" CornerRadius="2" Margin="0,0,3,0" Background="#00D2FF">
+                                            <Border.Effect>
+                                                <DropShadowEffect Color="#00D2FF" BlurRadius="11" ShadowDepth="0" Opacity="0.95" />
+                                            </Border.Effect>
+                                        </Border>
+
+                                        <!-- Segment 4: Leading Core Neon Luminous White-Cyan block -->
+                                        <Border Width="14" Height="7" CornerRadius="2" Margin="0,0,3,0">
+                                            <Border.Background>
+                                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                                    <GradientStop Color="#38BDF8" Offset="0.0" />
+                                                    <GradientStop Color="#FFFFFF" Offset="0.8" />
+                                                </LinearGradientBrush>
+                                            </Border.Background>
+                                            <Border.Effect>
+                                                <DropShadowEffect Color="#00E5FF" BlurRadius="15" ShadowDepth="0" Opacity="1.0" />
+                                            </Border.Effect>
+                                        </Border>
+                                    </StackPanel>
+                                </Canvas>
+
+                                <!-- Top Specular Accent Line -->
+                                <Border Height="1" VerticalAlignment="Top" Background="#3538BDF8" Margin="4,0.5,4,0" IsHitTestVisible="False" />
+                            </Grid>
+                        </Border>
                     </StackPanel>
 
                     <!-- ERROR STATE PANEL (Appears only on startup failure) -->

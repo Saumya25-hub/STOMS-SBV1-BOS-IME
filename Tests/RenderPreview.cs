@@ -32,6 +32,8 @@ namespace STOMS_SBV1_BOS_IME.Tests
                 window.SubtitleContainer.Opacity = 1.0;
                 window.TaglineContainer.Opacity = 1.0;
                 window.LoadingSection.Opacity = 1.0;
+                window.RealProgressFill.Width = 316.0;
+                window.BootSegmentTranslate.X = 180.0;
 
                 content.Measure(new Size(680, 470));
                 content.Arrange(new Rect(0, 0, 680, 470));

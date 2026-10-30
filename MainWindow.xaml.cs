@@ -12,7 +12,9 @@ namespace STOMS_SBV1_BOS_IME
     /// Interaction logic for MainWindow.xaml
     /// Features:
     /// - Continuously animated ambient blue gradient environment.
-    /// - Real interactive mouse-following light bloom with smooth interpolation.
+    /// - Zero-lag real-time hardware-synchronized mouse-following light sheen.
+    /// - Seamless diffuse specular lighting with zero dark circular rings.
+    /// - Modern electric blue custom ComboBox & ListBox controls.
     /// - Unified professionally rounded outer window corners on all 4 sides.
     /// - Production-ready operator authentication workflow.
     /// </summary>
@@ -20,8 +22,13 @@ namespace STOMS_SBV1_BOS_IME
     {
         private readonly LoginViewModel _viewModel;
         private Storyboard? _ambientStoryboard;
-        private readonly CubicEase _motionEasing = new() { EasingMode = EasingMode.EaseOut };
-        private readonly TimeSpan _lightMoveDuration = TimeSpan.FromMilliseconds(220);
+
+        // High-performance pointer tracking variables (Zero allocations on render loop)
+        private double _targetX;
+        private double _targetY;
+        private double _currentX;
+        private double _currentY;
+        private bool _isRenderingSubscribed = false;
 
         public MainWindow() : this(new LoginViewModel(new AuthenticationService()))
         {
@@ -47,16 +54,27 @@ namespace STOMS_SBV1_BOS_IME
             _ambientStoryboard = TryFindResource("AmbientGradientStoryboard") as Storyboard;
             _ambientStoryboard?.Begin(this, isControllable: true);
 
-            // Initialize default resting position for mouse light bloom
-            double centerX = (LeftGradientHost.ActualWidth > 0 ? LeftGradientHost.ActualWidth : 430) / 2.0 - 170;
-            double centerY = (LeftGradientHost.ActualHeight > 0 ? LeftGradientHost.ActualHeight : 650) / 2.0 - 170;
-            MouseLightTransform.X = centerX;
-            MouseLightTransform.Y = centerY;
+            // Initialize default resting position for light sheen (centered)
+            double panelW = LeftGradientHost.ActualWidth > 0 ? LeftGradientHost.ActualWidth : 430;
+            double panelH = LeftGradientHost.ActualHeight > 0 ? LeftGradientHost.ActualHeight : 650;
+            _currentX = (panelW / 2.0) - 280;
+            _currentY = (panelH / 2.0) - 280;
+            _targetX = _currentX;
+            _targetY = _currentY;
+            MouseLightTransform.X = _currentX;
+            MouseLightTransform.Y = _currentY;
         }
 
         private void OnWindowUnloaded(object sender, RoutedEventArgs e)
         {
             _ambientStoryboard?.Stop(this);
+
+            if (_isRenderingSubscribed)
+            {
+                CompositionTarget.Rendering -= OnRenderFrame;
+                _isRenderingSubscribed = false;
+            }
+
             Loaded -= OnWindowLoaded;
             Unloaded -= OnWindowUnloaded;
             StateChanged -= OnWindowStateChanged;
@@ -75,70 +93,74 @@ namespace STOMS_SBV1_BOS_IME
             }
         }
 
-        #region Interactive Mouse-Following Light Engine
+        #region Zero-Lag Hardware-Synchronized Mouse-Following Light Sheen
+
+        private void OnLeftPanelMouseEnter(object sender, MouseEventArgs e)
+        {
+            Point pos = e.GetPosition(LeftGradientHost);
+            double clampedX = Math.Clamp(pos.X, 0, LeftGradientHost.ActualWidth);
+            double clampedY = Math.Clamp(pos.Y, 0, LeftGradientHost.ActualHeight);
+
+            _targetX = clampedX - 280;
+            _targetY = clampedY - 280;
+            _currentX = _targetX;
+            _currentY = _targetY;
+            MouseLightTransform.X = _currentX;
+            MouseLightTransform.Y = _currentY;
+
+            if (!_isRenderingSubscribed)
+            {
+                CompositionTarget.Rendering += OnRenderFrame;
+                _isRenderingSubscribed = true;
+            }
+
+            // Smoothly fade in specular light sheen
+            var fadeIn = new DoubleAnimation(1.0, TimeSpan.FromMilliseconds(220))
+            {
+                EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+            };
+            MouseLightBloom.BeginAnimation(UIElement.OpacityProperty, fadeIn);
+        }
 
         private void OnLeftPanelMouseMove(object sender, MouseEventArgs e)
         {
             Point mousePos = e.GetPosition(LeftGradientHost);
 
-            // Clamp coordinates to panel bounds
+            // Directly update target position — ZERO allocations and ZERO storyboard clocks started!
             double clampedX = Math.Clamp(mousePos.X, 0, LeftGradientHost.ActualWidth);
             double clampedY = Math.Clamp(mousePos.Y, 0, LeftGradientHost.ActualHeight);
 
-            // Center the 340x340 radial light bloom around pointer
-            double targetX = clampedX - 170;
-            double targetY = clampedY - 170;
-
-            // Smoothly animate the bloom position (fluid damping without jumping)
-            var animX = new DoubleAnimation
-            {
-                To = targetX,
-                Duration = _lightMoveDuration,
-                EasingFunction = _motionEasing
-            };
-
-            var animY = new DoubleAnimation
-            {
-                To = targetY,
-                Duration = _lightMoveDuration,
-                EasingFunction = _motionEasing
-            };
-
-            MouseLightTransform.BeginAnimation(TranslateTransform.XProperty, animX);
-            MouseLightTransform.BeginAnimation(TranslateTransform.YProperty, animY);
+            _targetX = clampedX - 280;
+            _targetY = clampedY - 280;
         }
 
-        private void OnLeftPanelMouseEnter(object sender, MouseEventArgs e)
+        private void OnRenderFrame(object? sender, EventArgs e)
         {
-            // Fade in interactive light bloom
-            var fadeAnim = new DoubleAnimation
-            {
-                To = 0.72,
-                Duration = TimeSpan.FromMilliseconds(240),
-                EasingFunction = _motionEasing
-            };
-            MouseLightBloom.BeginAnimation(UIElement.OpacityProperty, fadeAnim);
+            // Monitor-synchronized 60/120fps smooth exponential lerp
+            double deltaX = _targetX - _currentX;
+            double deltaY = _targetY - _currentY;
+
+            _currentX += deltaX * 0.18;
+            _currentY += deltaY * 0.18;
+
+            MouseLightTransform.X = _currentX;
+            MouseLightTransform.Y = _currentY;
         }
 
         private void OnLeftPanelMouseLeave(object sender, MouseEventArgs e)
         {
-            // Fade out interactive light bloom gracefully
-            var fadeAnim = new DoubleAnimation
+            if (_isRenderingSubscribed)
             {
-                To = 0.0,
-                Duration = TimeSpan.FromMilliseconds(380),
-                EasingFunction = _motionEasing
+                CompositionTarget.Rendering -= OnRenderFrame;
+                _isRenderingSubscribed = false;
+            }
+
+            // Smoothly fade out specular sheen
+            var fadeOut = new DoubleAnimation(0.0, TimeSpan.FromMilliseconds(320))
+            {
+                EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
             };
-            MouseLightBloom.BeginAnimation(UIElement.OpacityProperty, fadeAnim);
-
-            // Gently glide light toward panel center
-            double centerX = (LeftGradientHost.ActualWidth > 0 ? LeftGradientHost.ActualWidth : 430) / 2.0 - 170;
-            double centerY = (LeftGradientHost.ActualHeight > 0 ? LeftGradientHost.ActualHeight : 650) / 2.0 - 170;
-
-            var returnX = new DoubleAnimation(centerX, TimeSpan.FromMilliseconds(450)) { EasingFunction = _motionEasing };
-            var returnY = new DoubleAnimation(centerY, TimeSpan.FromMilliseconds(450)) { EasingFunction = _motionEasing };
-            MouseLightTransform.BeginAnimation(TranslateTransform.XProperty, returnX);
-            MouseLightTransform.BeginAnimation(TranslateTransform.YProperty, returnY);
+            MouseLightBloom.BeginAnimation(UIElement.OpacityProperty, fadeOut);
         }
 
         private void OnLeftPanelMouseDown(object sender, MouseButtonEventArgs e)

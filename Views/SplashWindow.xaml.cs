@@ -16,6 +16,7 @@ namespace STOMS_SBV1_BOS_IME.Views
         private readonly SplashViewModel _viewModel;
         private Storyboard? _entranceStoryboard;
         private Storyboard? _exitStoryboard;
+        private Storyboard? _bootStoryboard;
         private bool _isClosingTransition = false;
 
         public event Action? ReadyToNavigateToLogin;
@@ -39,10 +40,17 @@ namespace STOMS_SBV1_BOS_IME.Views
             // Start the Phase A -> Phase D Entrance Storyboard
             _entranceStoryboard = TryFindResource("EntranceStoryboard") as Storyboard;
             _exitStoryboard = TryFindResource("ExitStoryboard") as Storyboard;
+            _bootStoryboard = TryFindResource("BootProgressBarStoryboard") as Storyboard;
 
             if (_entranceStoryboard != null)
             {
                 _entranceStoryboard.Begin(this);
+            }
+
+            // Start the Windows 98 boot-style continuous illuminated segments animation
+            if (_bootStoryboard != null)
+            {
+                _bootStoryboard.Begin(this, isControllable: true);
             }
 
             // Start asynchronous real application initialization
@@ -55,13 +63,16 @@ namespace STOMS_SBV1_BOS_IME.Views
             {
                 Dispatcher.Invoke(() =>
                 {
+                    double trackWidth = BootTrackBorder.ActualWidth > 0 ? BootTrackBorder.ActualWidth : 528;
+                    double targetWidth = Math.Clamp(trackWidth * (_viewModel.ProgressPercentage / 100.0), 0, trackWidth);
+
                     var anim = new DoubleAnimation
                     {
-                        To = _viewModel.ProgressPercentage,
+                        To = targetWidth,
                         Duration = TimeSpan.FromMilliseconds(300),
                         EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
                     };
-                    IndicatorProgressBar.BeginAnimation(ProgressBar.ValueProperty, anim);
+                    RealProgressFill.BeginAnimation(FrameworkElement.WidthProperty, anim);
                 });
             }
         }
@@ -106,6 +117,7 @@ namespace STOMS_SBV1_BOS_IME.Views
 
         private void OnSplashClosing(object? sender, CancelEventArgs e)
         {
+            _bootStoryboard?.Stop(this);
             _viewModel.PropertyChanged -= OnViewModelPropertyChanged;
             _viewModel.InitializationCompleted -= OnInitializationCompleted;
             _viewModel.ExitRequested -= OnExitRequested;
