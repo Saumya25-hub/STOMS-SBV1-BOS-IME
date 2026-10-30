@@ -1,0 +1,385 @@
+<UserControl x:Class="STOMS_SBV1_BOS_IME.Views.SalesInvoiceView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:viewmodels="clr-namespace:STOMS_SBV1_BOS_IME.ViewModels"
+             mc:Ignorable="d" 
+             d:DataContext="{d:DesignInstance Type=viewmodels:SalesInvoiceViewModel}"
+             d:DesignHeight="850" d:DesignWidth="1300">
+    <Grid Background="{DynamicResource Theme.Background.Main}">
+
+        <Grid Margin="16">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/> <!-- Header -->
+                <RowDefinition Height="*"/>    <!-- Split Screen: Left Catalog & Input, Right Invoice Ledger -->
+            </Grid.RowDefinitions>
+
+            <!-- 0. Header -->
+            <Border Grid.Row="0" Background="{DynamicResource Theme.Surface.Primary}" BorderBrush="{DynamicResource Theme.Border}" BorderThickness="1" CornerRadius="8" Padding="14,10" Margin="0,0,0,12">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                        <Border Background="{StaticResource BrandPrimaryBrush}" CornerRadius="6" Width="32" Height="32" Margin="0,0,10,0">
+                            <Path Data="{StaticResource Icon.Cart}" Fill="#FFFFFF" Width="16" Height="16" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="Smart Sales &amp; POS Invoicing" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource Theme.Text.Primary}"/>
+                                <Border Background="{DynamicResource Theme.Status.Success.Bg}" CornerRadius="4" Padding="6,2" Margin="10,0,0,0">
+                                    <TextBlock Text="AUTOMATIC FEFO ACTIVE" FontWeight="Bold" FontSize="10" Foreground="{StaticResource SuccessBrush}"/>
+                                </Border>
+                            </StackPanel>
+                            <TextBlock Text="Scan barcodes or search products — system automatically allocates earliest expiry batches and storage shelves" FontSize="11" Foreground="{DynamicResource Theme.Text.Muted}"/>
+                        </StackPanel>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                        <Button Style="{StaticResource OutlineButton}" Command="{Binding ToggleInvoiceHistoryCommand}" Height="30" Padding="10,0" Margin="0,0,8,0">
+                            <TextBlock Text="📋 Invoice History &amp; Returns" FontSize="11.5" FontWeight="SemiBold"/>
+                        </Button>
+                        <Button Style="{StaticResource OutlineButton}" Command="{Binding NewInvoiceCommand}" Height="30" Padding="10,0">
+                            <TextBlock Text="+ New Sale" FontSize="11.5" FontWeight="SemiBold"/>
+                        </Button>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- 1. Main Workspace Split -->
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="380"/> <!-- Left: Fast Scanning & Product Search -->
+                    <ColumnDefinition Width="*"/>   <!-- Center: Invoice Line Items Table -->
+                    <ColumnDefinition Width="320"/> <!-- Right: Checkout & Totals -->
+                </Grid.ColumnDefinitions>
+
+                <!-- A. LEFT: BARCODE SCANNER & ITEM PICKER -->
+                <Border Grid.Column="0" Background="{DynamicResource Theme.Surface.Primary}" BorderBrush="{DynamicResource Theme.Border}" BorderThickness="1" CornerRadius="8" Padding="16" Margin="0,0,10,0">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/> <!-- Barcode Reader -->
+                            <RowDefinition Height="Auto"/> <!-- Search & Dropdown -->
+                            <RowDefinition Height="*"/>    <!-- Catalog List -->
+                            <RowDefinition Height="Auto"/> <!-- Quantity & Unit Controls -->
+                        </Grid.RowDefinitions>
+
+                        <!-- Barcode Wedge Reader -->
+                        <Border Grid.Row="0" Background="{DynamicResource Theme.Surface.Secondary}" BorderBrush="{StaticResource BrandAccentBrush}" BorderThickness="1.5" CornerRadius="6" Padding="10,8" Margin="0,0,0,12">
+                            <StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                                    <Path Data="{StaticResource Icon.Barcode}" Fill="{StaticResource BrandAccentBrush}" Width="14" Height="14" Stretch="Uniform" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                                    <TextBlock Text="BARCODE SCANNER / SKU" FontSize="10" FontWeight="Bold" Foreground="{StaticResource BrandAccentBrush}"/>
+                                </StackPanel>
+                                <Grid>
+                                    <TextBox Text="{Binding BarcodeInput, UpdateSourceTrigger=PropertyChanged}" 
+                                             Style="{StaticResource FormTextBox}" 
+                                             FontFamily="Consolas" 
+                                             FontWeight="Bold" 
+                                             FontSize="13" 
+                                             ToolTip="Point barcode scanner here and scan, or type code and press Enter">
+                                        <TextBox.InputBindings>
+                                            <KeyBinding Key="Return" Command="{Binding ScanBarcodeCommand}"/>
+                                        </TextBox.InputBindings>
+                                    </TextBox>
+                                    <Button Style="{StaticResource IconButton}" Command="{Binding ScanBarcodeCommand}" HorizontalAlignment="Right" Margin="0,0,4,0" Width="26" Height="26" ToolTip="Scan / Add">
+                                        <Path Data="{StaticResource Icon.Inward}" Fill="{StaticResource BrandAccentBrush}" Width="10" Height="10" Stretch="Uniform"/>
+                                    </Button>
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Search Catalog -->
+                        <Grid Grid.Row="1" Margin="0,0,0,8">
+                            <TextBox Text="{Binding ProductSearchQuery, UpdateSourceTrigger=PropertyChanged}" 
+                                     Style="{StaticResource FormTextBox}" 
+                                     Height="32" Padding="28,4,8,4" 
+                                     ToolTip="Search products by name, SKU or category"/>
+                            <Path Data="{StaticResource Icon.Search}" Fill="{DynamicResource Theme.Text.Muted}" Width="11" Height="11" Stretch="Uniform" HorizontalAlignment="Left" Margin="8,0,0,0" VerticalAlignment="Center"/>
+                        </Grid>
+
+                        <!-- Catalog Items List -->
+                        <Border Grid.Row="2" Background="{DynamicResource Theme.Surface.Secondary}" BorderBrush="{DynamicResource Theme.Border}" BorderThickness="1" CornerRadius="6" Margin="0,0,0,12">
+                            <ListBox ItemsSource="{Binding CatalogProducts}" 
+                                     SelectedItem="{Binding SelectedCatalogProduct}" 
+                                     Style="{StaticResource ModernListBox}">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid Margin="4,3">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <StackPanel Grid.Column="0">
+                                                <TextBlock Text="{Binding Name}" FontWeight="SemiBold" FontSize="12" Foreground="{DynamicResource Theme.Text.Primary}" TextTrimming="CharacterEllipsis"/>
+                                                <StackPanel Orientation="Horizontal" Margin="0,2,0,0">
+                                                    <TextBlock Text="{Binding Sku}" FontFamily="Consolas" FontSize="10" Foreground="{StaticResource BrandAccentBrush}" Margin="0,0,6,0"/>
+                                                    <TextBlock Text="{Binding BarcodeDisplay}" FontSize="10" Foreground="{DynamicResource Theme.Text.Muted}"/>
+                                                </StackPanel>
+                                            </StackPanel>
+                                            <StackPanel Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                                <TextBlock Text="{Binding AvailableStock, StringFormat='{}{0:N0} Avail'}" FontWeight="Bold" FontSize="11" Foreground="{Binding AvailableStock, Converter={StaticResource StockStatusToColorConverter}}" HorizontalAlignment="Right"/>
+                                                <TextBlock Text="{Binding SellingRate, StringFormat='{}₹ {0:N2}'}" FontSize="10.5" Foreground="{DynamicResource Theme.Text.Secondary}" HorizontalAlignment="Right"/>
+                                            </StackPanel>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                        </Border>
+
+                        <!-- Quantity, Unit Selector & Add Button -->
+                        <Border Grid.Row="3" Background="{DynamicResource Theme.Surface.Secondary}" BorderBrush="{DynamicResource Theme.Border}" BorderThickness="1" CornerRadius="6" Padding="10">
+                            <StackPanel>
+                                <Grid Margin="0,0,0,6">
+                                    <TextBlock Text="{Binding SelectedProductAvailableStockDisplay}" FontSize="10.5" FontWeight="Bold" Foreground="{StaticResource SuccessBrush}"/>
+                                    <TextBlock Text="{Binding SelectedProductPriceDisplay}" FontSize="10.5" FontWeight="Bold" Foreground="{DynamicResource Theme.Text.Primary}" HorizontalAlignment="Right"/>
+                                </Grid>
+
+                                <Grid Margin="0,0,0,10">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="8"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <!-- Unit Selector -->
+                                    <StackPanel Grid.Column="0">
+                                        <TextBlock Text="Unit" Style="{StaticResource SectionHeader}" Margin="0,0,0,2"/>
+                                        <ComboBox ItemsSource="{Binding AvailableUnitsForSelectedProduct}" 
+                                                  SelectedItem="{Binding SelectedUnit}" 
+                                                  Style="{StaticResource FormComboBox}" Height="32"/>
+                                    </StackPanel>
+                                    <!-- Quantity Input -->
+                                    <StackPanel Grid.Column="2">
+                                        <TextBlock Text="Quantity" Style="{StaticResource SectionHeader}" Margin="0,0,0,2"/>
+                                        <TextBox Text="{Binding EnteredQuantity, UpdateSourceTrigger=PropertyChanged}" 
+                                                 Style="{StaticResource FormTextBox}" Height="32" FontWeight="Bold"/>
+                                    </StackPanel>
+                                </Grid>
+
+                                <Button Style="{StaticResource PrimaryButton}" Command="{Binding AddSelectedProductCommand}" Height="34">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="+ Add to Invoice" FontWeight="Bold" FontSize="11.5"/>
+                                    </StackPanel>
+                                </Button>
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+                </Border>
+
+                <!-- B. CENTER: INVOICE TABLE -->
+                <Border Grid.Column="1" Background="{DynamicResource Theme.Surface.Primary}" BorderBrush="{DynamicResource Theme.Border}" BorderThickness="1" CornerRadius="8" Padding="16" Margin="0,0,10,0">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <!-- Invoice Header Info -->
+                        <Grid Grid.Row="0" Margin="0,0,0,12">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="CURRENT SALE ITEMS" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource Theme.Text.Primary}"/>
+                                <Border Background="{DynamicResource Theme.Surface.Secondary}" CornerRadius="4" Padding="6,2" Margin="8,0,0,0">
+                                    <TextBlock Text="{Binding CurrentInvoice.InvoiceNumber}" FontFamily="Consolas" FontSize="11" FontWeight="Bold" Foreground="{StaticResource BrandAccentBrush}"/>
+                                </Border>
+                            </StackPanel>
+                            <TextBlock Text="{Binding CurrentInvoice.TotalItemsCount, StringFormat='{}{0} Line Items'}" FontSize="11.5" Foreground="{DynamicResource Theme.Text.Muted}" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                        </Grid>
+
+                        <!-- Line Items DataGrid -->
+                        <DataGrid Grid.Row="1" ItemsSource="{Binding CurrentInvoice.Items}" Style="{StaticResource {x:Type DataGrid}}">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="PRODUCT NAME" Binding="{Binding ProductName}" Width="*"/>
+                                <DataGridTextColumn Header="SKU / BARCODE" Binding="{Binding Sku}" Width="110"/>
+                                <DataGridTextColumn Header="UNIT" Binding="{Binding SelectedUnit}" Width="65"/>
+                                <DataGridTextColumn Header="QTY" Binding="{Binding Quantity, StringFormat='{}{0:G29}'}" Width="65"/>
+                                <DataGridTextColumn Header="RATE" Binding="{Binding UnitPrice, StringFormat='{}₹ {0:N2}'}" Width="85"/>
+                                <DataGridTextColumn Header="TOTAL" Binding="{Binding LineTotal, StringFormat='{}₹ {0:N2}'}" Width="95"/>
+                                <DataGridTemplateColumn Header="ACTIONS" Width="55">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Button Style="{StaticResource IconButton}" Command="{Binding DataContext.RemoveLineItemCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}" CommandParameter="{Binding}" ToolTip="Remove Item" Width="24" Height="24">
+                                                <TextBlock Text="✕" FontSize="11" Foreground="{StaticResource DangerBrush}"/>
+                                            </Button>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+
+                        <!-- Bottom Feedback Message -->
+                        <TextBlock Grid.Row="2" Text="{Binding FeedbackMessage}" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource BrandAccentBrush}" Margin="0,8,0,0"/>
+                    </Grid>
+                </Border>
+
+                <!-- C. RIGHT: CHECKOUT & AUTOMATIC FEFO EXECUTION -->
+                <Border Grid.Column="2" Background="{DynamicResource Theme.Surface.Primary}" BorderBrush="{DynamicResource Theme.Border}" BorderThickness="1" CornerRadius="8" Padding="16">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/> <!-- Customer Details -->
+                            <RowDefinition Height="Auto"/> <!-- Payment Method -->
+                            <RowDefinition Height="*"/>    <!-- Spacing -->
+                            <RowDefinition Height="Auto"/> <!-- Totals & Checkout -->
+                        </Grid.RowDefinitions>
+
+                        <!-- Customer Details -->
+                        <StackPanel Grid.Row="0" Margin="0,0,0,14">
+                            <TextBlock Text="CUSTOMER INFORMATION" FontSize="11" FontWeight="Bold" Foreground="{StaticResource BrandAccentBrush}" Margin="0,0,0,8"/>
+                            <TextBlock Text="Customer Name" Style="{StaticResource SectionHeader}" Margin="0,0,0,2"/>
+                            <TextBox Text="{Binding CustomerName, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FormTextBox}" Margin="0,0,0,8"/>
+
+                            <TextBlock Text="Phone / Contact Number" Style="{StaticResource SectionHeader}" Margin="0,0,0,2"/>
+                            <TextBox Text="{Binding CustomerPhone, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FormTextBox}"/>
+                        </StackPanel>
+
+                        <!-- Payment Method -->
+                        <StackPanel Grid.Row="1" Margin="0,0,0,14">
+                            <TextBlock Text="PAYMENT DETAILS" FontSize="11" FontWeight="Bold" Foreground="{StaticResource BrandAccentBrush}" Margin="0,0,0,8"/>
+                            <TextBlock Text="Payment Mode" Style="{StaticResource SectionHeader}" Margin="0,0,0,2"/>
+                            <ComboBox SelectedItem="{Binding SelectedPaymentMethod}" Style="{StaticResource FormComboBox}" Height="32" Margin="0,0,0,8">
+                                <ComboBoxItem Content="Cash" IsSelected="True"/>
+                                <ComboBoxItem Content="UPI / QR Code"/>
+                                <ComboBoxItem Content="Credit / Debit Card"/>
+                                <ComboBoxItem Content="Bank Transfer"/>
+                                <ComboBoxItem Content="Store Credit"/>
+                            </ComboBox>
+
+                            <TextBlock Text="Discount (₹)" Style="{StaticResource SectionHeader}" Margin="0,0,0,2"/>
+                            <TextBox Text="{Binding DiscountAmount, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FormTextBox}"/>
+                        </StackPanel>
+
+                        <!-- Summary Totals & Checkout -->
+                        <Border Grid.Row="3" Background="{DynamicResource Theme.Surface.Secondary}" BorderBrush="{DynamicResource Theme.Border}" BorderThickness="1" CornerRadius="8" Padding="14">
+                            <StackPanel>
+                                <Grid Margin="0,0,0,6">
+                                    <TextBlock Text="Subtotal:" FontSize="12" Foreground="{DynamicResource Theme.Text.Secondary}"/>
+                                    <TextBlock Text="{Binding CurrentInvoice.Subtotal, StringFormat='{}₹ {0:N2}'}" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource Theme.Text.Primary}" HorizontalAlignment="Right"/>
+                                </Grid>
+                                <Grid Margin="0,0,0,6">
+                                    <TextBlock Text="Tax / GST:" FontSize="12" Foreground="{DynamicResource Theme.Text.Secondary}"/>
+                                    <TextBlock Text="{Binding CurrentInvoice.TotalTax, StringFormat='{}₹ {0:N2}'}" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource Theme.Text.Primary}" HorizontalAlignment="Right"/>
+                                </Grid>
+                                <Grid Margin="0,0,0,10">
+                                    <TextBlock Text="Discount:" FontSize="12" Foreground="{DynamicResource Theme.Text.Secondary}"/>
+                                    <TextBlock Text="{Binding CurrentInvoice.DiscountAmount, StringFormat='{}-₹ {0:N2}'}" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource DangerBrush}" HorizontalAlignment="Right"/>
+                                </Grid>
+
+                                <Border Height="1" Background="{DynamicResource Theme.Border}" Margin="0,0,0,10"/>
+
+                                <Grid Margin="0,0,0,14">
+                                    <TextBlock Text="GRAND TOTAL:" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource Theme.Text.Primary}"/>
+                                    <TextBlock Text="{Binding GrandTotalDisplay}" FontSize="18" FontWeight="Bold" Foreground="{StaticResource SuccessBrush}" HorizontalAlignment="Right"/>
+                                </Grid>
+
+                                <!-- Automatic FEFO Sale Confirmation Button -->
+                                <Button Style="{StaticResource PrimaryButton}" Command="{Binding FinalizeSaleCommand}" Height="40">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="✓ Complete Sale (Auto FEFO)" FontWeight="Bold" FontSize="13"/>
+                                    </StackPanel>
+                                </Button>
+                                <TextBlock Text="* Automatically selects earliest expiry batches and storage shelves" FontSize="9.5" Foreground="{DynamicResource Theme.Text.Muted}" TextAlignment="Center" Margin="0,6,0,0" TextWrapping="Wrap"/>
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+                </Border>
+            </Grid>
+        </Grid>
+
+        <!-- SUCCESS DIALOG WITH AUTOMATED FEFO BATCH ALLOCATION BREAKDOWN (Part 7.D, 7.E) -->
+        <Grid Background="{DynamicResource Theme.Modal.Backdrop}" Visibility="{Binding IsSuccessDialogOpen, Converter={StaticResource BoolToVisibilityConverter}}">
+            <Border Background="{DynamicResource Theme.Surface.Modal}" BorderBrush="{DynamicResource Theme.Border}" BorderThickness="1" CornerRadius="12" MaxWidth="620" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="28">
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="40" ShadowDepth="10" Opacity="0.75" Direction="270" Color="#000000"/>
+                </Border.Effect>
+                <StackPanel>
+                    <Border Background="{StaticResource SuccessBrush}" CornerRadius="10" Width="44" Height="44" HorizontalAlignment="Center" Margin="0,0,0,12">
+                        <TextBlock Text="✓" FontSize="24" FontWeight="Bold" Foreground="#FFFFFF" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <TextBlock Text="SALE FINALIZED SUCCESSFULLY" FontSize="18" FontWeight="Bold" Foreground="{DynamicResource Theme.Text.Primary}" HorizontalAlignment="Center"/>
+                    <TextBlock Text="Invoice generated &amp; stock deducted automatically via FEFO" FontSize="12" Foreground="{DynamicResource Theme.Text.Muted}" HorizontalAlignment="Center" Margin="0,4,0,16"/>
+
+                    <!-- Automated FEFO Allocations Box -->
+                    <Border Background="{DynamicResource Theme.Surface.Secondary}" BorderBrush="{DynamicResource Theme.Border}" BorderThickness="1" CornerRadius="8" Padding="14" Margin="0,0,0,18">
+                        <StackPanel>
+                            <TextBlock Text="AUTOMATIC FEFO BATCH &amp; SHELF ALLOCATIONS:" FontSize="10" FontWeight="Bold" Foreground="{StaticResource BrandAccentBrush}" Margin="0,0,0,8"/>
+                            <ItemsControl ItemsSource="{Binding LastSaleResult.TotalAllocations}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Background="{DynamicResource Theme.Surface.Primary}" BorderBrush="{DynamicResource Theme.Border}" BorderThickness="1" CornerRadius="4" Padding="8,6" Margin="0,0,0,6">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+                                                <StackPanel Grid.Column="0">
+                                                    <TextBlock Text="{Binding FormattedAllocation}" FontWeight="SemiBold" FontSize="11" Foreground="{DynamicResource Theme.Text.Primary}"/>
+                                                </StackPanel>
+                                                <Border Grid.Column="1" Background="{DynamicResource Theme.Status.Success.Bg}" CornerRadius="3" Padding="6,2">
+                                                    <TextBlock Text="Allocated" FontSize="9.5" FontWeight="Bold" Foreground="{StaticResource SuccessBrush}"/>
+                                                </Border>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Close / Next Sale Button -->
+                    <Button Style="{StaticResource PrimaryButton}" Command="{Binding CloseSuccessDialogCommand}" Height="36" HorizontalAlignment="Stretch">
+                        <TextBlock Text="Start Next Sale" FontWeight="Bold" FontSize="12.5"/>
+                    </Button>
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <!-- INVOICE HISTORY & SALES RETURN DRAWER -->
+        <Grid Background="{DynamicResource Theme.Modal.Backdrop}" Visibility="{Binding IsInvoiceHistoryOpen, Converter={StaticResource BoolToVisibilityConverter}}">
+            <Border Background="{DynamicResource Theme.Surface.Modal}" BorderBrush="{DynamicResource Theme.Border}" BorderThickness="1" CornerRadius="12" MaxWidth="800" MaxHeight="650" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="24">
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="40" ShadowDepth="10" Opacity="0.75" Direction="270" Color="#000000"/>
+                </Border.Effect>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <Grid Grid.Row="0" Margin="0,0,0,12">
+                        <TextBlock Text="Invoice History &amp; Sales Returns" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource Theme.Text.Primary}"/>
+                        <Button Style="{StaticResource IconButton}" Command="{Binding ToggleInvoiceHistoryCommand}" HorizontalAlignment="Right">
+                            <TextBlock Text="✕" FontSize="12"/>
+                        </Button>
+                    </Grid>
+
+                    <DataGrid Grid.Row="1" ItemsSource="{Binding PastInvoices}" Style="{StaticResource {x:Type DataGrid}}">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="INVOICE #" Binding="{Binding InvoiceNumber}" Width="140"/>
+                            <DataGridTextColumn Header="DATE" Binding="{Binding InvoiceDate, StringFormat='{}{0:dd/MM/yyyy HH:mm}'}" Width="120"/>
+                            <DataGridTextColumn Header="CUSTOMER" Binding="{Binding CustomerName}" Width="*"/>
+                            <DataGridTextColumn Header="TOTAL" Binding="{Binding GrandTotal, StringFormat='{}₹ {0:N2}'}" Width="100"/>
+                            <DataGridTextColumn Header="STATUS" Binding="{Binding Status}" Width="90"/>
+                            <DataGridTemplateColumn Header="ACTIONS" Width="100">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Button Style="{StaticResource DangerButton}" Command="{Binding DataContext.CancelInvoiceCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}" CommandParameter="{Binding}" Height="26" Padding="8,0" ToolTip="Cancel Invoice &amp; Restore Stock">
+                                            <TextBlock Text="Return" FontSize="10.5" FontWeight="SemiBold"/>
+                                        </Button>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+
+                    <Button Grid.Row="2" Style="{StaticResource OutlineButton}" Command="{Binding ToggleInvoiceHistoryCommand}" Height="32" HorizontalAlignment="Right" Margin="0,12,0,0" Padding="14,0">
+                        <TextBlock Text="Close" FontWeight="SemiBold"/>
+                    </Button>
+                </Grid>
+            </Border>
+        </Grid>
+    </Grid>
+</UserControl>

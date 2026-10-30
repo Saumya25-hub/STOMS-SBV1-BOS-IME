@@ -15,6 +15,10 @@ namespace STOMS_SBV1_BOS_IME.Models
         public string WarehouseId { get; set; } = string.Empty;
         public string RackId { get; set; } = string.Empty;
         public string SectionId { get; set; } = string.Empty;
+        public string ShelfId { get; set; } = string.Empty;
+        public string ShelfCode { get; set; } = string.Empty;
+        public string? SupplierBatchNumber { get; set; }
+        public decimal PurchaseRate { get; set; }
         public string? CompartmentCode { get; set; }
         public string Supplier { get; set; } = string.Empty;
         public string ReferenceNumber { get; set; } = string.Empty;
@@ -30,6 +34,8 @@ namespace STOMS_SBV1_BOS_IME.Models
         public string WarehouseId { get; set; } = string.Empty;
         public string RackId { get; set; } = string.Empty;
         public string SectionId { get; set; } = string.Empty;
+        public string ShelfId { get; set; } = string.Empty;
+        public string ShelfCode { get; set; } = string.Empty;
         public string? BatchNumber { get; set; }
         public List<string> SelectedSerialNumbers { get; set; } = new();
         public string Reason { get; set; } = "Production Dispatch";
@@ -44,6 +50,8 @@ namespace STOMS_SBV1_BOS_IME.Models
         public bool Success { get; set; }
         public string Message { get; set; } = string.Empty;
         public string? TransactionId { get; set; }
+        public string? GeneratedBatchNumber { get; set; }
+        public decimal ConvertedBaseQuantity { get; set; }
         public decimal NewPhysicalStock { get; set; }
         public decimal NewAvailableStock { get; set; }
     }

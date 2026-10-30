@@ -28,8 +28,21 @@ namespace STOMS_SBV1_BOS_IME.Models
         private decimal _reservedStock;
         private decimal _damagedStock;
         private decimal _expiredStock;
+        private string _brand = "Standard";
+        private string _productType = "Finished Goods";
+        private string _imagePath = string.Empty;
+        private string _packagingUnit = "Box";
+        private decimal _conversionFactor = 1m;
+        private decimal _purchaseRate = 0m;
+        private decimal _sellingRate = 0m;
+        private decimal _mrp = 0m;
+        private decimal _gstRate = 0m;
+        private int _expiryAlertDays = 10;
         private DateTime _createdAt = DateTime.Now;
         private DateTime _updatedAt = DateTime.Now;
+
+        public List<ProductUnit> Units { get; set; } = new();
+        public List<ProductBarcode> Barcodes { get; set; } = new();
 
         public string Id
         {
@@ -197,6 +210,111 @@ namespace STOMS_SBV1_BOS_IME.Models
         {
             get => _expiredStock;
             set => SetProperty(ref _expiredStock, value);
+        }
+
+        public string Brand
+        {
+            get => _brand;
+            set => SetProperty(ref _brand, value);
+        }
+
+        public string ProductType
+        {
+            get => _productType;
+            set => SetProperty(ref _productType, value);
+        }
+
+        public string ImagePath
+        {
+            get => _imagePath;
+            set => SetProperty(ref _imagePath, value);
+        }
+
+        public string PackagingUnit
+        {
+            get => _packagingUnit;
+            set => SetProperty(ref _packagingUnit, value);
+        }
+
+        public decimal ConversionFactor
+        {
+            get => _conversionFactor;
+            set => SetProperty(ref _conversionFactor, Math.Max(0.0001m, value));
+        }
+
+        public decimal PurchaseRate
+        {
+            get => _purchaseRate;
+            set => SetProperty(ref _purchaseRate, value);
+        }
+
+        public decimal SellingRate
+        {
+            get => _sellingRate;
+            set => SetProperty(ref _sellingRate, value);
+        }
+
+        public decimal Mrp
+        {
+            get => _mrp;
+            set => SetProperty(ref _mrp, value);
+        }
+
+        public decimal GstRate
+        {
+            get => _gstRate;
+            set => SetProperty(ref _gstRate, value);
+        }
+
+        public int ExpiryAlertDays
+        {
+            get => _expiryAlertDays;
+            set => SetProperty(ref _expiryAlertDays, Math.Max(1, value));
+        }
+
+        public PackagingBreakdown GetPackagingBreakdown(decimal? customBaseQuantity = null)
+        {
+            return new PackagingBreakdown
+            {
+                TotalBaseQuantity = customBaseQuantity ?? AvailableStock,
+                BaseUnit = Unit,
+                PackagingUnit = string.IsNullOrWhiteSpace(PackagingUnit) ? Unit : PackagingUnit,
+                ConversionFactor = ConversionFactor > 0 ? ConversionFactor : 1m
+            };
+        }
+
+        public ProductUnit? FindUnit(string unitName)
+        {
+            var match = Units.Find(u => string.Equals(u.UnitName, unitName, StringComparison.OrdinalIgnoreCase));
+            if (match != null) return match;
+
+            if (string.Equals(Unit, unitName, StringComparison.OrdinalIgnoreCase))
+            {
+                return new ProductUnit
+                {
+                    UnitName = Unit,
+                    ConversionFactor = 1m,
+                    PurchaseRate = PurchaseRate,
+                    SellingRate = SellingRate,
+                    Mrp = Mrp,
+                    IsBaseUnit = true
+                };
+            }
+
+            if (!string.IsNullOrWhiteSpace(PackagingUnit) && string.Equals(PackagingUnit, unitName, StringComparison.OrdinalIgnoreCase))
+            {
+                return new ProductUnit
+                {
+                    UnitName = PackagingUnit,
+                    ConversionFactor = ConversionFactor,
+                    PurchaseRate = PurchaseRate * ConversionFactor,
+                    SellingRate = SellingRate > 0 ? SellingRate : SellingRate * ConversionFactor,
+                    Mrp = Mrp * ConversionFactor,
+                    IsBaseUnit = false
+                };
+            }
+
+            return null;
         }
 
         public DateTime CreatedAt

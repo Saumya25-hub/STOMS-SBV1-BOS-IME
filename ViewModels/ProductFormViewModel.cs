@@ -104,10 +104,45 @@ namespace STOMS_SBV1_BOS_IME.ViewModels
             }
         }
 
+        private string _brand = "Standard";
+        private string _productType = "Finished Goods";
+        private decimal _mrp = 0m;
+        private decimal _gstRate = 18m;
+        private int _expiryAlertDays = 10;
         private string _packagingUnit = "Box";
         private int _unitsPerPackage = 24;
         private decimal _purchaseRate = 125.00m;
         private decimal _sellingRate = 175.00m;
+
+        public string Brand
+        {
+            get => _brand;
+            set => SetProperty(ref _brand, value);
+        }
+
+        public string ProductType
+        {
+            get => _productType;
+            set => SetProperty(ref _productType, value);
+        }
+
+        public decimal Mrp
+        {
+            get => _mrp;
+            set => SetProperty(ref _mrp, value);
+        }
+
+        public decimal GstRate
+        {
+            get => _gstRate;
+            set => SetProperty(ref _gstRate, value);
+        }
+
+        public int ExpiryAlertDays
+        {
+            get => _expiryAlertDays;
+            set => SetProperty(ref _expiryAlertDays, Math.Max(1, value));
+        }
 
         public string Unit
         {
@@ -279,6 +314,7 @@ namespace STOMS_SBV1_BOS_IME.ViewModels
         public ICommand SaveCommand { get; }
         public ICommand CancelCommand { get; }
         public ICommand RegenerateSkuCommand { get; }
+        public ICommand GenerateBarcodeCommand { get; }
 
         public ProductFormViewModel(
             IInventoryService inventoryService,
@@ -296,6 +332,10 @@ namespace STOMS_SBV1_BOS_IME.ViewModels
             {
                 _isSkuUserModified = false;
                 await AutoGenerateSkuAsync();
+            });
+            GenerateBarcodeCommand = new RelayCommand(() =>
+            {
+                Barcode = BarcodeService.Instance.GenerateInternalBarcode(BarcodeFormat.Ean13);
             });
 
             _ = InitializeFormAsync(existingProduct);
@@ -467,7 +507,16 @@ namespace STOMS_SBV1_BOS_IME.ViewModels
                     Sku = Sku.Trim().ToUpperInvariant(),
                     Barcode = string.IsNullOrWhiteSpace(Barcode) ? null : Barcode.Trim(),
                     Category = SelectedCategory,
+                    Brand = Brand,
+                    ProductType = ProductType,
                     Unit = Unit,
+                    PackagingUnit = PackagingUnit,
+                    ConversionFactor = UnitsPerPackage > 0 ? UnitsPerPackage : 1m,
+                    PurchaseRate = PurchaseRate,
+                    SellingRate = SellingRate,
+                    Mrp = Mrp,
+                    GstRate = GstRate,
+                    ExpiryAlertDays = ExpiryAlertDays,
                     Description = Description.Trim(),
                     MinStockLevel = MinStockLevel,
                     ReorderLevel = ReorderLevel,
@@ -481,6 +530,30 @@ namespace STOMS_SBV1_BOS_IME.ViewModels
                     RequiresExpiry = RequiresExpiry,
                     IsActive = IsActive
                 };
+
+                // Register packaging unit in product.Units list
+                product.Units.Add(new ProductUnit
+                {
+                    UnitName = Unit,
+                    ConversionFactor = 1m,
+                    PurchaseRate = PurchaseRate,
+                    SellingRate = SellingRate,
+                    Mrp = Mrp,
+                    IsBaseUnit = true
+                });
+
+                if (!string.IsNullOrWhiteSpace(PackagingUnit) && !string.Equals(PackagingUnit, Unit, StringComparison.OrdinalIgnoreCase))
+                {
+                    product.Units.Add(new ProductUnit
+                    {
+                        UnitName = PackagingUnit,
+                        ConversionFactor = UnitsPerPackage > 0 ? UnitsPerPackage : 1m,
+                        PurchaseRate = PurchaseRate * UnitsPerPackage,
+                        SellingRate = SellingRate,
+                        Mrp = Mrp * UnitsPerPackage,
+                        IsBaseUnit = false
+                    });
+                }
 
                 Product saved;
                 if (IsEditMode)

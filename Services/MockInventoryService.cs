@@ -35,6 +35,7 @@ namespace STOMS_SBV1_BOS_IME.Services
         private readonly List<StockApprovalRequest> _approvalRequests = new();
         private readonly List<Warehouse> _warehouses = new();
         private readonly List<Rack> _racks = new();
+        private int _autoBatchSequence = 1;
 
         public bool IsConnectedToRemoteApi => false;
         public string ApiEndpointUrl => "https://api.stoms.internal/v1 (In-Memory Master Ledger)";
@@ -145,7 +146,7 @@ namespace STOMS_SBV1_BOS_IME.Services
                 Id = "PRD-101",
                 Name = "Heavy Industrial Ball Bearings (Deep Groove 6205)",
                 Sku = "SKU-BRG-6205",
-                Barcode = "8901234567890",
+                Barcode = "8901234567801",
                 Category = "Mechanical Power Transmission",
                 Unit = "Pcs",
                 Description = "High precision deep groove ball bearing 6205-2RS with rubber contact seals for rotary motors and pumps.",
@@ -972,7 +973,11 @@ namespace STOMS_SBV1_BOS_IME.Services
                     });
                 }
 
-                var product = _products.FirstOrDefault(p => p.Id.Equals(dto.ProductId, StringComparison.OrdinalIgnoreCase));
+                var product = _products.FirstOrDefault(p =>
+                    p.Id.Equals(dto.ProductId, StringComparison.OrdinalIgnoreCase) ||
+                    p.Sku.Equals(dto.ProductId, StringComparison.OrdinalIgnoreCase) ||
+                    (!string.IsNullOrEmpty(p.Barcode) && p.Barcode.Equals(dto.ProductId, StringComparison.OrdinalIgnoreCase)));
+
                 if (product == null)
                 {
                     return Task.FromResult(new StockReceiveResult
@@ -982,57 +987,118 @@ namespace STOMS_SBV1_BOS_IME.Services
                     });
                 }
 
-                var warehouse = _warehouses.FirstOrDefault(w => w.Id == dto.WarehouseId);
-                var rack = _racks.FirstOrDefault(r => r.Id == dto.RackId);
-                var section = rack?.Sections.FirstOrDefault(s => s.Id == dto.SectionId);
+                // Automatic Unit Conversion (Part 5.C)
+                var unitName = !string.IsNullOrWhiteSpace(dto.Unit) ? dto.Unit : product.Unit;
+                decimal conversionFactor = 1m;
+                var configuredUnit = product.FindUnit(unitName);
+                if (configuredUnit != null && configuredUnit.ConversionFactor > 0)
+                {
+                    conversionFactor = configuredUnit.ConversionFactor;
+                }
+                else
+                {
+                    conversionFactor = UnitConversionEngine.Instance.GetDefaultConversionFactor(product.Unit, unitName);
+                }
 
-                if (warehouse == null || rack == null || section == null)
+                decimal baseQuantity = dto.Quantity * conversionFactor;
+
+                // Location Resolution & Dynamic Provisioning
+                var warehouse = _warehouses.FirstOrDefault(w => w.Id == dto.WarehouseId || w.Code == dto.WarehouseId) ?? _warehouses.First();
+                var rack = _racks.FirstOrDefault(r =>
+                    r.Id == dto.RackId ||
+                    r.RackCode.Equals(dto.RackId, StringComparison.OrdinalIgnoreCase) ||
+                    r.RackCode.Equals($"RCK-{dto.RackId}", StringComparison.OrdinalIgnoreCase));
+
+                if (rack == null)
+                {
+                    // Auto-provision rack if user designated a simple code like "A" or "B"
+                    var rackCode = dto.RackId.StartsWith("RCK-", StringComparison.OrdinalIgnoreCase) ? dto.RackId : $"RCK-{dto.RackId}";
+                    rack = new Rack
+                    {
+                        Id = $"RCK-{Guid.NewGuid().ToString("N")[..6]}",
+                        RackCode = rackCode,
+                        Name = $"Rack {dto.RackId}",
+                        WarehouseId = warehouse.Id,
+                        WarehouseName = warehouse.Name,
+                        Zone = "Central Bay"
+                    };
+                    _racks.Add(rack);
+                }
+
+                var shelfCode = !string.IsNullOrWhiteSpace(dto.ShelfCode) ? dto.ShelfCode : (!string.IsNullOrWhiteSpace(dto.SectionId) ? dto.SectionId : "S1");
+                var section = rack.Sections.FirstOrDefault(s => s.Id == dto.SectionId || s.SectionCode.Equals(shelfCode, StringComparison.OrdinalIgnoreCase));
+                if (section == null)
+                {
+                    section = new RackSection
+                    {
+                        Id = $"SEC-{Guid.NewGuid().ToString("N")[..6]}",
+                        RackId = rack.Id,
+                        RackCode = rack.RackCode,
+                        SectionCode = shelfCode,
+                        Name = $"Shelf {shelfCode}",
+                        MaxCapacity = 500,
+                        OccupiedCapacity = 0
+                    };
+                    rack.Sections.Add(section);
+                }
+
+                // Auto-sync Shelf collection on Rack
+                var shelf = rack.Shelves.FirstOrDefault(s => s.ShelfCode.Equals(shelfCode, StringComparison.OrdinalIgnoreCase));
+                if (shelf == null)
+                {
+                    shelf = new RackShelf
+                    {
+                        ShelfId = section.Id,
+                        ShelfCode = section.SectionCode,
+                        RackId = rack.Id,
+                        RackCode = rack.RackCode,
+                        WarehouseId = warehouse.Id
+                    };
+                    rack.Shelves.Add(shelf);
+                }
+
+                // Batch Tracking Validation (when manual batch is expected and no mfg/expiry is provided for auto-batch)
+                if (product.IsBatchTracked && string.IsNullOrWhiteSpace(dto.BatchNumber) && !dto.ExpiryDate.HasValue && !dto.MfgDate.HasValue)
                 {
                     return Task.FromResult(new StockReceiveResult
                     {
                         Success = false,
-                        Message = "Destination storage location (Warehouse, Rack, Tier Section) is invalid or inactive."
+                        Message = "Batch/Lot number is required for batch-tracked products."
                     });
                 }
 
-                // Batch Validation
-                if (product.IsBatchTracked)
+                // Expiry Date Validation
+                if (dto.MfgDate.HasValue && dto.ExpiryDate.HasValue && dto.ExpiryDate.Value.Date <= dto.MfgDate.Value.Date)
                 {
-                    if (string.IsNullOrWhiteSpace(dto.BatchNumber))
+                    return Task.FromResult(new StockReceiveResult
                     {
-                        return Task.FromResult(new StockReceiveResult
-                        {
-                            Success = false,
-                            Message = "Batch/Lot number is required for batch-tracked products."
-                        });
-                    }
+                        Success = false,
+                        Message = "Expiry date must be strictly after the manufacturing date."
+                    });
+                }
 
-                    if (product.RequiresExpiry)
+                if (product.RequiresExpiry && !dto.ExpiryDate.HasValue)
+                {
+                    return Task.FromResult(new StockReceiveResult
                     {
-                        if (!dto.ExpiryDate.HasValue)
-                        {
-                            return Task.FromResult(new StockReceiveResult
-                            {
-                                Success = false,
-                                Message = "Expiry date is mandatory for perishable products."
-                            });
-                        }
+                        Success = false,
+                        Message = "Expiry date is mandatory for perishable products."
+                    });
+                }
 
-                        if (dto.ExpiryDate.Value.Date <= DateTime.Today)
-                        {
-                            return Task.FromResult(new StockReceiveResult
-                            {
-                                Success = false,
-                                Message = "Expiry date must be in the future. Cannot receive already expired stock."
-                            });
-                        }
-                    }
+                if (dto.ExpiryDate.HasValue && dto.ExpiryDate.Value.Date <= DateTime.Today)
+                {
+                    return Task.FromResult(new StockReceiveResult
+                    {
+                        Success = false,
+                        Message = "Expiry date must be in the future. Cannot receive already expired stock."
+                    });
                 }
 
                 // Serial Number Validation
                 if (product.IsSerialTracked)
                 {
-                    int expectedCount = (int)dto.Quantity;
+                    int expectedCount = (int)baseQuantity;
                     if (dto.SerialNumbers == null || dto.SerialNumbers.Count != expectedCount)
                     {
                         return Task.FromResult(new StockReceiveResult
@@ -1042,7 +1108,6 @@ namespace STOMS_SBV1_BOS_IME.Services
                         });
                     }
 
-                    // Check for duplicate serials in request
                     var duplicatesInRequest = dto.SerialNumbers.GroupBy(s => s.Trim(), StringComparer.OrdinalIgnoreCase)
                         .Where(g => g.Count() > 1)
                         .Select(g => g.Key)
@@ -1057,7 +1122,6 @@ namespace STOMS_SBV1_BOS_IME.Services
                         });
                     }
 
-                    // Check if any serial already exists in the registry for this product
                     foreach (var sn in dto.SerialNumbers)
                     {
                         var trimmedSn = sn.Trim();
@@ -1072,46 +1136,58 @@ namespace STOMS_SBV1_BOS_IME.Services
                     }
                 }
 
-                // 1. Process Batch Record
-                if (product.IsBatchTracked && !string.IsNullOrWhiteSpace(dto.BatchNumber))
+                // Automatic Batch Generation (Part 5.E & Test 2)
+                string batchNumber = dto.BatchNumber?.Trim() ?? string.Empty;
+                if (string.IsNullOrWhiteSpace(batchNumber))
                 {
-                    var cleanBatch = dto.BatchNumber.Trim();
-                    var existingBatch = _batches.FirstOrDefault(b =>
-                        b.ProductId == product.Id &&
-                        b.BatchNumber.Equals(cleanBatch, StringComparison.OrdinalIgnoreCase) &&
-                        b.SectionId == section.Id);
-
-                    if (existingBatch != null)
-                    {
-                        existingBatch.ReceivedQuantity += dto.Quantity;
-                        existingBatch.RemainingQuantity += dto.Quantity;
-                    }
-                    else
-                    {
-                        _batches.Add(new StockBatch
-                        {
-                            BatchId = $"BAT-{Guid.NewGuid().ToString("N")[..8].ToUpperInvariant()}",
-                            BatchNumber = cleanBatch,
-                            ProductId = product.Id,
-                            ProductName = product.Name,
-                            Sku = product.Sku,
-                            WarehouseId = warehouse.Id,
-                            WarehouseName = warehouse.Name,
-                            RackId = rack.Id,
-                            RackCode = rack.RackCode,
-                            SectionId = section.Id,
-                            SectionCode = section.SectionCode,
-                            ReceivedQuantity = dto.Quantity,
-                            RemainingQuantity = dto.Quantity,
-                            Unit = product.Unit,
-                            MfgDate = dto.MfgDate,
-                            ExpiryDate = dto.ExpiryDate,
-                            ReceivedDate = DateTime.Now,
-                            Supplier = dto.Supplier,
-                            Status = StockStatus.Normal
-                        });
-                    }
+                    string pfx = product.Name.Length >= 3
+                        ? new string(product.Name.Where(char.IsLetter).Take(3).ToArray()).ToUpperInvariant()
+                        : "BAT";
+                    if (string.IsNullOrWhiteSpace(pfx)) pfx = "BAT";
+                    batchNumber = $"{pfx}-{DateTime.Now:yyyy}-{_autoBatchSequence++:D4}";
                 }
+
+                // 1. Process Batch Record
+                var batchId = $"BAT-{Guid.NewGuid().ToString("N")[..8].ToUpperInvariant()}";
+                var newBatch = new StockBatch
+                {
+                    BatchId = batchId,
+                    BatchNumber = batchNumber,
+                    ProductId = product.Id,
+                    ProductName = product.Name,
+                    Sku = product.Sku,
+                    WarehouseId = warehouse.Id,
+                    WarehouseName = warehouse.Name,
+                    RackId = rack.Id,
+                    RackCode = rack.RackCode,
+                    SectionId = section.Id,
+                    SectionCode = section.SectionCode,
+                    ShelfId = shelf.ShelfId,
+                    ShelfCode = shelf.ShelfCode,
+                    SupplierBatchNumber = dto.SupplierBatchNumber ?? string.Empty,
+                    ReceivedQuantity = baseQuantity,
+                    RemainingQuantity = baseQuantity,
+                    Unit = product.Unit,
+                    MfgDate = dto.MfgDate,
+                    ExpiryDate = dto.ExpiryDate,
+                    ReceivedDate = DateTime.Now,
+                    Supplier = dto.Supplier,
+                    Status = StockStatus.Normal
+                };
+                _batches.Add(newBatch);
+
+                // Add to shelf stored items
+                shelf.StoredItems.Add(new ShelfStoredItem
+                {
+                    ProductId = product.Id,
+                    ProductName = product.Name,
+                    Sku = product.Sku,
+                    BatchId = batchId,
+                    BatchNumber = batchNumber,
+                    Quantity = baseQuantity,
+                    Unit = product.Unit,
+                    ExpiryDate = dto.ExpiryDate
+                });
 
                 // 2. Process Serial Records
                 if (product.IsSerialTracked && dto.SerialNumbers != null)
@@ -1125,7 +1201,7 @@ namespace STOMS_SBV1_BOS_IME.Services
                             ProductId = product.Id,
                             ProductName = product.Name,
                             Sku = product.Sku,
-                            BatchNumber = dto.BatchNumber?.Trim(),
+                            BatchNumber = batchNumber,
                             WarehouseId = warehouse.Id,
                             WarehouseName = warehouse.Name,
                             RackId = rack.Id,
@@ -1143,12 +1219,12 @@ namespace STOMS_SBV1_BOS_IME.Services
                 var locBal = _locationBalances.FirstOrDefault(b =>
                     b.ProductId == product.Id &&
                     b.WarehouseId == warehouse.Id &&
-                    b.SectionId == section.Id);
+                    (b.SectionId == section.Id || b.SectionCode == shelf.ShelfCode));
 
                 if (locBal != null)
                 {
-                    locBal.PhysicalQuantity += dto.Quantity;
-                    locBal.AvailableQuantity += dto.Quantity;
+                    locBal.PhysicalQuantity += baseQuantity;
+                    locBal.AvailableQuantity += baseQuantity;
                 }
                 else
                 {
@@ -1163,15 +1239,15 @@ namespace STOMS_SBV1_BOS_IME.Services
                         RackCode = rack.RackCode,
                         SectionId = section.Id,
                         SectionCode = section.SectionCode,
-                        PhysicalQuantity = dto.Quantity,
-                        AvailableQuantity = dto.Quantity,
+                        PhysicalQuantity = baseQuantity,
+                        AvailableQuantity = baseQuantity,
                         Unit = product.Unit
                     });
                 }
 
-                // 4. Update Product Master Totals
-                product.PhysicalStock += dto.Quantity;
-                product.AvailableStock += dto.Quantity;
+                // 4. Update Product Master Totals in Base Units
+                product.PhysicalStock += baseQuantity;
+                product.AvailableStock += baseQuantity;
                 product.UpdatedAt = DateTime.Now;
 
                 // 5. Create Movement Transaction
@@ -1183,14 +1259,19 @@ namespace STOMS_SBV1_BOS_IME.Services
                     ProductId = product.Id,
                     ProductName = product.Name,
                     Sku = product.Sku,
+                    BatchId = batchId,
+                    BatchNumber = batchNumber,
                     Type = MovementType.StockIn,
-                    Quantity = dto.Quantity,
+                    Quantity = baseQuantity,
+                    BaseQuantity = baseQuantity,
                     Unit = product.Unit,
+                    PreviousBalance = product.PhysicalStock - baseQuantity,
+                    NewBalance = product.PhysicalStock,
                     SourceLocation = string.IsNullOrWhiteSpace(dto.Supplier) ? "Supplier Goods Inward" : $"Supplier: {dto.Supplier}",
-                    DestinationLocation = $"{warehouse.Code} / {rack.RackCode} / {section.SectionCode}",
+                    DestinationLocation = $"{warehouse.Code} / {rack.RackCode} / {shelf.ShelfCode}",
                     InitiatedBy = dto.ReceivedBy,
                     Status = MovementStatus.Completed,
-                    Remarks = string.IsNullOrWhiteSpace(dto.ReferenceNumber) ? "GRN Stock Inward" : $"Ref: {dto.ReferenceNumber} — {dto.Notes}"
+                    Remarks = $"GRN Stock Inward: {dto.Quantity} {unitName} ({baseQuantity:N0} {product.Unit}). Batch: {batchNumber}"
                 });
 
                 InventoryChanged?.Invoke(this, EventArgs.Empty);
@@ -1198,8 +1279,10 @@ namespace STOMS_SBV1_BOS_IME.Services
                 return Task.FromResult(new StockReceiveResult
                 {
                     Success = true,
-                    Message = $"Successfully received {dto.Quantity:N0} {product.Unit} into {rack.RackCode} / {section.SectionCode}.",
+                    Message = $"Successfully received {dto.Quantity:N0} {unitName} ({baseQuantity:N0} {product.Unit}) into {rack.RackCode} / {shelf.ShelfCode}. Batch: {batchNumber}",
                     TransactionId = txnId,
+                    GeneratedBatchNumber = batchNumber,
+                    ConvertedBaseQuantity = baseQuantity,
                     NewPhysicalStock = product.PhysicalStock,
                     NewAvailableStock = product.AvailableStock
                 });
@@ -1727,9 +1810,215 @@ namespace STOMS_SBV1_BOS_IME.Services
         {
             lock (_lock)
             {
-                var rack = _racks.FirstOrDefault(r => r.Id == rackId);
+                var rack = _racks.FirstOrDefault(r => r.Id == rackId || r.RackCode.Equals(rackId, StringComparison.OrdinalIgnoreCase));
                 var sections = rack?.Sections.ToList() ?? new List<RackSection>();
                 return Task.FromResult(sections);
+            }
+        }
+
+        public Task<List<RackShelf>> GetShelvesByRackAsync(string rackIdOrCode)
+        {
+            lock (_lock)
+            {
+                var rack = _racks.FirstOrDefault(r =>
+                    r.Id == rackIdOrCode ||
+                    r.RackCode.Equals(rackIdOrCode, StringComparison.OrdinalIgnoreCase));
+                var shelves = rack?.Shelves.ToList() ?? new List<RackShelf>();
+                return Task.FromResult(shelves);
+            }
+        }
+
+        public Task<bool> TransferStockAsync(
+            string productId,
+            string batchId,
+            decimal quantity,
+            string sourceLocation,
+            string destinationRackCode,
+            string destinationShelfCode,
+            string destinationWarehouseId = "WH-01")
+        {
+            lock (_lock)
+            {
+                if (quantity <= 0) return Task.FromResult(false);
+
+                var product = _products.FirstOrDefault(p => p.Id == productId || p.Sku == productId);
+                if (product == null) return Task.FromResult(false);
+
+                var batch = _batches.FirstOrDefault(b => (b.BatchId == batchId || b.BatchNumber == batchId) && b.ProductId == product.Id);
+                if (batch == null || batch.RemainingQuantity < quantity) return Task.FromResult(false);
+
+                var destWarehouse = _warehouses.FirstOrDefault(w => w.Id == destinationWarehouseId) ?? _warehouses.First();
+                var destRack = _racks.FirstOrDefault(r => r.RackCode.Equals(destinationRackCode, StringComparison.OrdinalIgnoreCase));
+                if (destRack == null)
+                {
+                    destRack = new Rack
+                    {
+                        Id = $"RCK-{Guid.NewGuid().ToString("N")[..6]}",
+                        RackCode = destinationRackCode,
+                        Name = $"Rack {destinationRackCode}",
+                        WarehouseId = destWarehouse.Id,
+                        WarehouseName = destWarehouse.Name
+                    };
+                    _racks.Add(destRack);
+                }
+
+                // If moving entire batch quantity: update batch location directly
+                if (batch.RemainingQuantity == quantity)
+                {
+                    batch.WarehouseId = destWarehouse.Id;
+                    batch.WarehouseName = destWarehouse.Name;
+                    batch.RackId = destRack.Id;
+                    batch.RackCode = destRack.RackCode;
+                    batch.SectionCode = destinationShelfCode;
+                    batch.ShelfCode = destinationShelfCode;
+                }
+                else
+                {
+                    // Split batch for partial quantity transfer
+                    batch.RemainingQuantity -= quantity;
+                    var newBatch = new StockBatch
+                    {
+                        BatchId = $"BAT-{Guid.NewGuid().ToString("N")[..8].ToUpperInvariant()}",
+                        BatchNumber = batch.BatchNumber,
+                        ProductId = product.Id,
+                        ProductName = product.Name,
+                        Sku = product.Sku,
+                        WarehouseId = destWarehouse.Id,
+                        WarehouseName = destWarehouse.Name,
+                        RackId = destRack.Id,
+                        RackCode = destRack.RackCode,
+                        SectionCode = destinationShelfCode,
+                        ShelfCode = destinationShelfCode,
+                        ReceivedQuantity = quantity,
+                        RemainingQuantity = quantity,
+                        Unit = batch.Unit,
+                        MfgDate = batch.MfgDate,
+                        ExpiryDate = batch.ExpiryDate,
+                        ReceivedDate = batch.ReceivedDate,
+                        Supplier = batch.Supplier,
+                        Status = batch.Status
+                    };
+                    _batches.Add(newBatch);
+                }
+
+                // Total stock on product remains unchanged! Only location balances change (Part 11 & Test 9)
+                _movements.Insert(0, new StockMovement
+                {
+                    TransactionId = $"MOV-{DateTime.Now:yyyyMMdd}-{Guid.NewGuid():N}"[..20],
+                    Timestamp = DateTime.Now,
+                    ProductId = product.Id,
+                    ProductName = product.Name,
+                    Sku = product.Sku,
+                    BatchId = batch.BatchId,
+                    BatchNumber = batch.BatchNumber,
+                    Type = MovementType.RackTransfer,
+                    Quantity = quantity,
+                    BaseQuantity = quantity,
+                    Unit = product.Unit,
+                    PreviousBalance = product.PhysicalStock,
+                    NewBalance = product.PhysicalStock,
+                    SourceLocation = sourceLocation,
+                    DestinationLocation = $"{destRack.RackCode} → {destinationShelfCode}",
+                    InitiatedBy = "Current User",
+                    Status = MovementStatus.Completed,
+                    Remarks = $"Internal stock relocation: {quantity} {product.Unit}"
+                });
+
+                InventoryChanged?.Invoke(this, EventArgs.Empty);
+                return Task.FromResult(true);
+            }
+        }
+
+        public void DeductShelfStock(string rackCode, string shelfCode, decimal baseQuantity)
+        {
+            lock (_lock)
+            {
+                var rack = _racks.FirstOrDefault(r => r.RackCode.Equals(rackCode, StringComparison.OrdinalIgnoreCase));
+                var shelf = rack?.Shelves.FirstOrDefault(s => s.ShelfCode.Equals(shelfCode, StringComparison.OrdinalIgnoreCase));
+                if (shelf != null)
+                {
+                    shelf.OccupiedCapacity = Math.Max(0m, shelf.OccupiedCapacity - (baseQuantity * 0.5m)); // Approximate weight factor
+                }
+            }
+        }
+
+        public void RestoreShelfStock(string rackCode, string shelfCode, decimal baseQuantity)
+        {
+            lock (_lock)
+            {
+                var rack = _racks.FirstOrDefault(r => r.RackCode.Equals(rackCode, StringComparison.OrdinalIgnoreCase));
+                var shelf = rack?.Shelves.FirstOrDefault(s => s.ShelfCode.Equals(shelfCode, StringComparison.OrdinalIgnoreCase));
+                if (shelf != null)
+                {
+                    shelf.OccupiedCapacity += (baseQuantity * 0.5m);
+                }
+            }
+        }
+
+        public void RecordDirectMovement(StockMovement movement)
+        {
+            lock (_lock)
+            {
+                _movements.Insert(0, movement);
+                InventoryChanged?.Invoke(this, EventArgs.Empty);
+            }
+        }
+
+        public void SynchronizeFromLayout(WarehouseRackLayout layout)
+        {
+            lock (_lock)
+            {
+                var warehouse = _warehouses.FirstOrDefault(w => w.Id == layout.WarehouseId) ?? _warehouses.First();
+
+                foreach (var item in layout.Items.Where(i => i.ElementType == LayoutElementType.Rack))
+                {
+                    var existingRack = _racks.FirstOrDefault(r => r.RackCode.Equals(item.Code, StringComparison.OrdinalIgnoreCase));
+                    if (existingRack == null)
+                    {
+                        existingRack = new Rack
+                        {
+                            Id = $"RCK-{item.Id[..Math.Min(item.Id.Length, 8)]}",
+                            RackCode = item.Code,
+                            Name = item.Name,
+                            WarehouseId = warehouse.Id,
+                            WarehouseName = warehouse.Name,
+                            Zone = item.Zone,
+                            CanvasX = item.X,
+                            CanvasY = item.Y,
+                            Width = item.Width,
+                            Height = item.Height,
+                            MaxCapacity = 1000m
+                        };
+                        _racks.Add(existingRack);
+                    }
+                    else
+                    {
+                        existingRack.Name = item.Name;
+                        existingRack.CanvasX = item.X;
+                        existingRack.CanvasY = item.Y;
+                        existingRack.Width = item.Width;
+                        existingRack.Height = item.Height;
+                    }
+
+                    // Synchronize shelves
+                    var shelfCodes = item.GenerateShelfCodes();
+                    foreach (var code in shelfCodes)
+                    {
+                        if (!existingRack.Shelves.Any(s => s.ShelfCode.Equals(code, StringComparison.OrdinalIgnoreCase)))
+                        {
+                            existingRack.Shelves.Add(new RackShelf
+                            {
+                                ShelfId = $"SHF-{Guid.NewGuid():N}"[..10],
+                                ShelfCode = code,
+                                RackId = existingRack.Id,
+                                RackCode = existingRack.RackCode,
+                                WarehouseId = warehouse.Id
+                            });
+                        }
+                    }
+                }
+
+                InventoryChanged?.Invoke(this, EventArgs.Empty);
             }
         }
     }

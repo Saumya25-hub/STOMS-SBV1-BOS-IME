@@ -139,6 +139,7 @@ namespace STOMS_SBV1_BOS_IME.ViewModels
         public ICommand ZoomOutCommand { get; }
         public ICommand ResetZoomCommand { get; }
         public ICommand OpenAddRackCommand { get; }
+        public ICommand OpenRackDesignerCommand { get; }
         public ICommand SaveNewRackCommand { get; }
         public ICommand CancelNewRackCommand { get; }
         public ICommand DeleteRackCommand { get; }
@@ -165,6 +166,11 @@ namespace STOMS_SBV1_BOS_IME.ViewModels
             {
                 NewRackCode = $"RCK-{char.ConvertFromUtf32(65 + Racks.Count)}-01";
                 IsAddRackOpen = true;
+            });
+
+            OpenRackDesignerCommand = new RelayCommand(() =>
+            {
+                _navigationService.NavigateTo("RackDesigner");
             });
 
             SaveNewRackCommand = new RelayCommand(SaveNewRack);
@@ -269,3 +275,4 @@ namespace STOMS_SBV1_BOS_IME.ViewModels
         }
     }
 }
+

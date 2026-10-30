@@ -25,6 +25,8 @@ namespace STOMS_SBV1_BOS_IME.Models
         }
 
         public string Id { get; set; } = string.Empty;
+        public string RackId { get; set; } = string.Empty;
+        public string RackCode { get; set; } = string.Empty;
         public string SectionCode { get; set; } = string.Empty;
         public string Name { get; set; } = string.Empty;
         public int TierLevel { get; set; } = 1;

@@ -89,14 +89,19 @@
 
                         <!-- Barcode (Optional) -->
                         <StackPanel Grid.Column="2">
-                            <TextBlock Text="Barcode (Optional)" Style="{StaticResource SectionHeader}" Margin="0,0,0,4"/>
+                            <Grid Margin="0,0,0,4">
+                                <TextBlock Text="Barcode (EAN-13 / Code128)" Style="{StaticResource SectionHeader}"/>
+                                <Button Content="Auto-Gen" Command="{Binding GenerateBarcodeCommand}" 
+                                        HorizontalAlignment="Right" FontSize="11" Padding="6,1" 
+                                        Style="{StaticResource OutlineButton}" Height="20" ToolTip="Generate valid internal EAN-13 barcode"/>
+                            </Grid>
                             <Grid>
                                 <TextBox Text="{Binding Barcode, UpdateSourceTrigger=PropertyChanged}" 
                                          Style="{StaticResource FormTextBox}" 
                                          FontFamily="Consolas" FontSize="12" Padding="28,6,8,6"/>
                                 <Path Data="{StaticResource Icon.Barcode}" Fill="{DynamicResource Theme.Text.Muted}" Width="14" Height="14" Stretch="Uniform" HorizontalAlignment="Left" Margin="8,0,0,0" VerticalAlignment="Center"/>
                             </Grid>
-                            <TextBlock Text="EAN-13, UPC or QR code string" FontSize="10" Foreground="{DynamicResource Theme.Text.Muted}" Margin="0,2,0,0"/>
+                            <TextBlock Text="Scanned or generated barcode identifier" FontSize="10" Foreground="{DynamicResource Theme.Text.Muted}" Margin="0,2,0,0"/>
                         </StackPanel>
                     </Grid>
 

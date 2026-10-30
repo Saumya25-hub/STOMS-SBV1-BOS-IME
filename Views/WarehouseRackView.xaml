@@ -69,6 +69,13 @@
                         </StackPanel>
                     </Border>
 
+                    <!-- Designer Wizard Button -->
+                    <Button Style="{StaticResource OutlineButton}" Command="{Binding OpenRackDesignerCommand}" Height="34" Margin="0,0,8,0" Padding="12,0" ToolTip="Open Visual Drag-and-Drop Rack Canvas Designer">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="📐 Visual Designer" FontWeight="SemiBold" FontSize="12"/>
+                        </StackPanel>
+                    </Button>
+
                     <!-- Add Rack Action -->
                     <Button Style="{StaticResource PrimaryButton}" Command="{Binding OpenAddRackCommand}" Height="34" Padding="14,0">
                         <StackPanel Orientation="Horizontal">
@@ -358,3 +365,4 @@
         </Grid>
     </Grid>
 </UserControl>
+

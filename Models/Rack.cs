@@ -57,6 +57,9 @@ namespace STOMS_SBV1_BOS_IME.Models
         public string CapacityUnit { get; set; } = "kg";
 
         public List<RackSection> Sections { get; set; } = new();
+        public List<RackShelf> Shelves { get; set; } = new();
+
+        public int ShelvesCount => Shelves.Count > 0 ? Shelves.Count : SectionsCount;
 
         public bool IsExpanded
         {

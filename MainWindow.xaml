@@ -24,6 +24,12 @@
         <DataTemplate DataType="{x:Type viewmodels:WarehouseRackViewModel}">
             <views:WarehouseRackView/>
         </DataTemplate>
+        <DataTemplate DataType="{x:Type viewmodels:RackDesignerViewModel}">
+            <views:RackDesignerWizardView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewmodels:SalesInvoiceViewModel}">
+            <views:SalesInvoiceView/>
+        </DataTemplate>
         <DataTemplate DataType="{x:Type viewmodels:SettingsViewModel}">
             <views:SettingsView/>
         </DataTemplate>
@@ -175,6 +181,19 @@
                                 </Grid.ColumnDefinitions>
                                 <Path Grid.Column="0" Data="{StaticResource Icon.Outward}" Fill="{StaticResource DangerBrush}" Width="15" Height="15" Stretch="Uniform" VerticalAlignment="Center"/>
                                 <TextBlock Grid.Column="1" Text="Stock Outward (Issue)" FontSize="12.5" VerticalAlignment="Center"
+                                           Visibility="{Binding DataContext.IsSidebarCollapsed, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
+                            </Grid>
+                        </Button>
+
+                        <!-- Sales / POS Invoicing (Auto FEFO) -->
+                        <Button Style="{StaticResource SidebarNavButton}" Command="{Binding NavigateCommand}" CommandParameter="Sales" Margin="0,1" ToolTip="Smart POS Sales &amp; Invoicing with Automated FEFO">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="28"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Path Grid.Column="0" Data="{StaticResource Icon.Cart}" Fill="{StaticResource BrandAccentBrush}" Width="15" Height="15" Stretch="Uniform" VerticalAlignment="Center"/>
+                                <TextBlock Grid.Column="1" Text="Sales &amp; POS (FEFO)" FontSize="12.5" FontWeight="SemiBold" VerticalAlignment="Center"
                                            Visibility="{Binding DataContext.IsSidebarCollapsed, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
                             </Grid>
                         </Button>

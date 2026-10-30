@@ -83,7 +83,7 @@ namespace STOMS_SBV1_BOS_IME.Tests
             Assert.AreEqual("No Barcode", created.BarcodeDisplay);
 
             // Barcode uniqueness
-            bool barcodeUnique = await service.IsBarcodeUniqueAsync("8901234567890"); // Belongs to PRD-101
+            bool barcodeUnique = await service.IsBarcodeUniqueAsync("8901234567801"); // Belongs to PRD-101
             Assert.IsFalse(barcodeUnique);
 
             bool newBarcodeUnique = await service.IsBarcodeUniqueAsync("999988887777");

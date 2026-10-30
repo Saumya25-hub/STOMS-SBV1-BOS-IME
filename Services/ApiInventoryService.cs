@@ -274,6 +274,18 @@ namespace STOMS_SBV1_BOS_IME.Services
             var result = await _httpClient.GetFromJsonAsync<List<RackSection>>($"racks/{rackId}/sections");
             return result ?? new List<RackSection>();
         }
+
+        public async Task<bool> TransferStockAsync(string productId, string batchId, decimal quantity, string sourceLocation, string destinationRackCode, string destinationShelfCode, string destinationWarehouseId = "WH-01")
+        {
+            var response = await _httpClient.PostAsJsonAsync("stock/transfer", new { productId, batchId, quantity, sourceLocation, destinationRackCode, destinationShelfCode, destinationWarehouseId });
+            return response.IsSuccessStatusCode;
+        }
+
+        public async Task<List<RackShelf>> GetShelvesByRackAsync(string rackIdOrCode)
+        {
+            var result = await _httpClient.GetFromJsonAsync<List<RackShelf>>($"racks/{rackIdOrCode}/shelves");
+            return result ?? new List<RackShelf>();
+        }
     }
 }
 

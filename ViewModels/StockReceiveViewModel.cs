@@ -18,9 +18,91 @@ namespace STOMS_SBV1_BOS_IME.ViewModels
 
         private Product? _selectedProduct;
         private decimal _quantity = 1;
+        private string _barcodeInput = string.Empty;
+        private string _selectedUnit = "Pcs";
+        private decimal _purchaseRate = 0m;
+        private string _supplierBatchNumber = string.Empty;
+        private bool _isExpiryApplicable = true;
         private string _batchNumber = string.Empty;
         private DateTime? _mfgDate = DateTime.Today.AddDays(-10);
         private DateTime? _expiryDate = DateTime.Today.AddMonths(12);
+
+        public ObservableCollection<string> AvailableUnits { get; } = new();
+
+        public string BarcodeInput
+        {
+            get => _barcodeInput;
+            set => SetProperty(ref _barcodeInput, value);
+        }
+
+        public string SelectedUnit
+        {
+            get => _selectedUnit;
+            set
+            {
+                if (SetProperty(ref _selectedUnit, value))
+                {
+                    UpdatePurchaseRateForUnit();
+                    OnPropertyChanged(nameof(TotalBaseQuantity));
+                    OnPropertyChanged(nameof(TotalPurchaseValue));
+                    OnPropertyChanged(nameof(LiveConversionPreview));
+                }
+            }
+        }
+
+        public decimal PurchaseRate
+        {
+            get => _purchaseRate;
+            set
+            {
+                if (SetProperty(ref _purchaseRate, value))
+                {
+                    OnPropertyChanged(nameof(TotalPurchaseValue));
+                    OnPropertyChanged(nameof(LiveConversionPreview));
+                }
+            }
+        }
+
+        public string SupplierBatchNumber
+        {
+            get => _supplierBatchNumber;
+            set => SetProperty(ref _supplierBatchNumber, value);
+        }
+
+        public bool IsExpiryApplicable
+        {
+            get => _isExpiryApplicable;
+            set
+            {
+                if (SetProperty(ref _isExpiryApplicable, value))
+                {
+                    if (!value) ExpiryDate = null;
+                }
+            }
+        }
+
+        public decimal ConversionFactor
+        {
+            get
+            {
+                if (SelectedProduct == null) return 1m;
+                var unit = SelectedProduct.FindUnit(SelectedUnit);
+                return unit?.ConversionFactor ?? 1m;
+            }
+        }
+
+        public decimal TotalBaseQuantity => Quantity * ConversionFactor;
+
+        public decimal TotalPurchaseValue => Quantity * PurchaseRate;
+
+        public string LiveConversionPreview
+        {
+            get
+            {
+                if (SelectedProduct == null) return string.Empty;
+                return $"Entered: {Quantity:G29} {SelectedUnit} | Conversion: 1 {SelectedUnit} = {ConversionFactor:G29} {SelectedProduct.Unit} | Total Stock: {TotalBaseQuantity:N0} {SelectedProduct.Unit} | Total: ₹ {TotalPurchaseValue:N2}";
+            }
+        }
         private string _serialsInputText = string.Empty;
         private string _supplier = string.Empty;
         private string _referenceNumber = string.Empty;
@@ -57,9 +139,44 @@ namespace STOMS_SBV1_BOS_IME.ViewModels
                     {
                         // Auto-fill default location
                         SelectedWarehouse = Warehouses.FirstOrDefault(w => w.Id == value.DefaultWarehouseId) ?? Warehouses.FirstOrDefault();
+                        UpdateUnitsForProduct();
                     }
                 }
             }
+        }
+
+        private void UpdateUnitsForProduct()
+        {
+            AvailableUnits.Clear();
+            if (SelectedProduct == null) return;
+
+            AvailableUnits.Add(SelectedProduct.Unit);
+            if (!string.IsNullOrWhiteSpace(SelectedProduct.PackagingUnit) &&
+                !string.Equals(SelectedProduct.PackagingUnit, SelectedProduct.Unit, StringComparison.OrdinalIgnoreCase))
+            {
+                AvailableUnits.Add(SelectedProduct.PackagingUnit);
+            }
+
+            foreach (var u in SelectedProduct.Units)
+            {
+                if (!AvailableUnits.Contains(u.UnitName))
+                {
+                    AvailableUnits.Add(u.UnitName);
+                }
+            }
+
+            SelectedUnit = !string.IsNullOrWhiteSpace(SelectedProduct.PackagingUnit)
+                ? SelectedProduct.PackagingUnit
+                : SelectedProduct.Unit;
+
+            UpdatePurchaseRateForUnit();
+        }
+
+        private void UpdatePurchaseRateForUnit()
+        {
+            if (SelectedProduct == null) return;
+            var unit = SelectedProduct.FindUnit(SelectedUnit);
+            PurchaseRate = unit?.PurchaseRate > 0 ? unit.PurchaseRate : SelectedProduct.PurchaseRate * ConversionFactor;
         }
 
         public string ProductSku => SelectedProduct?.Sku ?? "—";
@@ -191,6 +308,7 @@ namespace STOMS_SBV1_BOS_IME.ViewModels
         public ICommand SubmitCommand { get; }
         public ICommand CancelCommand { get; }
         public ICommand AutoGenerateSerialsCommand { get; }
+        public ICommand ScanBarcodeCommand { get; }
 
         public StockReceiveViewModel(
             IInventoryService inventoryService,
@@ -205,8 +323,29 @@ namespace STOMS_SBV1_BOS_IME.ViewModels
             SubmitCommand = new AsyncRelayCommand(SubmitReceiveAsync);
             CancelCommand = new RelayCommand(() => _onCancelled());
             AutoGenerateSerialsCommand = new RelayCommand(AutoGenerateSerials);
+            ScanBarcodeCommand = new AsyncRelayCommand(ProcessBarcodeScanAsync);
 
             _ = InitializeAsync(preselectedProductId);
+        }
+
+        public async Task ProcessBarcodeScanAsync()
+        {
+            if (string.IsNullOrWhiteSpace(BarcodeInput)) return;
+            var barcode = BarcodeInput.Trim();
+            BarcodeInput = string.Empty;
+
+            var product = await _inventoryService.GetProductByBarcodeAsync(barcode) ??
+                          await _inventoryService.GetProductBySkuAsync(barcode);
+
+            if (product != null)
+            {
+                SelectedProduct = product;
+                ErrorMessage = string.Empty;
+            }
+            else
+            {
+                ErrorMessage = $"Product with barcode '{barcode}' not found in Product Master. Would you like to create this product?";
+            }
         }
 
         private async Task InitializeAsync(string? preselectedProductId)
@@ -370,14 +509,18 @@ namespace STOMS_SBV1_BOS_IME.ViewModels
                 {
                     ProductId = SelectedProduct.Id,
                     Quantity = Quantity,
-                    Unit = SelectedProduct.Unit,
-                    BatchNumber = IsBatchTracked ? BatchNumber.Trim() : null,
+                    Unit = SelectedUnit,
+                    PurchaseRate = PurchaseRate,
+                    SupplierBatchNumber = SupplierBatchNumber.Trim(),
+                    BatchNumber = !string.IsNullOrWhiteSpace(BatchNumber) ? BatchNumber.Trim() : null,
                     MfgDate = MfgDate,
-                    ExpiryDate = ExpiryDate,
+                    ExpiryDate = IsExpiryApplicable ? ExpiryDate : null,
                     SerialNumbers = parsedSerials,
                     WarehouseId = SelectedWarehouse.Id,
                     RackId = SelectedRack.Id,
                     SectionId = SelectedSection.Id,
+                    ShelfId = SelectedSection.Id,
+                    ShelfCode = SelectedSection.SectionCode,
                     Supplier = Supplier.Trim(),
                     ReferenceNumber = ReferenceNumber.Trim(),
                     Notes = Notes.Trim(),

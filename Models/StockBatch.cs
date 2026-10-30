@@ -16,6 +16,9 @@ namespace STOMS_SBV1_BOS_IME.Models
         private string _rackCode = string.Empty;
         private string _sectionId = string.Empty;
         private string _sectionCode = string.Empty;
+        private string _shelfId = string.Empty;
+        private string _shelfCode = string.Empty;
+        private string _supplierBatchNumber = string.Empty;
         private decimal _receivedQuantity;
         private decimal _remainingQuantity;
         private string _unit = "Pcs";
@@ -89,6 +92,24 @@ namespace STOMS_SBV1_BOS_IME.Models
         {
             get => _sectionCode;
             set => SetProperty(ref _sectionCode, value);
+        }
+
+        public string ShelfId
+        {
+            get => _shelfId;
+            set => SetProperty(ref _shelfId, value);
+        }
+
+        public string ShelfCode
+        {
+            get => _shelfCode;
+            set => SetProperty(ref _shelfCode, value);
+        }
+
+        public string SupplierBatchNumber
+        {
+            get => _supplierBatchNumber;
+            set => SetProperty(ref _supplierBatchNumber, value);
         }
 
         public decimal ReceivedQuantity
@@ -185,7 +206,7 @@ namespace STOMS_SBV1_BOS_IME.Models
         public string RemainingQuantityDisplay => $"{RemainingQuantity:N0} / {ReceivedQuantity:N0} {Unit}";
 
         public string LocationDisplay => !string.IsNullOrEmpty(WarehouseName)
-            ? $"{WarehouseName} [{RackCode} / {SectionCode}]"
+            ? $"{WarehouseName} [{RackCode} / {(string.IsNullOrEmpty(ShelfCode) ? SectionCode : ShelfCode)}]"
             : "Unassigned";
 
         public string StatusDisplay => Status switch

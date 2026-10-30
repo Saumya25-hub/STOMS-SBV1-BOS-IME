@@ -30,6 +30,8 @@ namespace STOMS_SBV1_BOS_IME.ViewModels
         private readonly ProductManagementViewModel _productManagementViewModel;
         private readonly WarehouseRackViewModel _warehouseRackViewModel;
         private readonly SettingsViewModel _settingsViewModel;
+        private readonly SalesInvoiceViewModel _salesInvoiceViewModel;
+        private readonly RackDesignerViewModel _rackDesignerViewModel;
 
         public object CurrentViewModel
         {
@@ -139,6 +141,8 @@ namespace STOMS_SBV1_BOS_IME.ViewModels
             _productManagementViewModel = new ProductManagementViewModel(MockInventoryService.Instance, _navigationService);
             _warehouseRackViewModel = new WarehouseRackViewModel(null, MockInventoryService.Instance, _navigationService);
             _settingsViewModel = new SettingsViewModel(_themeService, _localizationService);
+            _salesInvoiceViewModel = new SalesInvoiceViewModel(SalesService.Instance, MockInventoryService.Instance, BarcodeService.Instance, _navigationService);
+            _rackDesignerViewModel = new RackDesignerViewModel(RackLayoutService.Instance, MockInventoryService.Instance, _navigationService);
 
             _currentViewModel = _dashboardViewModel;
 
@@ -252,6 +256,22 @@ namespace STOMS_SBV1_BOS_IME.ViewModels
                     PageSubtitle = "Interactive 2D visual layout studio & storage bays";
                     Breadcrumb = "STOMS ERP / Logistics / Warehouse & Rack Layout";
                     CurrentViewModel = _warehouseRackViewModel;
+                    break;
+
+                case "RackDesigner":
+                    ActiveNavKey = "Warehouse";
+                    PageTitle = "Visual Rack Designer";
+                    PageSubtitle = "Layout canvas & visual storage topology builder";
+                    Breadcrumb = "STOMS ERP / Logistics / Visual Rack Designer";
+                    CurrentViewModel = _rackDesignerViewModel;
+                    break;
+
+                case "Sales":
+                case "POS":
+                    PageTitle = "Sales & POS Invoicing";
+                    PageSubtitle = "Point of sale billing with automated FEFO batch allocation";
+                    Breadcrumb = "STOMS ERP / Operations / Sales & POS";
+                    CurrentViewModel = _salesInvoiceViewModel;
                     break;
 
                 case "Movements":

@@ -49,11 +49,22 @@ namespace STOMS_SBV1_BOS_IME.Services
         Task<bool> ApproveIssueRequestAsync(string requestId, string approvedBy);
         Task<bool> RejectIssueRequestAsync(string requestId, string rejectedBy, string reason);
 
+        // Stock Transfer
+        Task<bool> TransferStockAsync(
+            string productId,
+            string batchId,
+            decimal quantity,
+            string sourceLocation,
+            string destinationRackCode,
+            string destinationShelfCode,
+            string destinationWarehouseId = "WH-01");
+
         // Topology Lookups
         Task<List<string>> GetCategoriesAsync();
         Task<List<Warehouse>> GetWarehousesAsync();
         Task<List<Rack>> GetRacksByWarehouseAsync(string warehouseId);
         Task<List<RackSection>> GetSectionsByRackAsync(string rackId);
+        Task<List<RackShelf>> GetShelvesByRackAsync(string rackIdOrCode);
     }
 }
 
