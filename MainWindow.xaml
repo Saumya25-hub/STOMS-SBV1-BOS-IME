@@ -433,7 +433,7 @@
                 Background="#FFFFFF"
                 BorderBrush="#CBD5E1"
                 BorderThickness="1"
-                ClipToBounds="True">
+                ClipToBounds="False">
             
             <Border.Effect>
                 <DropShadowEffect Color="#0F172A"
@@ -442,7 +442,7 @@
                                   Opacity="0.18" />
             </Border.Effect>
 
-            <Grid>
+            <Grid x:Name="WindowRootContent" SizeChanged="OnWindowRootContentSizeChanged">
                 <Grid.ColumnDefinitions>
                     <!-- Left: Interactive Animated Gradient Showcase (43%) -->
                     <ColumnDefinition Width="430" />
@@ -453,9 +453,10 @@
                 <!-- ================= LEFT INTERACTIVE ANIMATED GRADIENT PANEL ================= -->
                 <Border x:Name="LeftGradientHost"
                         Grid.Column="0"
-                        CornerRadius="19,0,0,19"
+                        CornerRadius="20,0,0,20"
                         ClipToBounds="True"
                         Background="#07132B"
+                        SizeChanged="OnLeftGradientHostSizeChanged"
                         MouseMove="OnLeftPanelMouseMove"
                         MouseEnter="OnLeftPanelMouseEnter"
                         MouseLeave="OnLeftPanelMouseLeave"
@@ -664,10 +665,12 @@
                 </Border>
 
                 <!-- ================= RIGHT LOGIN / WORKSPACE PANEL ================= -->
-                <Border Grid.Column="1"
-                        CornerRadius="0,19,19,0"
+                <Border x:Name="RightPanelHost"
+                        Grid.Column="1"
+                        CornerRadius="0,20,20,0"
                         Background="#FFFFFF"
-                        ClipToBounds="True">
+                        ClipToBounds="True"
+                        SizeChanged="OnRightPanelHostSizeChanged">
                     <Grid>
                         <Grid.RowDefinitions>
                             <!-- Top Window Navigation Bar -->

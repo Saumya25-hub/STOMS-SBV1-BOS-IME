@@ -38,6 +38,7 @@ namespace STOMS_SBV1_BOS_IME.Tests
                 content.Measure(new Size(680, 470));
                 content.Arrange(new Rect(0, 0, 680, 470));
                 content.UpdateLayout();
+                window.UpdateClipping();
 
                 var rtb = new RenderTargetBitmap(680, 470, 96, 96, PixelFormats.Pbgra32);
                 rtb.Render(content);
@@ -68,11 +69,12 @@ namespace STOMS_SBV1_BOS_IME.Tests
                 var window = new MainWindow(loginVm);
 
                 var content = (FrameworkElement)window.Content;
-                content.Measure(new Size(1020, 640));
-                content.Arrange(new Rect(0, 0, 1020, 640));
+                content.Measure(new Size(1030, 650));
+                content.Arrange(new Rect(0, 0, 1030, 650));
                 content.UpdateLayout();
+                window.UpdateClipping();
 
-                var rtb = new RenderTargetBitmap(1020, 640, 96, 96, PixelFormats.Pbgra32);
+                var rtb = new RenderTargetBitmap(1030, 650, 96, 96, PixelFormats.Pbgra32);
                 rtb.Render(content);
 
                 var encoder = new PngBitmapEncoder();

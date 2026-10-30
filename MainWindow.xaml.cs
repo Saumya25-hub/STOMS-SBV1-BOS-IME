@@ -50,6 +50,8 @@ namespace STOMS_SBV1_BOS_IME
 
         private void OnWindowLoaded(object sender, RoutedEventArgs e)
         {
+            UpdateClipping();
+
             // Start continuous ambient gradient animation
             _ambientStoryboard = TryFindResource("AmbientGradientStoryboard") as Storyboard;
             _ambientStoryboard?.Begin(this, isControllable: true);
@@ -199,6 +201,124 @@ namespace STOMS_SBV1_BOS_IME
         private void OnCloseClick(object sender, RoutedEventArgs e)
         {
             Close();
+        }
+
+        #endregion
+
+        #region Strict Rounded Corner Clipping Engine
+
+        private void OnWindowRootContentSizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            UpdateRootClipping();
+        }
+
+        private void OnLeftGradientHostSizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            UpdateLeftPanelClipping();
+        }
+
+        private void OnRightPanelHostSizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            UpdateRightPanelClipping();
+        }
+
+        public void UpdateClipping()
+        {
+            UpdateRootClipping();
+            UpdateLeftPanelClipping();
+            UpdateRightPanelClipping();
+        }
+
+        private void UpdateRootClipping()
+        {
+            if (WindowRootContent != null && WindowRootContent.ActualWidth > 0 && WindowRootContent.ActualHeight > 0)
+            {
+                WindowRootContent.Clip = new RectangleGeometry(
+                    new Rect(0, 0, WindowRootContent.ActualWidth, WindowRootContent.ActualHeight),
+                    20, 20);
+            }
+        }
+
+        private void UpdateLeftPanelClipping()
+        {
+            if (LeftGradientHost != null && LeftGradientHost.ActualWidth > 0 && LeftGradientHost.ActualHeight > 0)
+            {
+                LeftGradientHost.Clip = CreateLeftRoundedGeometry(LeftGradientHost.ActualWidth, LeftGradientHost.ActualHeight, 20);
+            }
+        }
+
+        private void UpdateRightPanelClipping()
+        {
+            if (RightPanelHost != null && RightPanelHost.ActualWidth > 0 && RightPanelHost.ActualHeight > 0)
+            {
+                RightPanelHost.Clip = CreateRightRoundedGeometry(RightPanelHost.ActualWidth, RightPanelHost.ActualHeight, 20);
+            }
+        }
+
+        private static Geometry CreateLeftRoundedGeometry(double width, double height, double radius)
+        {
+            if (width <= 0 || height <= 0)
+                return Geometry.Empty;
+
+            double r = Math.Min(radius, Math.Min(width / 2.0, height / 2.0));
+
+            var figure = new PathFigure
+            {
+                StartPoint = new Point(r, 0),
+                IsClosed = true,
+                IsFilled = true
+            };
+
+            // Top edge to top-right corner (flat/flush seam)
+            figure.Segments.Add(new LineSegment(new Point(width, 0), true));
+            // Right edge down to bottom-right corner (flat/flush seam)
+            figure.Segments.Add(new LineSegment(new Point(width, height), true));
+            // Bottom edge to start of bottom-left arc
+            figure.Segments.Add(new LineSegment(new Point(r, height), true));
+            // Bottom-left rounded arc
+            figure.Segments.Add(new ArcSegment(new Point(0, height - r), new Size(r, r), 0, false, SweepDirection.Clockwise, true));
+            // Left edge up to start of top-left arc
+            figure.Segments.Add(new LineSegment(new Point(0, r), true));
+            // Top-left rounded arc back to start
+            figure.Segments.Add(new ArcSegment(new Point(r, 0), new Size(r, r), 0, false, SweepDirection.Clockwise, true));
+
+            var geometry = new PathGeometry();
+            geometry.Figures.Add(figure);
+            geometry.Freeze();
+            return geometry;
+        }
+
+        private static Geometry CreateRightRoundedGeometry(double width, double height, double radius)
+        {
+            if (width <= 0 || height <= 0)
+                return Geometry.Empty;
+
+            double r = Math.Min(radius, Math.Min(width / 2.0, height / 2.0));
+
+            var figure = new PathFigure
+            {
+                StartPoint = new Point(0, 0),
+                IsClosed = true,
+                IsFilled = true
+            };
+
+            // Top edge to start of top-right arc
+            figure.Segments.Add(new LineSegment(new Point(width - r, 0), true));
+            // Top-right rounded arc
+            figure.Segments.Add(new ArcSegment(new Point(width, r), new Size(r, r), 0, false, SweepDirection.Clockwise, true));
+            // Right edge down to start of bottom-right arc
+            figure.Segments.Add(new LineSegment(new Point(width, height - r), true));
+            // Bottom-right rounded arc
+            figure.Segments.Add(new ArcSegment(new Point(width - r, height), new Size(r, r), 0, false, SweepDirection.Clockwise, true));
+            // Bottom edge to bottom-left corner (flat/flush seam)
+            figure.Segments.Add(new LineSegment(new Point(0, height), true));
+            // Left edge up to start point (flat/flush seam)
+            figure.Segments.Add(new LineSegment(new Point(0, 0), true));
+
+            var geometry = new PathGeometry();
+            geometry.Figures.Add(figure);
+            geometry.Freeze();
+            return geometry;
         }
 
         #endregion

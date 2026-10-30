@@ -256,7 +256,7 @@
                 BorderBrush="#E2E8F0"
                 BorderThickness="1"
                 CornerRadius="18"
-                ClipToBounds="True"
+                ClipToBounds="False"
                 Opacity="0">
             
             <Border.RenderTransform>
@@ -270,7 +270,7 @@
                                   Opacity="0.14" />
             </Border.Effect>
 
-            <Grid>
+            <Grid x:Name="SplashRootContent" SizeChanged="OnSplashRootContentSizeChanged">
                 <!-- Subtle Ambient Radial Blue Gradient -->
                 <Rectangle IsHitTestVisible="False">
                     <Rectangle.Fill>

@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 using System.Windows.Media.Animation;
 using STOMS_SBV1_BOS_IME.ViewModels;
 
@@ -37,6 +38,8 @@ namespace STOMS_SBV1_BOS_IME.Views
 
         private async void OnSplashLoaded(object sender, RoutedEventArgs e)
         {
+            UpdateClipping();
+
             // Start the Phase A -> Phase D Entrance Storyboard
             _entranceStoryboard = TryFindResource("EntranceStoryboard") as Storyboard;
             _exitStoryboard = TryFindResource("ExitStoryboard") as Storyboard;
@@ -123,5 +126,24 @@ namespace STOMS_SBV1_BOS_IME.Views
             _viewModel.ExitRequested -= OnExitRequested;
             _viewModel.Cancel();
         }
+
+        #region Strict Rounded Corner Clipping Engine
+
+        private void OnSplashRootContentSizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            UpdateClipping();
+        }
+
+        public void UpdateClipping()
+        {
+            if (SplashRootContent != null && SplashRootContent.ActualWidth > 0 && SplashRootContent.ActualHeight > 0)
+            {
+                SplashRootContent.Clip = new RectangleGeometry(
+                    new Rect(0, 0, SplashRootContent.ActualWidth, SplashRootContent.ActualHeight),
+                    18, 18);
+            }
+        }
+
+        #endregion
     }
 }
