@@ -26,6 +26,7 @@ namespace STOMS_SBV1_BOS_IME.ViewModels
         private string _globalSearchText = string.Empty;
 
         private readonly DashboardViewModel _dashboardViewModel;
+        private readonly ProductManagementViewModel _productManagementViewModel;
 
         public object CurrentViewModel
         {
@@ -121,6 +122,7 @@ namespace STOMS_SBV1_BOS_IME.ViewModels
 
             _isDarkMode = _themeService.IsDarkMode;
             _dashboardViewModel = new DashboardViewModel(dashboardService: null, _navigationService, _realtimeService);
+            _productManagementViewModel = new ProductManagementViewModel(MockInventoryService.Instance, _navigationService);
             _currentViewModel = _dashboardViewModel;
 
             NavigateCommand = new RelayCommand<string>(NavigateToModule);
@@ -166,36 +168,48 @@ namespace STOMS_SBV1_BOS_IME.ViewModels
 
                 case "Products":
                     PageTitle = "Product Management";
+                    PageSubtitle = "Master catalog & specifications";
                     Breadcrumb = "STOMS ERP / Master Data / Products & SKUs";
-                    CurrentViewModel = new PlaceholderViewModel(
-                        "Product Management & Master SKU Catalog",
-                        "MOD-PRD-02",
-                        "Step 2 Engineering Milestone",
-                        "Centralized SKU catalog, Bill of Materials (BOM), unit definition, supplier mapping, and barcodes.",
-                        new List<string>
-                        {
-                            "Multi-tier category & brand classification",
-                            "Dynamic reorder point & safety stock calculation",
-                            "EAN-13, QR Code & custom barcode generation",
-                            "Batch & serial number tracking definitions"
-                        });
+                    _productManagementViewModel.ActiveSection = "Catalog";
+                    CurrentViewModel = _productManagementViewModel;
+                    break;
+
+                case "Products_Add":
+                    ActiveNavKey = "Products";
+                    PageTitle = "Product Management";
+                    PageSubtitle = "Master catalog & specifications";
+                    Breadcrumb = "STOMS ERP / Master Data / Add New SKU";
+                    _productManagementViewModel.ActiveSection = "Catalog";
+                    _productManagementViewModel.OpenAddProduct();
+                    CurrentViewModel = _productManagementViewModel;
                     break;
 
                 case "Stock":
                     PageTitle = "Stock Management";
-                    Breadcrumb = "STOMS ERP / Operations / Real-Time Stock Ledger";
-                    CurrentViewModel = new PlaceholderViewModel(
-                        "Stock Management & Multi-Warehouse Ledger",
-                        "MOD-STK-03",
-                        "Step 2 Engineering Milestone",
-                        "Comprehensive inventory valuations, FIFO/LIFO batch tracking, and real-time ledger synchronization.",
-                        new List<string>
-                        {
-                            "Air-gapped transaction verification",
-                            "Unit-of-measurement cross-ledger protection",
-                            "Cycle counts and variance reconciliations",
-                            "Real-time SignalR distributed stock updates"
-                        });
+                    PageSubtitle = "Multi-warehouse real-time ledger";
+                    Breadcrumb = "STOMS ERP / Operations / Stock Balances";
+                    _productManagementViewModel.ActiveSection = "Balances";
+                    CurrentViewModel = _productManagementViewModel;
+                    break;
+
+                case "Stock_Receive":
+                    ActiveNavKey = "Stock";
+                    PageTitle = "Stock Management";
+                    PageSubtitle = "Goods Inward Receipt (GRN)";
+                    Breadcrumb = "STOMS ERP / Operations / Stock Receive";
+                    _productManagementViewModel.ActiveSection = "Catalog";
+                    _productManagementViewModel.OpenReceiveStock();
+                    CurrentViewModel = _productManagementViewModel;
+                    break;
+
+                case "Stock_Issue":
+                    ActiveNavKey = "Stock";
+                    PageTitle = "Stock Management";
+                    PageSubtitle = "Goods Outward & Dispatch";
+                    Breadcrumb = "STOMS ERP / Operations / Stock Issue";
+                    _productManagementViewModel.ActiveSection = "Catalog";
+                    _productManagementViewModel.OpenIssueStock();
+                    CurrentViewModel = _productManagementViewModel;
                     break;
 
                 case "Warehouse":

@@ -52,6 +52,19 @@ namespace STOMS_SBV1_BOS_IME.Converters
                 };
             }
 
+            if (value is StockSerialStatus serialStatus)
+            {
+                return serialStatus switch
+                {
+                    StockSerialStatus.Available => new SolidColorBrush(Color.FromRgb(16, 185, 129)),   // Green
+                    StockSerialStatus.Reserved => new SolidColorBrush(Color.FromRgb(59, 130, 246)),    // Blue
+                    StockSerialStatus.Issued => new SolidColorBrush(Color.FromRgb(100, 116, 139)),    // Slate
+                    StockSerialStatus.Damaged => new SolidColorBrush(Color.FromRgb(239, 68, 68)),     // Red
+                    StockSerialStatus.Quarantined => new SolidColorBrush(Color.FromRgb(168, 85, 247)), // Purple
+                    _ => new SolidColorBrush(Color.FromRgb(100, 116, 139))
+                };
+            }
+
             if (value is AlertSeverity severity)
             {
                 return severity switch

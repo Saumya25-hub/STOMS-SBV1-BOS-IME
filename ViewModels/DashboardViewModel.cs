@@ -226,18 +226,18 @@ namespace STOMS_SBV1_BOS_IME.ViewModels
             ResetZoomCommand = new RelayCommand(() => ZoomLevel = 1.0);
             ToggleEditLayoutCommand = new RelayCommand(() => IsEditingLayout = !IsEditingLayout);
 
-            // Quick Actions with Honest Non-Destructive Dialogs
+            // Quick Actions routed directly to Step 2 Inventory Workflows
             ReceiveStockActionCommand = new RelayCommand(() =>
-                ShowFeedback("Stock Inward Workflow", "Receiving stock requires validated supplier PO and Goods Received Note (GRN) verification. This workflow is scheduled for Step 2: Stock Management. Stock is never directly modified from the dashboard."));
+                _navigationService.NavigateTo("Stock_Receive"));
 
             IssueStockActionCommand = new RelayCommand(() =>
-                ShowFeedback("Stock Outward Workflow", "Stock issues require validated work orders or sales dispatch manifests with server-side authorization. This workflow will be available in Step 2: Stock Management."));
+                _navigationService.NavigateTo("Stock_Issue"));
 
             TransferStockActionCommand = new RelayCommand(() =>
-                ShowFeedback("Inter-Warehouse Transfer", "Transferring items between racks or warehouses triggers dual-custody audit logs and requires supervisor approval. This workflow will be implemented in Step 2: Stock Movements."));
+                ShowFeedback("Inter-Warehouse Transfer", "Transferring items between racks or warehouses triggers dual-custody audit logs and requires supervisor approval. This workflow will be implemented in Step 3: Stock Movements."));
 
             AddProductActionCommand = new RelayCommand(() =>
-                _navigationService.NavigateTo("Products"));
+                _navigationService.NavigateTo("Products_Add"));
 
             ViewWarehouseActionCommand = new RelayCommand(() =>
                 _navigationService.NavigateTo("Warehouse"));

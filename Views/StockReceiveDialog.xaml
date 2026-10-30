@@ -1,0 +1,262 @@
+<UserControl x:Class="STOMS_SBV1_BOS_IME.Views.StockReceiveDialog"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:STOMS_SBV1_BOS_IME.Views"
+             xmlns:viewmodels="clr-namespace:STOMS_SBV1_BOS_IME.ViewModels"
+             mc:Ignorable="d" 
+             d:DataContext="{d:DesignInstance Type=viewmodels:StockReceiveViewModel}">
+    <Border Background="{DynamicResource Theme.Surface.Primary}" 
+            BorderBrush="{DynamicResource Theme.Border}" 
+            BorderThickness="1" 
+            CornerRadius="8" 
+            MaxWidth="740" 
+            MaxHeight="800"
+            HorizontalAlignment="Center" 
+            VerticalAlignment="Center">
+        <Border.Effect>
+            <DropShadowEffect BlurRadius="25" ShadowDepth="4" Opacity="0.35" Direction="270"/>
+        </Border.Effect>
+
+        <Grid Margin="24">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- 1. Header -->
+            <Grid Grid.Row="0" Margin="0,0,0,16">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0">
+                    <StackPanel Orientation="Horizontal">
+                        <Border Background="{DynamicResource Theme.Status.Success.Bg}" CornerRadius="4" Padding="6,2" Margin="0,0,8,0">
+                            <TextBlock Text="+ GOODS INWARD" FontWeight="Bold" FontSize="11" Foreground="{StaticResource SuccessBrush}"/>
+                        </Border>
+                        <TextBlock Text="Stock Receive (GRN)" FontSize="18" FontWeight="Bold" Foreground="{DynamicResource Theme.Text.Primary}"/>
+                    </StackPanel>
+                    <TextBlock Text="Inward physical materials into warehouse bays, log batches, and register serials" FontSize="12" Foreground="{DynamicResource Theme.Text.Muted}" Margin="0,2,0,0"/>
+                </StackPanel>
+
+                <Button Grid.Column="1" Style="{StaticResource IconButton}" Command="{Binding CancelCommand}" ToolTip="Close dialog" Width="30" Height="30">
+                    <Path Data="{StaticResource Icon.Close}" Fill="{DynamicResource Theme.Text.Muted}" Width="12" Height="12" Stretch="Uniform"/>
+                </Button>
+            </Grid>
+
+            <!-- 2. Error Message Banner -->
+            <Border Grid.Row="1" Background="{DynamicResource Theme.Status.Danger.Bg}" 
+                    BorderBrush="{StaticResource DangerBrush}" BorderThickness="1" 
+                    CornerRadius="4" Padding="12,8" Margin="0,0,0,14"
+                    Visibility="{Binding HasError, Converter={StaticResource BoolToVisibilityConverter}}">
+                <StackPanel Orientation="Horizontal">
+                    <Path Data="{StaticResource Icon.Alert}" Fill="{StaticResource DangerBrush}" Width="14" Height="14" Stretch="Uniform" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                    <TextBlock Text="{Binding ErrorMessage}" Foreground="{StaticResource DangerBrush}" FontWeight="SemiBold" FontSize="12" VerticalAlignment="Center" TextWrapping="Wrap"/>
+                </StackPanel>
+            </Border>
+
+            <!-- 3. Scrollable Form -->
+            <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Padding="0,0,8,0">
+                <StackPanel>
+                    <!-- Product Selection -->
+                    <TextBlock Text="Select Item to Receive *" Style="{StaticResource SectionHeader}" Margin="0,0,0,4"/>
+                    <ComboBox ItemsSource="{Binding Products}" 
+                              SelectedItem="{Binding SelectedProduct}" 
+                              DisplayMemberPath="Name" 
+                              Style="{StaticResource FormComboBox}" Height="36"/>
+
+                    <!-- Product Telemetry Snapshot Pill -->
+                    <Border Background="{DynamicResource Theme.Surface.Secondary}" 
+                            BorderBrush="{DynamicResource Theme.Border}" 
+                            BorderThickness="1" CornerRadius="6" Padding="12,8" Margin="0,8,0,0">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="SKU CATALOG CODE" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource Theme.Text.Muted}"/>
+                                <TextBlock Text="{Binding ProductSku}" FontFamily="Consolas" FontWeight="Bold" FontSize="13" Foreground="{StaticResource BrandAccentBrush}"/>
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="1">
+                                <TextBlock Text="CURRENT PHYSICAL STOCK" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource Theme.Text.Muted}"/>
+                                <TextBlock Text="{Binding CurrentPhysicalStock, StringFormat='{}{0:N0}'}" FontWeight="Bold" FontSize="13" Foreground="{DynamicResource Theme.Text.Primary}"/>
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="2">
+                                <TextBlock Text="TRACKING PROFILE" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource Theme.Text.Muted}"/>
+                                <TextBlock Text="{Binding SelectedProduct.TrackingTypeDisplay}" FontWeight="SemiBold" FontSize="12" Foreground="{StaticResource BrandAccentBrush}"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+
+                    <!-- Quantity & Destination Location Row -->
+                    <Grid Margin="0,14,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="130"/>
+                            <ColumnDefinition Width="14"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Quantity -->
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="Receive Quantity *" Style="{StaticResource SectionHeader}" Margin="0,0,0,4"/>
+                            <Grid>
+                                <TextBox Text="{Binding Quantity, UpdateSourceTrigger=PropertyChanged}" 
+                                         Style="{StaticResource FormTextBox}" 
+                                         FontWeight="Bold" FontSize="14" Padding="8,6,36,6"/>
+                                <TextBlock Text="{Binding ProductUnit}" Foreground="{DynamicResource Theme.Text.Muted}" 
+                                           HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,8,0" FontSize="11"/>
+                            </Grid>
+                        </StackPanel>
+
+                        <!-- Destination Warehouse / Rack / Section -->
+                        <StackPanel Grid.Column="2">
+                            <TextBlock Text="Destination Bay (Warehouse / Rack / Tier) *" Style="{StaticResource SectionHeader}" Margin="0,0,0,4"/>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="8"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="8"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <ComboBox Grid.Column="0" ItemsSource="{Binding Warehouses}" 
+                                          SelectedItem="{Binding SelectedWarehouse}" 
+                                          DisplayMemberPath="Code" 
+                                          Style="{StaticResource FormComboBox}" Height="34" ToolTip="Warehouse Facility"/>
+
+                                <ComboBox Grid.Column="2" ItemsSource="{Binding Racks}" 
+                                          SelectedItem="{Binding SelectedRack}" 
+                                          DisplayMemberPath="RackCode" 
+                                          Style="{StaticResource FormComboBox}" Height="34" ToolTip="Storage Rack"/>
+
+                                <ComboBox Grid.Column="4" ItemsSource="{Binding Sections}" 
+                                          SelectedItem="{Binding SelectedSection}" 
+                                          DisplayMemberPath="SectionCode" 
+                                          Style="{StaticResource FormComboBox}" Height="34" ToolTip="Shelf Tier"/>
+                            </Grid>
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- Batch / Lot Section (Dynamic) -->
+                    <Border Background="{DynamicResource Theme.Surface.Secondary}" 
+                            BorderBrush="{DynamicResource Theme.Border}" 
+                            BorderThickness="1" CornerRadius="6" Padding="14" Margin="0,14,0,0"
+                            Visibility="{Binding IsBatchTracked, Converter={StaticResource BoolToVisibilityConverter}}">
+                        <StackPanel>
+                            <TextBlock Text="BATCH / LOT TRACEABILITY &amp; EXPIRED DATES" FontSize="11" FontWeight="Bold" Foreground="{StaticResource BrandAccentBrush}" Margin="0,0,0,8"/>
+
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="12"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="12"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <!-- Batch Number -->
+                                <StackPanel Grid.Column="0">
+                                    <TextBlock Text="Batch / Lot Number *" Style="{StaticResource SectionHeader}" Margin="0,0,0,4"/>
+                                    <TextBox Text="{Binding BatchNumber, UpdateSourceTrigger=PropertyChanged}" 
+                                             Style="{StaticResource FormTextBox}" FontFamily="Consolas" FontWeight="SemiBold"/>
+                                </StackPanel>
+
+                                <!-- Mfg Date -->
+                                <StackPanel Grid.Column="2">
+                                    <TextBlock Text="Mfg Date" Style="{StaticResource SectionHeader}" Margin="0,0,0,4"/>
+                                    <DatePicker SelectedDate="{Binding MfgDate}" Height="32"/>
+                                </StackPanel>
+
+                                <!-- Expiry Date -->
+                                <StackPanel Grid.Column="4">
+                                    <TextBlock Text="Expiry Date" Style="{StaticResource SectionHeader}" Margin="0,0,0,4"/>
+                                    <DatePicker SelectedDate="{Binding ExpiryDate}" Height="32"/>
+                                    <TextBlock Text="* Mandatory for perishable items" FontSize="10" Foreground="{StaticResource WarningBrush}" Margin="0,2,0,0"
+                                               Visibility="{Binding RequiresExpiry, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                                </StackPanel>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Serial Tracking Section (Dynamic) -->
+                    <Border Background="{DynamicResource Theme.Surface.Secondary}" 
+                            BorderBrush="{DynamicResource Theme.Border}" 
+                            BorderThickness="1" CornerRadius="6" Padding="14" Margin="0,14,0,0"
+                            Visibility="{Binding IsSerialTracked, Converter={StaticResource BoolToVisibilityConverter}}">
+                        <StackPanel>
+                            <Grid Margin="0,0,0,6">
+                                <TextBlock Text="{Binding SerialsCountLabel}" FontSize="11" FontWeight="Bold" Foreground="{StaticResource BrandAccentBrush}"/>
+                                <Button Content="Auto-Generate Serial Range" Command="{Binding AutoGenerateSerialsCommand}" 
+                                        HorizontalAlignment="Right" Style="{StaticResource OutlineButton}" FontSize="11" Padding="8,2" Height="22"
+                                        ToolTip="Automatically generates sequential serial numbers based on part SKU and batch"/>
+                            </Grid>
+
+                            <TextBox Text="{Binding SerialsInputText, UpdateSourceTrigger=PropertyChanged}" 
+                                     Style="{StaticResource FormTextBox}" 
+                                     Height="85" TextWrapping="Wrap" AcceptsReturn="True" 
+                                     FontFamily="Consolas" FontSize="11" VerticalScrollBarVisibility="Auto"/>
+                            <TextBlock Text="Enter one serial number per line, or comma-separated. Total serials must equal received quantity." FontSize="10" Foreground="{DynamicResource Theme.Text.Muted}" Margin="0,2,0,0"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Commercial Metadata: Supplier, PO, Notes -->
+                    <Grid Margin="0,14,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="14"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="Supplier / Vendor Source" Style="{StaticResource SectionHeader}" Margin="0,0,0,4"/>
+                            <TextBox Text="{Binding Supplier, UpdateSourceTrigger=PropertyChanged}" 
+                                     Style="{StaticResource FormTextBox}" Height="32"/>
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="2">
+                            <TextBlock Text="PO / Delivery Challan Ref #" Style="{StaticResource SectionHeader}" Margin="0,0,0,4"/>
+                            <TextBox Text="{Binding ReferenceNumber, UpdateSourceTrigger=PropertyChanged}" 
+                                     Style="{StaticResource FormTextBox}" Height="32"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <TextBlock Text="Receiving Remarks / Inspection Sign-Off" Style="{StaticResource SectionHeader}" Margin="0,12,0,4"/>
+                    <TextBox Text="{Binding Notes, UpdateSourceTrigger=PropertyChanged}" 
+                             Style="{StaticResource FormTextBox}" Height="45" TextWrapping="Wrap"/>
+                </StackPanel>
+            </ScrollViewer>
+
+            <!-- 4. Footer Buttons -->
+            <Border Grid.Row="3" BorderBrush="{DynamicResource Theme.Border}" BorderThickness="0,1,0,0" Padding="0,16,0,0" Margin="0,16,0,0">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Button Grid.Column="0" Content="Cancel" Style="{StaticResource OutlineButton}" 
+                            Command="{Binding CancelCommand}" HorizontalAlignment="Left" Width="100" Height="36"/>
+
+                    <Button Grid.Column="1" Style="{StaticResource PrimaryButton}" 
+                            Command="{Binding SubmitCommand}" Width="190" Height="36">
+                        <StackPanel Orientation="Horizontal">
+                            <Path Data="{StaticResource Icon.Inward}" Fill="#FFFFFF" Width="12" Height="12" Stretch="Uniform" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                            <TextBlock Text="Confirm Goods Inward" FontWeight="SemiBold"/>
+                        </StackPanel>
+                    </Button>
+                </Grid>
+            </Border>
+        </Grid>
+    </Border>
+</UserControl>
