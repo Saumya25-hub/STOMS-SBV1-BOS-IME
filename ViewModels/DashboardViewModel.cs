@@ -30,11 +30,34 @@ namespace STOMS_SBV1_BOS_IME.ViewModels
         private string _rackSearchQuery = string.Empty;
         private StockStatus? _selectedStatusFilter;
         private MovementDateRange _selectedMovementRange = MovementDateRange.AllTime;
+        private double _zoomLevel = 1.0;
+        private bool _isEditingLayout = false;
 
         public ObservableCollection<Warehouse> Warehouses { get; } = new();
         public ObservableCollection<Rack> Racks { get; } = new();
         public ObservableCollection<StockMovement> RecentMovements { get; } = new();
         public ObservableCollection<InventoryAlert> ActiveAlerts { get; } = new();
+
+        public double ZoomLevel
+        {
+            get => _zoomLevel;
+            set
+            {
+                var clamped = Math.Clamp(value, 0.6, 2.0);
+                if (SetProperty(ref _zoomLevel, clamped))
+                {
+                    OnPropertyChanged(nameof(ZoomDisplay));
+                }
+            }
+        }
+
+        public string ZoomDisplay => $"{(int)(_zoomLevel * 100)}%";
+
+        public bool IsEditingLayout
+        {
+            get => _isEditingLayout;
+            set => SetProperty(ref _isEditingLayout, value);
+        }
 
         public DashboardSummary Summary
         {
@@ -89,8 +112,10 @@ namespace STOMS_SBV1_BOS_IME.ViewModels
             get => _selectedRack;
             set
             {
+                if (_selectedRack != null) _selectedRack.IsSelected = false;
                 if (SetProperty(ref _selectedRack, value))
                 {
+                    if (_selectedRack != null) _selectedRack.IsSelected = true;
                     SelectedSection = value?.SelectedSection ?? value?.Sections.FirstOrDefault();
                 }
             }
@@ -99,7 +124,14 @@ namespace STOMS_SBV1_BOS_IME.ViewModels
         public RackSection? SelectedSection
         {
             get => _selectedSection;
-            set => SetProperty(ref _selectedSection, value);
+            set
+            {
+                if (_selectedSection != null) _selectedSection.IsSelected = false;
+                if (SetProperty(ref _selectedSection, value))
+                {
+                    if (_selectedSection != null) _selectedSection.IsSelected = true;
+                }
+            }
         }
 
         public string RackSearchQuery
@@ -151,6 +183,10 @@ namespace STOMS_SBV1_BOS_IME.ViewModels
         public ICommand ToggleRackExpandCommand { get; }
         public ICommand SelectSectionCommand { get; }
         public ICommand CloseFeedbackDialogCommand { get; }
+        public ICommand ZoomInCommand { get; }
+        public ICommand ZoomOutCommand { get; }
+        public ICommand ResetZoomCommand { get; }
+        public ICommand ToggleEditLayoutCommand { get; }
 
         // Quick Action Commands
         public ICommand ReceiveStockActionCommand { get; }
@@ -185,6 +221,10 @@ namespace STOMS_SBV1_BOS_IME.ViewModels
             });
             SelectSectionCommand = new RelayCommand<RackSection>(section => SelectedSection = section);
             CloseFeedbackDialogCommand = new RelayCommand(() => ShowActionFeedbackDialog = false);
+            ZoomInCommand = new RelayCommand(() => ZoomLevel += 0.15);
+            ZoomOutCommand = new RelayCommand(() => ZoomLevel -= 0.15);
+            ResetZoomCommand = new RelayCommand(() => ZoomLevel = 1.0);
+            ToggleEditLayoutCommand = new RelayCommand(() => IsEditingLayout = !IsEditingLayout);
 
             // Quick Actions with Honest Non-Destructive Dialogs
             ReceiveStockActionCommand = new RelayCommand(() =>
@@ -368,6 +408,15 @@ namespace STOMS_SBV1_BOS_IME.ViewModels
             ActionFeedbackTitle = title;
             ActionFeedbackBody = body;
             ShowActionFeedbackDialog = true;
+        }
+
+        public void UpdateRackPosition(Rack rack, double newX, double newY)
+        {
+            if (rack == null) return;
+            var snappedX = Math.Max(20, Math.Min(900, Math.Round(newX / 20.0) * 20.0));
+            var snappedY = Math.Max(20, Math.Min(600, Math.Round(newY / 20.0) * 20.0));
+            rack.CanvasX = snappedX;
+            rack.CanvasY = snappedY;
         }
     }
 }

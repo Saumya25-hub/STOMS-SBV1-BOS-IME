@@ -268,21 +268,21 @@
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
 
-                    <!-- Title & Breadcrumb -->
+                    <!-- Title & Subtitle -->
                     <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                        <TextBlock Text="{Binding Breadcrumb}" FontSize="11" Foreground="{DynamicResource Theme.Text.Muted}" Margin="0,0,0,2"/>
-                        <TextBlock Text="{Binding PageTitle}" FontSize="18" FontWeight="Bold" Foreground="{DynamicResource Theme.Text.Primary}"/>
+                        <TextBlock Text="{Binding HeaderDisplayTitle}" FontSize="18" FontWeight="Bold" Foreground="{DynamicResource Theme.Text.Primary}"/>
+                        <TextBlock Text="{Binding PageSubtitle}" FontSize="12" Foreground="{DynamicResource Theme.Text.Muted}" Margin="0,1,0,0"/>
                     </StackPanel>
 
                     <!-- Global Product / SKU Search Bar -->
-                    <Grid Grid.Column="1" MaxWidth="400" Margin="32,0" VerticalAlignment="Center">
+                    <Grid Grid.Column="1" MaxWidth="380" Margin="32,0" VerticalAlignment="Center">
                         <TextBox Style="{StaticResource ModernTextBox}" 
                                  Text="{Binding GlobalSearchText, UpdateSourceTrigger=PropertyChanged}" 
-                                 Padding="32,6,10,6"
+                                 Padding="30,6,10,6"
                                  ToolTip="Type SKU, Product name, or Batch number and press Enter"/>
                         <!-- Search Icon -->
                         <Path Data="{StaticResource Icon.Search}" Fill="{DynamicResource Theme.Text.Muted}" 
-                              Width="14" Height="14" Stretch="Uniform" 
+                              Width="13" Height="13" Stretch="Uniform" 
                               HorizontalAlignment="Left" Margin="10,0,0,0" VerticalAlignment="Center"/>
                     </Grid>
 
@@ -305,7 +305,18 @@
 
                         <!-- Theme Toggle Button -->
                         <Button Style="{StaticResource IconButton}" Command="{Binding ToggleThemeCommand}" ToolTip="Toggle Light / Dark Mode" Margin="0,0,8,0">
-                            <Path Data="{StaticResource Icon.Sun}" Fill="{DynamicResource Theme.Text.Primary}" Width="16" Height="16" Stretch="Uniform"/>
+                            <Path Width="16" Height="16" Stretch="Uniform" Fill="{DynamicResource Theme.Text.Primary}">
+                                <Path.Style>
+                                    <Style TargetType="Path">
+                                        <Setter Property="Data" Value="{StaticResource Icon.Moon}"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsDarkMode}" Value="True">
+                                                <Setter Property="Data" Value="{StaticResource Icon.Sun}"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Path.Style>
+                            </Path>
                         </Button>
 
                         <!-- Notifications Bell -->

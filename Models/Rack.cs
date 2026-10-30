@@ -8,7 +8,12 @@ namespace STOMS_SBV1_BOS_IME.Models
     public class Rack : ObservableObject
     {
         private bool _isExpanded;
+        private bool _isSelected;
         private RackSection? _selectedSection;
+        private double _canvasX = 40;
+        private double _canvasY = 40;
+        private double _width = 250;
+        private double _height = 150;
 
         public string Id { get; set; } = string.Empty;
         public string WarehouseId { get; set; } = string.Empty;
@@ -16,6 +21,36 @@ namespace STOMS_SBV1_BOS_IME.Models
         public string RackCode { get; set; } = string.Empty;
         public string Name { get; set; } = string.Empty;
         public string Zone { get; set; } = "Aisle A";
+
+        public bool IsSelected
+        {
+            get => _isSelected;
+            set => SetProperty(ref _isSelected, value);
+        }
+
+        public double CanvasX
+        {
+            get => _canvasX;
+            set => SetProperty(ref _canvasX, value);
+        }
+
+        public double CanvasY
+        {
+            get => _canvasY;
+            set => SetProperty(ref _canvasY, value);
+        }
+
+        public double Width
+        {
+            get => _width;
+            set => SetProperty(ref _width, value);
+        }
+
+        public double Height
+        {
+            get => _height;
+            set => SetProperty(ref _height, value);
+        }
 
         public decimal? MaxCapacity { get; set; }
         public decimal OccupiedCapacity { get; set; }

@@ -83,6 +83,43 @@ namespace STOMS_SBV1_BOS_IME.Converters
         public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture) => throw new NotSupportedException();
     }
 
+    public class StockStatusToBgColorConverter : IValueConverter
+    {
+        public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+        {
+            if (value is StockStatus status)
+            {
+                return status switch
+                {
+                    StockStatus.Normal => (SolidColorBrush)Application.Current.FindResource("Theme.Status.Success.Bg"),
+                    StockStatus.LowStock => (SolidColorBrush)Application.Current.FindResource("Theme.Status.Warning.Bg"),
+                    StockStatus.NearExpiry => (SolidColorBrush)Application.Current.FindResource("Theme.Status.Orange.Bg"),
+                    StockStatus.Expired => (SolidColorBrush)Application.Current.FindResource("Theme.Status.Danger.Bg"),
+                    StockStatus.Damaged => (SolidColorBrush)Application.Current.FindResource("Theme.Status.Purple.Bg"),
+                    _ => (SolidColorBrush)Application.Current.FindResource("Theme.Badge.Background")
+                };
+            }
+
+            if (value is MovementType moveType)
+            {
+                return moveType switch
+                {
+                    MovementType.StockIn => (SolidColorBrush)Application.Current.FindResource("Theme.Status.Success.Bg"),
+                    MovementType.StockOut => (SolidColorBrush)Application.Current.FindResource("Theme.Status.Danger.Bg"),
+                    MovementType.Transfer => (SolidColorBrush)Application.Current.FindResource("Theme.Status.Info.Bg"),
+                    MovementType.Return => (SolidColorBrush)Application.Current.FindResource("Theme.Status.Success.Bg"),
+                    MovementType.Damage => (SolidColorBrush)Application.Current.FindResource("Theme.Status.Purple.Bg"),
+                    MovementType.Adjustment => (SolidColorBrush)Application.Current.FindResource("Theme.Status.Warning.Bg"),
+                    _ => (SolidColorBrush)Application.Current.FindResource("Theme.Badge.Background")
+                };
+            }
+
+            return (SolidColorBrush)Application.Current.FindResource("Theme.Badge.Background");
+        }
+
+        public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture) => throw new NotSupportedException();
+    }
+
     public class OccupancyColorConverter : IValueConverter
     {
         public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
@@ -98,5 +135,18 @@ namespace STOMS_SBV1_BOS_IME.Converters
 
         public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture) => throw new NotSupportedException();
     }
-}
 
+    public class ZoomToPercentConverter : IValueConverter
+    {
+        public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+        {
+            if (value is double zoom)
+            {
+                return $"{(int)(zoom * 100)}%";
+            }
+            return "100%";
+        }
+
+        public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture) => throw new NotSupportedException();
+    }
+}

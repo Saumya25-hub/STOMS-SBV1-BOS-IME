@@ -6,66 +6,92 @@
              xmlns:models="clr-namespace:STOMS_SBV1_BOS_IME.Models"
              xmlns:converters="clr-namespace:STOMS_SBV1_BOS_IME.Converters"
              mc:Ignorable="d" 
-             d:DesignHeight="1200" d:DesignWidth="1200">
+             d:DesignHeight="1200" d:DesignWidth="1280">
     <Grid>
-        <!-- Main Scrollable Content -->
+        <!-- Main Scrollable Dashboard Content -->
         <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-            <StackPanel Margin="24,20,24,32">
+            <StackPanel Margin="24,18,24,28">
 
-                <!-- Data Origin & Telemetry Banner -->
-                <Border Background="{DynamicResource Theme.Surface.CardAlt}" 
-                        BorderBrush="{DynamicResource Theme.Border}" 
-                        BorderThickness="1" 
-                        CornerRadius="8" 
-                        Padding="14,10" 
-                        Margin="0,0,0,20">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
+                <!-- TOP BAR: COMPACT TELEMETRY STATUS & QUICK ACTIONS -->
+                <Grid Margin="0,0,0,16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
 
-                        <!-- Pulse Status Indicator -->
-                        <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
-                            <Ellipse Width="8" Height="8" Fill="{StaticResource BrandAccentBrush}" Margin="0,0,8,0"/>
-                            <TextBlock Text="SYSTEM TELEMETRY:" FontWeight="Bold" FontSize="11" Foreground="{DynamicResource Theme.Text.Muted}" Margin="0,0,8,0"/>
-                            <TextBlock Text="{Binding Summary.DataOriginDescription}" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource Theme.Text.Secondary}"/>
-                        </StackPanel>
-
-                        <!-- Refresh & Timestamp -->
-                        <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
-                            <TextBlock Text="{Binding Summary.LastRefreshed, StringFormat='Synced: {0:HH:mm:ss}'}" FontSize="11" Foreground="{DynamicResource Theme.Text.Muted}" Margin="0,0,12,0" VerticalAlignment="Center"/>
-                            <Button Style="{StaticResource SecondaryButton}" 
-                                    Command="{Binding RefreshCommand}" 
-                                    Padding="10,4" 
-                                    ToolTip="Refresh live telemetry from warehouse engine">
-                                <StackPanel Orientation="Horizontal">
-                                    <Path Data="{StaticResource Icon.Refresh}" Fill="{DynamicResource Theme.Text.Primary}" Width="12" Height="12" Stretch="Uniform" Margin="0,0,6,0"/>
-                                    <TextBlock Text="Sync Ledger" FontSize="11" FontWeight="SemiBold"/>
-                                </StackPanel>
+                    <!-- Telemetry Sync Pill -->
+                    <Border Grid.Column="0" 
+                            Background="{DynamicResource Theme.Surface.Card}" 
+                            BorderBrush="{DynamicResource Theme.Border}" 
+                            BorderThickness="1" 
+                            CornerRadius="6" 
+                            Height="34" 
+                            Padding="12,0" 
+                            VerticalAlignment="Center">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <Ellipse Width="7" Height="7" Fill="{StaticResource BrandAccentBrush}" Margin="0,0,8,0"/>
+                            <TextBlock Text="Telemetry:" FontWeight="SemiBold" FontSize="12" Foreground="{DynamicResource Theme.Text.Secondary}" Margin="0,0,6,0"/>
+                            <TextBlock Text="{Binding Summary.DataOriginDescription}" FontSize="12" Foreground="{DynamicResource Theme.Text.Muted}" Margin="0,0,10,0"/>
+                            <TextBlock Text="{Binding Summary.LastRefreshed, StringFormat='• Synced {0:HH:mm:ss}'}" FontSize="11" Foreground="{DynamicResource Theme.Text.Muted}" Margin="0,0,10,0"/>
+                            <Button Style="{StaticResource IconButton}" Command="{Binding RefreshCommand}" Padding="2" ToolTip="Refresh Telemetry">
+                                <Path Data="{StaticResource Icon.Refresh}" Fill="{DynamicResource Theme.Text.Primary}" Width="11" Height="11" Stretch="Uniform"/>
                             </Button>
                         </StackPanel>
-                    </Grid>
-                </Border>
+                    </Border>
 
-                <!-- Error Banner if any -->
-                <Border Background="#33EF4444" 
+                    <!-- Quick Actions Toolbar (4 Essential Operations) -->
+                    <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                        <!-- 1. Receive Stock -->
+                        <Button Style="{StaticResource QuickActionButton}" Command="{Binding ReceiveStockActionCommand}" Margin="0,0,8,0">
+                            <StackPanel Orientation="Horizontal">
+                                <Path Data="{StaticResource Icon.Inward}" Fill="{StaticResource SuccessBrush}" Width="12" Height="12" Stretch="Uniform" Margin="0,0,6,0"/>
+                                <TextBlock Text="Receive Stock"/>
+                            </StackPanel>
+                        </Button>
+
+                        <!-- 2. Issue Stock -->
+                        <Button Style="{StaticResource QuickActionButton}" Command="{Binding IssueStockActionCommand}" Margin="0,0,8,0">
+                            <StackPanel Orientation="Horizontal">
+                                <Path Data="{StaticResource Icon.Outward}" Fill="{StaticResource DangerBrush}" Width="12" Height="12" Stretch="Uniform" Margin="0,0,6,0"/>
+                                <TextBlock Text="Issue Stock"/>
+                            </StackPanel>
+                        </Button>
+
+                        <!-- 3. Transfer Stock -->
+                        <Button Style="{StaticResource QuickActionButton}" Command="{Binding TransferStockActionCommand}" Margin="0,0,8,0">
+                            <StackPanel Orientation="Horizontal">
+                                <Path Data="{StaticResource Icon.Transfer}" Fill="{StaticResource BrandAccentBrush}" Width="12" Height="12" Stretch="Uniform" Margin="0,0,6,0"/>
+                                <TextBlock Text="Transfer Stock"/>
+                            </StackPanel>
+                        </Button>
+
+                        <!-- 4. Add Product -->
+                        <Button Style="{StaticResource QuickActionButton}" Command="{Binding AddProductActionCommand}">
+                            <StackPanel Orientation="Horizontal">
+                                <Path Data="{StaticResource Icon.Products}" Fill="{StaticResource InfoBrush}" Width="12" Height="12" Stretch="Uniform" Margin="0,0,6,0"/>
+                                <TextBlock Text="Add Product"/>
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+                </Grid>
+
+                <!-- ERROR BANNER (IF ANY) -->
+                <Border Background="{DynamicResource Theme.Status.Danger.Bg}" 
                         BorderBrush="{StaticResource DangerBrush}" 
                         BorderThickness="1" 
                         CornerRadius="6" 
-                        Padding="12" 
+                        Padding="12,10" 
                         Margin="0,0,0,16" 
                         Visibility="{Binding ErrorMessage, Converter={StaticResource NullToVisibilityConverter}}">
                     <StackPanel Orientation="Horizontal">
-                        <Path Data="{StaticResource Icon.Alert}" Fill="{StaticResource DangerBrush}" Width="16" Height="16" Stretch="Uniform" Margin="0,0,10,0" VerticalAlignment="Center"/>
-                        <TextBlock Text="{Binding ErrorMessage}" Foreground="{StaticResource DangerBrush}" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                        <Path Data="{StaticResource Icon.Alert}" Fill="{StaticResource DangerBrush}" Width="14" Height="14" Stretch="Uniform" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                        <TextBlock Text="{Binding ErrorMessage}" Foreground="{StaticResource DangerBrush}" FontWeight="SemiBold" FontSize="12.5" VerticalAlignment="Center"/>
                     </StackPanel>
                 </Border>
 
-                <!-- SECTION 1: INVENTORY SUMMARY CARDS (6 CARDS) -->
-                <TextBlock Text="KEY INVENTORY TELEMETRY" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource Theme.Text.Muted}" Margin="2,0,0,8"/>
-                <Grid Margin="0,0,0,24">
+                <!-- SECTION 1: 6 ESSENTIAL SUMMARY CARDS -->
+                <Grid Margin="0,0,0,18">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="*"/>
@@ -76,451 +102,589 @@
                     </Grid.ColumnDefinitions>
 
                     <!-- Card 1: Total Products -->
-                    <Border Grid.Column="0" Style="{StaticResource IndustrialCard}" Margin="0,0,8,0">
-                        <Button Background="Transparent" BorderThickness="0" Padding="0" Cursor="Hand"
-                                Command="{Binding FilterByStatusCardCommand}" CommandParameter="totalproducts">
-                            <StackPanel>
-                                <Grid Margin="0,0,0,10">
-                                    <TextBlock Text="Total Products" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource Theme.Text.Secondary}" VerticalAlignment="Center"/>
-                                    <Path Data="{StaticResource Icon.Products}" Fill="{StaticResource BrandAccentBrush}" Width="16" Height="16" Stretch="Uniform" HorizontalAlignment="Right"/>
-                                </Grid>
-                                <TextBlock Text="{Binding Summary.TotalProducts, StringFormat='{}{0:N0}'}" FontSize="24" FontWeight="Bold" Margin="0,0,0,4"/>
-                                <TextBlock Text="Distinct SKU records" FontSize="11" Foreground="{DynamicResource Theme.Text.Muted}"/>
-                            </StackPanel>
-                        </Button>
-                    </Border>
-
-                    <!-- Card 2: Total Stock Quantity -->
-                    <Border Grid.Column="1" Style="{StaticResource IndustrialCard}" Margin="4,0,4,0">
-                        <Button Background="Transparent" BorderThickness="0" Padding="0" Cursor="Hand"
-                                Command="{Binding FilterByStatusCardCommand}" CommandParameter="totalquantity">
-                            <StackPanel>
-                                <Grid Margin="0,0,0,10">
-                                    <TextBlock Text="Stock Quantity" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource Theme.Text.Secondary}" VerticalAlignment="Center"/>
-                                    <Path Data="{StaticResource Icon.Stock}" Fill="{StaticResource BrandPrimaryBrush}" Width="16" Height="16" Stretch="Uniform" HorizontalAlignment="Right"/>
-                                </Grid>
-                                <TextBlock Text="{Binding Summary.TotalStockQuantity, StringFormat='{}{0:N0}'}" FontSize="24" FontWeight="Bold" Margin="0,0,0,4"/>
-                                <TextBlock Text="{Binding Summary.PrimaryUnit, StringFormat='Unit aware: {0}'}" FontSize="11" Foreground="{DynamicResource Theme.Text.Muted}"/>
-                            </StackPanel>
-                        </Button>
-                    </Border>
-
-                    <!-- Card 3: Low Stock Items -->
-                    <Border Grid.Column="2" Style="{StaticResource IndustrialCard}" Margin="4,0,4,0">
-                        <Button Background="Transparent" BorderThickness="0" Padding="0" Cursor="Hand"
-                                Command="{Binding FilterByStatusCardCommand}" CommandParameter="lowstock">
-                            <StackPanel>
-                                <Grid Margin="0,0,0,10">
-                                    <TextBlock Text="Low Stock" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource Theme.Text.Secondary}" VerticalAlignment="Center"/>
-                                    <Path Data="{StaticResource Icon.LowStock}" Fill="{StaticResource WarningBrush}" Width="16" Height="16" Stretch="Uniform" HorizontalAlignment="Right"/>
-                                </Grid>
-                                <TextBlock Text="{Binding Summary.LowStockItemsCount}" FontSize="24" FontWeight="Bold" Foreground="{StaticResource WarningBrush}" Margin="0,0,0,4"/>
-                                <TextBlock Text="At/below threshold" FontSize="11" Foreground="{DynamicResource Theme.Text.Muted}"/>
-                            </StackPanel>
-                        </Button>
-                    </Border>
-
-                    <!-- Card 4: Near Expiry -->
-                    <Border Grid.Column="3" Style="{StaticResource IndustrialCard}" Margin="4,0,4,0">
-                        <Button Background="Transparent" BorderThickness="0" Padding="0" Cursor="Hand"
-                                Command="{Binding FilterByStatusCardCommand}" CommandParameter="nearexpiry">
-                            <StackPanel>
-                                <Grid Margin="0,0,0,10">
-                                    <TextBlock Text="Near Expiry" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource Theme.Text.Secondary}" VerticalAlignment="Center"/>
-                                    <Path Data="{StaticResource Icon.Expiry}" Fill="#EA580C" Width="16" Height="16" Stretch="Uniform" HorizontalAlignment="Right"/>
-                                </Grid>
-                                <TextBlock Text="{Binding Summary.NearExpiryBatchesCount}" FontSize="24" FontWeight="Bold" Foreground="#EA580C" Margin="0,0,0,4"/>
-                                <TextBlock Text="Expiring ≤ 30 days" FontSize="11" Foreground="{DynamicResource Theme.Text.Muted}"/>
-                            </StackPanel>
-                        </Button>
-                    </Border>
-
-                    <!-- Card 5: Expired Stock -->
-                    <Border Grid.Column="4" Style="{StaticResource IndustrialCard}" Margin="4,0,4,0">
-                        <Button Background="Transparent" BorderThickness="0" Padding="0" Cursor="Hand"
-                                Command="{Binding FilterByStatusCardCommand}" CommandParameter="expired">
-                            <StackPanel>
-                                <Grid Margin="0,0,0,10">
-                                    <TextBlock Text="Expired Stock" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource Theme.Text.Secondary}" VerticalAlignment="Center"/>
-                                    <Path Data="{StaticResource Icon.Expired}" Fill="{StaticResource DangerBrush}" Width="16" Height="16" Stretch="Uniform" HorizontalAlignment="Right"/>
-                                </Grid>
-                                <TextBlock Text="{Binding Summary.ExpiredStockBatchesCount}" FontSize="24" FontWeight="Bold" Foreground="{StaticResource DangerBrush}" Margin="0,0,0,4"/>
-                                <TextBlock Text="Quarantine required" FontSize="11" Foreground="{DynamicResource Theme.Text.Muted}"/>
-                            </StackPanel>
-                        </Button>
-                    </Border>
-
-                    <!-- Card 6: Pending Approvals -->
-                    <Border Grid.Column="5" Style="{StaticResource IndustrialCard}" Margin="8,0,0,0">
-                        <Button Background="Transparent" BorderThickness="0" Padding="0" Cursor="Hand"
-                                Command="{Binding FilterByStatusCardCommand}" CommandParameter="pendingapprovals">
-                            <StackPanel>
-                                <Grid Margin="0,0,0,10">
-                                    <TextBlock Text="Pending Approvals" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource Theme.Text.Secondary}" VerticalAlignment="Center"/>
-                                    <Path Data="{StaticResource Icon.Approvals}" Fill="{StaticResource InfoBrush}" Width="16" Height="16" Stretch="Uniform" HorizontalAlignment="Right"/>
-                                </Grid>
-                                <TextBlock Text="{Binding Summary.PendingApprovalsCount}" FontSize="24" FontWeight="Bold" Foreground="{StaticResource InfoBrush}" Margin="0,0,0,4"/>
-                                <TextBlock Text="Awaiting sign-off" FontSize="11" Foreground="{DynamicResource Theme.Text.Muted}"/>
-                            </StackPanel>
-                        </Button>
-                    </Border>
-                </Grid>
-
-                <!-- SECTION 2: QUICK ACTIONS TOOLBAR -->
-                <TextBlock Text="RAPID WAREHOUSE OPERATIONS" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource Theme.Text.Muted}" Margin="2,0,0,8"/>
-                <Border Style="{StaticResource IndustrialCard}" Margin="0,0,0,24" Padding="12,10">
-                    <WrapPanel Orientation="Horizontal">
-                        <!-- Receive Stock -->
-                        <Button Style="{StaticResource SecondaryButton}" Margin="0,4,10,4" Command="{Binding ReceiveStockActionCommand}">
-                            <StackPanel Orientation="Horizontal">
-                                <Path Data="{StaticResource Icon.Inward}" Fill="{StaticResource SuccessBrush}" Width="14" Height="14" Stretch="Uniform" Margin="0,0,8,0"/>
-                                <TextBlock Text="Receive Stock (Inward)" FontWeight="SemiBold"/>
-                            </StackPanel>
-                        </Button>
-
-                        <!-- Issue Stock -->
-                        <Button Style="{StaticResource SecondaryButton}" Margin="0,4,10,4" Command="{Binding IssueStockActionCommand}">
-                            <StackPanel Orientation="Horizontal">
-                                <Path Data="{StaticResource Icon.Outward}" Fill="{StaticResource DangerBrush}" Width="14" Height="14" Stretch="Uniform" Margin="0,0,8,0"/>
-                                <TextBlock Text="Issue Stock (Outward)" FontWeight="SemiBold"/>
-                            </StackPanel>
-                        </Button>
-
-                        <!-- Transfer Stock -->
-                        <Button Style="{StaticResource SecondaryButton}" Margin="0,4,10,4" Command="{Binding TransferStockActionCommand}">
-                            <StackPanel Orientation="Horizontal">
-                                <Path Data="{StaticResource Icon.Transfer}" Fill="{StaticResource BrandAccentBrush}" Width="14" Height="14" Stretch="Uniform" Margin="0,0,8,0"/>
-                                <TextBlock Text="Transfer Stock" FontWeight="SemiBold"/>
-                            </StackPanel>
-                        </Button>
-
-                        <!-- Add Product -->
-                        <Button Style="{StaticResource SecondaryButton}" Margin="0,4,10,4" Command="{Binding AddProductActionCommand}">
-                            <StackPanel Orientation="Horizontal">
-                                <Path Data="{StaticResource Icon.Products}" Fill="{DynamicResource Theme.Text.Primary}" Width="14" Height="14" Stretch="Uniform" Margin="0,0,8,0"/>
-                                <TextBlock Text="Add Product (SKU)" FontWeight="SemiBold"/>
-                            </StackPanel>
-                        </Button>
-
-                        <!-- View Warehouse -->
-                        <Button Style="{StaticResource SecondaryButton}" Margin="0,4,10,4" Command="{Binding ViewWarehouseActionCommand}">
-                            <StackPanel Orientation="Horizontal">
-                                <Path Data="{StaticResource Icon.Warehouse}" Fill="{DynamicResource Theme.Text.Primary}" Width="14" Height="14" Stretch="Uniform" Margin="0,0,8,0"/>
-                                <TextBlock Text="Warehouse Topology" FontWeight="SemiBold"/>
-                            </StackPanel>
-                        </Button>
-
-                        <!-- Review Approvals -->
-                        <Button Style="{StaticResource SecondaryButton}" Margin="0,4,0,4" Command="{Binding ReviewApprovalsActionCommand}">
-                            <StackPanel Orientation="Horizontal">
-                                <Path Data="{StaticResource Icon.Approvals}" Fill="{StaticResource InfoBrush}" Width="14" Height="14" Stretch="Uniform" Margin="0,0,8,0"/>
-                                <TextBlock Text="Review Pending Sign-Offs" FontWeight="SemiBold"/>
-                            </StackPanel>
-                        </Button>
-                    </WrapPanel>
-                </Border>
-
-                <!-- SECTION 3: WAREHOUSE & RACK VISUALIZATION (CORE FEATURE) -->
-                <Grid Margin="0,0,0,8">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
-                    <TextBlock Grid.Column="0" Text="WAREHOUSE RACK TOPOLOGY &amp; BIN VISUALIZATION" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource Theme.Text.Muted}" VerticalAlignment="Center"/>
-
-                    <!-- Filter Controls -->
-                    <StackPanel Grid.Column="1" Orientation="Horizontal">
-                        <!-- Warehouse Selector -->
-                        <ComboBox Width="200" 
-                                  ItemsSource="{Binding Warehouses}" 
-                                  SelectedItem="{Binding SelectedWarehouse, Mode=TwoWay}" 
-                                  DisplayMemberPath="Name" 
-                                  Style="{StaticResource ModernComboBox}" 
-                                  Margin="0,0,8,0"
-                                  ToolTip="Filter racks by specific warehouse facility"/>
-
-                        <!-- Search SKU / Rack -->
-                        <TextBox Width="180" 
-                                 Text="{Binding RackSearchQuery, UpdateSourceTrigger=PropertyChanged}" 
-                                 Style="{StaticResource ModernTextBox}" 
-                                 Margin="0,0,8,0"
-                                 ToolTip="Search rack code, section, or product SKU"/>
-
-                        <!-- Reset Filters -->
-                        <Button Style="{StaticResource SecondaryButton}" 
-                                Command="{Binding ResetFiltersCommand}" 
-                                Padding="8,4" 
-                                ToolTip="Reset warehouse &amp; rack filters"
-                                Visibility="{Binding HasActiveFilters, Converter={StaticResource BoolToVisibilityConverter}}">
-                            <StackPanel Orientation="Horizontal">
-                                <Path Data="{StaticResource Icon.Filter}" Fill="{DynamicResource Theme.Text.Primary}" Width="11" Height="11" Stretch="Uniform" Margin="0,0,4,0"/>
-                                <TextBlock Text="Clear Filter" FontSize="11"/>
-                            </StackPanel>
-                        </Button>
-                    </StackPanel>
-                </Grid>
-
-                <!-- Rack Visualization Split View -->
-                <Grid Margin="0,0,0,24" MinHeight="360">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="380"/>
-                        <ColumnDefinition Width="16"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-
-                    <!-- Left: Rack Vertical Structures List -->
-                    <Border Grid.Column="0" Style="{StaticResource IndustrialCard}" Padding="12">
+                    <Button Grid.Column="0" Style="{StaticResource SummaryCardButton}" Margin="0,0,6,0"
+                            Command="{Binding FilterByStatusCardCommand}" CommandParameter="totalproducts">
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
 
-                            <TextBlock Grid.Row="0" Text="RACKS &amp; STORAGE BAYS" FontWeight="SemiBold" FontSize="12" Foreground="{DynamicResource Theme.Text.Muted}" Margin="4,0,0,8"/>
-
-                            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
-                                <ItemsControl ItemsSource="{Binding Racks}">
-                                    <ItemsControl.ItemTemplate>
-                                        <DataTemplate DataType="{x:Type models:Rack}">
-                                            <Border Margin="0,0,0,8" 
-                                                    Background="{DynamicResource Theme.Surface.CardAlt}" 
-                                                    BorderBrush="{DynamicResource Theme.Border}" 
-                                                    BorderThickness="1" 
-                                                    CornerRadius="6">
-                                                <Grid>
-                                                    <Grid.RowDefinitions>
-                                                        <RowDefinition Height="Auto"/>
-                                                        <RowDefinition Height="Auto"/>
-                                                    </Grid.RowDefinitions>
-
-                                                    <!-- Rack Header Card -->
-                                                    <Button Grid.Row="0" 
-                                                            Background="Transparent" 
-                                                            BorderThickness="0" 
-                                                            Padding="12,10" 
-                                                            Cursor="Hand"
-                                                            HorizontalContentAlignment="Stretch"
-                                                            Command="{Binding DataContext.ToggleRackExpandCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                                            CommandParameter="{Binding}">
-                                                        <Grid>
-                                                            <Grid.ColumnDefinitions>
-                                                                <ColumnDefinition Width="Auto"/>
-                                                                <ColumnDefinition Width="*"/>
-                                                                <ColumnDefinition Width="Auto"/>
-                                                            </Grid.ColumnDefinitions>
-
-                                                            <!-- Steel Rack Icon / Level indicator -->
-                                                            <Border Grid.Column="0" 
-                                                                    Width="36" Height="36" 
-                                                                    Background="{DynamicResource Theme.Rack.SteelFrame}" 
-                                                                    CornerRadius="4" 
-                                                                    Margin="0,0,10,0">
-                                                                <Path Data="{StaticResource Icon.Warehouse}" Fill="{DynamicResource Theme.Text.Primary}" Width="18" Height="18" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                                            </Border>
-
-                                                            <!-- Rack Info -->
-                                                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                                                                <StackPanel Orientation="Horizontal">
-                                                                    <TextBlock Text="{Binding RackCode}" FontWeight="Bold" FontSize="13" Margin="0,0,8,0"/>
-                                                                    <Border Background="{DynamicResource Theme.Badge.Background}" CornerRadius="3" Padding="6,1">
-                                                                        <TextBlock Text="{Binding StatusBadgeText}" FontSize="10" FontWeight="SemiBold" 
-                                                                                   Foreground="{Binding OverallStatus, Converter={StaticResource StockStatusToColorConverter}}"/>
-                                                                    </Border>
-                                                                </StackPanel>
-                                                                <TextBlock Text="{Binding Name}" FontSize="11" Foreground="{DynamicResource Theme.Text.Secondary}" Margin="0,2,0,2"/>
-                                                                <TextBlock Text="{Binding CapacityDetailsDisplay, StringFormat='Cap: {0}'}" FontSize="10" Foreground="{DynamicResource Theme.Text.Muted}"/>
-                                                            </StackPanel>
-
-                                                            <!-- Expand Icon & Occupancy % -->
-                                                            <StackPanel Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center">
-                                                                <TextBlock Text="{Binding OccupancyDisplay}" FontWeight="Bold" FontSize="12" HorizontalAlignment="Right"
-                                                                           Foreground="{Binding OccupancyPercentage, Converter={StaticResource OccupancyColorConverter}}"/>
-                                                                <TextBlock Text="{Binding SectionsCount, StringFormat='{}{0} Tiers'}" FontSize="10" Foreground="{DynamicResource Theme.Text.Muted}" HorizontalAlignment="Right"/>
-                                                            </StackPanel>
-                                                        </Grid>
-                                                    </Button>
-
-                                                    <!-- Expandable Shelf Tiers -->
-                                                    <Border Grid.Row="1" 
-                                                            BorderBrush="{DynamicResource Theme.Border}" 
-                                                            BorderThickness="0,1,0,0" 
-                                                            Padding="8" 
-                                                            Visibility="{Binding IsExpanded, Converter={StaticResource BoolToVisibilityConverter}}">
-                                                        <ItemsControl ItemsSource="{Binding Sections}">
-                                                            <ItemsControl.ItemTemplate>
-                                                                <DataTemplate DataType="{x:Type models:RackSection}">
-                                                                    <!-- Individual Shelf Tier Button -->
-                                                                    <Button Style="{StaticResource SecondaryButton}" 
-                                                                            Margin="0,2" 
-                                                                            Padding="8,6" 
-                                                                            HorizontalContentAlignment="Stretch"
-                                                                            Command="{Binding DataContext.SelectSectionCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                                                            CommandParameter="{Binding}">
-                                                                        <Grid>
-                                                                            <Grid.ColumnDefinitions>
-                                                                                <ColumnDefinition Width="Auto"/>
-                                                                                <ColumnDefinition Width="*"/>
-                                                                                <ColumnDefinition Width="Auto"/>
-                                                                            </Grid.ColumnDefinitions>
-
-                                                                            <TextBlock Grid.Column="0" Text="{Binding SectionCode}" FontWeight="Bold" FontSize="11" Width="50" Foreground="{DynamicResource Theme.Text.Primary}"/>
-                                                                            <TextBlock Grid.Column="1" Text="{Binding SummaryDescription}" FontSize="11" TextTrimming="CharacterEllipsis" Foreground="{DynamicResource Theme.Text.Secondary}"/>
-                                                                            
-                                                                            <StackPanel Grid.Column="2" Orientation="Horizontal">
-                                                                                <Ellipse Width="6" Height="6" Margin="0,0,6,0" Fill="{Binding WorstStatus, Converter={StaticResource StockStatusToColorConverter}}"/>
-                                                                                <TextBlock Text="{Binding TotalStockQuantity, StringFormat='{}{0:N0} qty'}" FontSize="10" FontWeight="SemiBold" Foreground="{DynamicResource Theme.Text.Muted}"/>
-                                                                            </StackPanel>
-                                                                        </Grid>
-                                                                    </Button>
-                                                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-                    </Border>
-                </Grid>
-            </Border>
-        </DataTemplate>
-    </ItemsControl.ItemTemplate>
-</ItemsControl>
-                            </ScrollViewer>
+                            <Grid Grid.Row="0">
+                                <TextBlock Text="Total Products" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource Theme.Text.Secondary}" TextTrimming="CharacterEllipsis"/>
+                                <Border HorizontalAlignment="Right" Width="26" Height="26" Background="{DynamicResource Theme.Status.Info.Bg}" CornerRadius="13">
+                                    <Path Data="{StaticResource Icon.Products}" Fill="{StaticResource InfoBrush}" Width="13" Height="13" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+                            </Grid>
+                            <TextBlock Grid.Row="1" Text="{Binding Summary.TotalProducts, StringFormat='{}{0:N0}'}" FontSize="24" FontWeight="Bold" Margin="0,4,0,2"/>
+                            <TextBlock Grid.Row="2" Text="Active catalog SKUs" FontSize="11" Foreground="{DynamicResource Theme.Text.Muted}" TextTrimming="CharacterEllipsis"/>
                         </Grid>
-                    </Border>
+                    </Button>
 
-                    <!-- Right: Selected Section & Bin Inspector Details -->
-                    <Border Grid.Column="2" Style="{StaticResource IndustrialCard}">
+                    <!-- Card 2: Total Stock Quantity -->
+                    <Button Grid.Column="1" Style="{StaticResource SummaryCardButton}" Margin="3,0,3,0"
+                            Command="{Binding FilterByStatusCardCommand}" CommandParameter="totalquantity">
                         <Grid>
-                            <!-- If a section is selected -->
-                            <StackPanel Visibility="{Binding SelectedSection, Converter={StaticResource NullToVisibilityConverter}}">
-                                <!-- Section Header Details -->
-                                <Grid Margin="0,0,0,16">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="Auto"/>
-                                    </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
 
-                                    <StackPanel Grid.Column="0">
-                                        <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
-                                            <TextBlock Text="{Binding SelectedSection.SectionCode, StringFormat='Section: {0}'}" FontSize="16" FontWeight="Bold"/>
-                                            <Border Background="{DynamicResource Theme.Badge.Background}" CornerRadius="4" Padding="8,2" Margin="10,0,0,0">
-                                                <TextBlock Text="{Binding SelectedSection.WorstStatus}" FontWeight="SemiBold" FontSize="11"
-                                                           Foreground="{Binding SelectedSection.WorstStatus, Converter={StaticResource StockStatusToColorConverter}}"/>
-                                            </Border>
-                                        </StackPanel>
-                                        <TextBlock Text="{Binding SelectedSection.Name}" FontSize="12" Foreground="{DynamicResource Theme.Text.Secondary}"/>
-                                    </StackPanel>
+                            <Grid Grid.Row="0">
+                                <TextBlock Text="Total Stock" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource Theme.Text.Secondary}" TextTrimming="CharacterEllipsis"/>
+                                <Border HorizontalAlignment="Right" Width="26" Height="26" Background="{DynamicResource Theme.Status.Success.Bg}" CornerRadius="13">
+                                    <Path Data="{StaticResource Icon.Stock}" Fill="{StaticResource SuccessBrush}" Width="13" Height="13" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+                            </Grid>
+                            <TextBlock Grid.Row="1" Text="{Binding Summary.TotalStockQuantity, StringFormat='{}{0:N0}'}" FontSize="24" FontWeight="Bold" Margin="0,4,0,2"/>
+                            <TextBlock Grid.Row="2" Text="Native units tracked" FontSize="11" Foreground="{DynamicResource Theme.Text.Muted}" TextTrimming="CharacterEllipsis"/>
+                        </Grid>
+                    </Button>
 
-                                    <!-- Capacity & Load Factor -->
-                                    <StackPanel Grid.Column="1" HorizontalAlignment="Right">
-                                        <TextBlock Text="TIER CAPACITY &amp; LOAD" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource Theme.Text.Muted}" HorizontalAlignment="Right"/>
-                                        <TextBlock Text="{Binding SelectedSection.OccupancyDisplay}" FontSize="13" FontWeight="Bold" HorizontalAlignment="Right"
-                                                   Foreground="{Binding SelectedSection.OccupancyPercentage, Converter={StaticResource OccupancyColorConverter}}"/>
-                                    </StackPanel>
-                                </Grid>
+                    <!-- Card 3: Low Stock Items -->
+                    <Button Grid.Column="2" Style="{StaticResource SummaryCardButton}" Margin="3,0,3,0"
+                            Command="{Binding FilterByStatusCardCommand}" CommandParameter="lowstock">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
 
-                                <!-- Visual Shelf Beam Representation -->
-                                <Border Height="6" Background="{DynamicResource Theme.Rack.SteelFrame}" CornerRadius="3" Margin="0,0,0,16"/>
+                            <Grid Grid.Row="0">
+                                <TextBlock Text="Low Stock" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource Theme.Text.Secondary}" TextTrimming="CharacterEllipsis"/>
+                                <Border HorizontalAlignment="Right" Width="26" Height="26" Background="{DynamicResource Theme.Status.Warning.Bg}" CornerRadius="13">
+                                    <Path Data="{StaticResource Icon.LowStock}" Fill="{StaticResource WarningBrush}" Width="13" Height="13" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+                            </Grid>
+                            <TextBlock Grid.Row="1" Text="{Binding Summary.LowStockItemsCount}" FontSize="24" FontWeight="Bold" Foreground="{StaticResource WarningBrush}" Margin="0,4,0,2"/>
+                            <TextBlock Grid.Row="2" Text="Below reorder point" FontSize="11" Foreground="{DynamicResource Theme.Text.Muted}" TextTrimming="CharacterEllipsis"/>
+                        </Grid>
+                    </Button>
 
-                                <!-- Empty Section State -->
-                                <Border Background="{DynamicResource Theme.Surface.CardAlt}" 
-                                        BorderBrush="{DynamicResource Theme.Border}" 
-                                        BorderThickness="1" 
-                                        CornerRadius="6" 
-                                        Padding="24" 
-                                        Margin="0,0,0,16"
-                                        Visibility="{Binding SelectedSection.IsEmpty, Converter={StaticResource BoolToVisibilityConverter}}">
-                                    <StackPanel HorizontalAlignment="Center">
-                                        <Path Data="{StaticResource Icon.Warehouse}" Fill="{DynamicResource Theme.Text.Muted}" Width="28" Height="28" Stretch="Uniform" Margin="0,0,0,8" HorizontalAlignment="Center"/>
-                                        <TextBlock Text="Empty Storage Tier" FontWeight="Bold" FontSize="14" HorizontalAlignment="Center" Margin="0,0,0,4"/>
-                                        <TextBlock Text="This section currently holds no assigned stock items. Ready for Goods Inward allocation." 
-                                                   FontSize="12" Foreground="{DynamicResource Theme.Text.Secondary}" HorizontalAlignment="Center"/>
+                    <!-- Card 4: Near Expiry -->
+                    <Button Grid.Column="3" Style="{StaticResource SummaryCardButton}" Margin="3,0,3,0"
+                            Command="{Binding FilterByStatusCardCommand}" CommandParameter="nearexpiry">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <Grid Grid.Row="0">
+                                <TextBlock Text="Near Expiry" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource Theme.Text.Secondary}" TextTrimming="CharacterEllipsis"/>
+                                <Border HorizontalAlignment="Right" Width="26" Height="26" Background="{DynamicResource Theme.Status.Orange.Bg}" CornerRadius="13">
+                                    <Path Data="{StaticResource Icon.Expiry}" Fill="{StaticResource OrangeBrush}" Width="13" Height="13" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+                            </Grid>
+                            <TextBlock Grid.Row="1" Text="{Binding Summary.NearExpiryBatchesCount}" FontSize="24" FontWeight="Bold" Foreground="{StaticResource OrangeBrush}" Margin="0,4,0,2"/>
+                            <TextBlock Grid.Row="2" Text="Expiring ≤ 30 days" FontSize="11" Foreground="{DynamicResource Theme.Text.Muted}" TextTrimming="CharacterEllipsis"/>
+                        </Grid>
+                    </Button>
+
+                    <!-- Card 5: Expired Stock -->
+                    <Button Grid.Column="4" Style="{StaticResource SummaryCardButton}" Margin="3,0,3,0"
+                            Command="{Binding FilterByStatusCardCommand}" CommandParameter="expired">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <Grid Grid.Row="0">
+                                <TextBlock Text="Expired Stock" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource Theme.Text.Secondary}" TextTrimming="CharacterEllipsis"/>
+                                <Border HorizontalAlignment="Right" Width="26" Height="26" Background="{DynamicResource Theme.Status.Danger.Bg}" CornerRadius="13">
+                                    <Path Data="{StaticResource Icon.Expired}" Fill="{StaticResource DangerBrush}" Width="13" Height="13" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+                            </Grid>
+                            <TextBlock Grid.Row="1" Text="{Binding Summary.ExpiredStockBatchesCount}" FontSize="24" FontWeight="Bold" Foreground="{StaticResource DangerBrush}" Margin="0,4,0,2"/>
+                            <TextBlock Grid.Row="2" Text="Quarantine required" FontSize="11" Foreground="{DynamicResource Theme.Text.Muted}" TextTrimming="CharacterEllipsis"/>
+                        </Grid>
+                    </Button>
+
+                    <!-- Card 6: Pending Approvals -->
+                    <Button Grid.Column="5" Style="{StaticResource SummaryCardButton}" Margin="6,0,0,0"
+                            Command="{Binding FilterByStatusCardCommand}" CommandParameter="pendingapprovals">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <Grid Grid.Row="0">
+                                <TextBlock Text="Pending Approvals" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource Theme.Text.Secondary}" TextTrimming="CharacterEllipsis"/>
+                                <Border HorizontalAlignment="Right" Width="26" Height="26" Background="{DynamicResource Theme.Status.Purple.Bg}" CornerRadius="13">
+                                    <Path Data="{StaticResource Icon.Approvals}" Fill="{StaticResource PurpleBrush}" Width="13" Height="13" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+                            </Grid>
+                            <TextBlock Grid.Row="1" Text="{Binding Summary.PendingApprovalsCount}" FontSize="24" FontWeight="Bold" Foreground="{StaticResource InfoBrush}" Margin="0,4,0,2"/>
+                            <TextBlock Grid.Row="2" Text="Awaiting sign-off" FontSize="11" Foreground="{DynamicResource Theme.Text.Muted}" TextTrimming="CharacterEllipsis"/>
+                        </Grid>
+                    </Button>
+                </Grid>
+
+                <!-- SECTION 2: WAREHOUSE & RACK OVERVIEW (CORE VISUAL WORKSPACE) -->
+                <Border Style="{StaticResource IndustrialCard}" Margin="0,0,0,18" Padding="16,14">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <!-- Workspace Header & Controls Toolbar -->
+                            <RowDefinition Height="Auto"/>
+                            <!-- Workspace Canvas & Inspector Body -->
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <!-- TOOLBAR -->
+                        <Grid Grid.Row="0" Margin="0,0,0,14">
+                            <Grid.ColumnDefinitions>
+                                <!-- Workspace Title -->
+                                <ColumnDefinition Width="Auto"/>
+                                <!-- Spacer -->
+                                <ColumnDefinition Width="*"/>
+                                <!-- Controls: Warehouse Filter, Search, Zoom, Edit Layout -->
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                <TextBlock Text="Warehouse Layout Workspace" FontSize="14" FontWeight="Bold"/>
+                                <TextBlock Text="Interactive rack floorplan, occupancy metrics &amp; bin inspector" FontSize="11" Foreground="{DynamicResource Theme.Text.Muted}"/>
+                            </StackPanel>
+
+                            <!-- Controls Toolbar -->
+                            <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                                <!-- Warehouse Selector -->
+                                <ComboBox Width="180" 
+                                          ItemsSource="{Binding Warehouses}" 
+                                          SelectedItem="{Binding SelectedWarehouse, Mode=TwoWay}" 
+                                          DisplayMemberPath="Name" 
+                                          Style="{StaticResource ModernComboBox}" 
+                                          Margin="0,0,8,0"
+                                          ToolTip="Select warehouse facility"/>
+
+                                <!-- Search Rack or SKU -->
+                                <TextBox Width="150" 
+                                         Text="{Binding RackSearchQuery, UpdateSourceTrigger=PropertyChanged}" 
+                                         Style="{StaticResource ModernTextBox}" 
+                                         Margin="0,0,8,0"
+                                         ToolTip="Search rack code or product SKU"/>
+
+                                <!-- Clear Filter Button -->
+                                <Button Style="{StaticResource CanvasToolButton}" 
+                                        Command="{Binding ResetFiltersCommand}" 
+                                        Margin="0,0,8,0"
+                                        ToolTip="Clear search &amp; filters"
+                                        Visibility="{Binding HasActiveFilters, Converter={StaticResource BoolToVisibilityConverter}}">
+                                    <TextBlock Text="Clear" FontSize="11"/>
+                                </Button>
+
+                                <!-- Zoom Controls -->
+                                <Border BorderBrush="{DynamicResource Theme.Border}" BorderThickness="1" CornerRadius="4" Margin="0,0,10,0">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Button Style="{StaticResource IconButton}" Command="{Binding ZoomOutCommand}" Padding="6,2" ToolTip="Zoom Out">
+                                            <Path Data="{StaticResource Icon.ZoomOut}" Fill="{DynamicResource Theme.Text.Primary}" Width="10" Height="10" Stretch="Uniform"/>
+                                        </Button>
+                                        <Button Style="{StaticResource IconButton}" Command="{Binding ResetZoomCommand}" Padding="4,2" ToolTip="Reset Zoom (100%)">
+                                            <TextBlock Text="{Binding ZoomDisplay}" FontSize="11" FontWeight="SemiBold"/>
+                                        </Button>
+                                        <Button Style="{StaticResource IconButton}" Command="{Binding ZoomInCommand}" Padding="6,2" ToolTip="Zoom In">
+                                            <Path Data="{StaticResource Icon.ZoomIn}" Fill="{DynamicResource Theme.Text.Primary}" Width="10" Height="10" Stretch="Uniform"/>
+                                        </Button>
                                     </StackPanel>
                                 </Border>
 
-                                <!-- Stored Products List (When Products Exist) -->
-                                <StackPanel Visibility="{Binding SelectedSection.IsEmpty, Converter={StaticResource InverseBoolToVisibilityConverter}}">
-                                    <TextBlock Text="ASSIGNED SKUs &amp; BATCH DETAILS" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource Theme.Text.Muted}" Margin="0,0,0,8"/>
-
-                                    <ItemsControl ItemsSource="{Binding SelectedSection.Products}">
-                                        <ItemsControl.ItemTemplate>
-                                            <DataTemplate DataType="{x:Type models:StoredProductItem}">
-                                                <Border Style="{StaticResource IndustrialCardAlt}" Margin="0,0,0,8">
-                                                    <Grid>
-                                                        <Grid.ColumnDefinitions>
-                                                            <ColumnDefinition Width="Auto"/>
-                                                            <ColumnDefinition Width="*"/>
-                                                            <ColumnDefinition Width="Auto"/>
-                                                            <ColumnDefinition Width="Auto"/>
-                                                        </Grid.ColumnDefinitions>
-
-                                                        <!-- Status Icon -->
-                                                        <Border Grid.Column="0" Width="32" Height="32" 
-                                                                Background="{DynamicResource Theme.Badge.Background}" 
-                                                                CornerRadius="4" Margin="0,0,12,0">
-                                                            <Path Data="{StaticResource Icon.Products}" Fill="{Binding Status, Converter={StaticResource StockStatusToColorConverter}}" Width="16" Height="16" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                                        </Border>
-
-                                                        <!-- SKU & Product Info -->
-                                                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                                                            <StackPanel Orientation="Horizontal">
-                                                                <TextBlock Text="{Binding Sku}" FontWeight="Bold" FontSize="12" Margin="0,0,8,0"/>
-                                                                <TextBlock Text="{Binding Category, StringFormat='({0})'}" FontSize="11" Foreground="{DynamicResource Theme.Text.Muted}"/>
-                                                            </StackPanel>
-                                                            <TextBlock Text="{Binding Name}" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource Theme.Text.Primary}" Margin="0,2,0,2"/>
-                                                            <TextBlock Text="{Binding BatchNumber, StringFormat='Batch: {0}'}" FontSize="10" Foreground="{DynamicResource Theme.Text.Muted}"/>
-                                                        </StackPanel>
-
-                                                        <!-- Expiry & Reorder Info -->
-                                                        <StackPanel Grid.Column="2" VerticalAlignment="Center" Margin="16,0" HorizontalAlignment="Right">
-                                                            <TextBlock Text="{Binding ExpiryDisplay, StringFormat='Exp: {0}'}" FontSize="11" Foreground="{DynamicResource Theme.Text.Secondary}" HorizontalAlignment="Right"/>
-                                                            <TextBlock Text="{Binding StatusDisplay}" FontSize="10" FontWeight="SemiBold" HorizontalAlignment="Right"
-                                                                       Foreground="{Binding Status, Converter={StaticResource StockStatusToColorConverter}}"/>
-                                                        </StackPanel>
-
-                                                        <!-- Quantity & Native Unit -->
-                                                        <Border Grid.Column="3" 
-                                                                Background="{DynamicResource Theme.Badge.Background}" 
-                                                                BorderBrush="{DynamicResource Theme.Border}" 
-                                                                BorderThickness="1" 
-                                                                CornerRadius="6" 
-                                                                Padding="10,6" 
-                                                                VerticalAlignment="Center">
-                                                            <TextBlock Text="{Binding QuantityDisplay}" FontWeight="Bold" FontSize="13" Foreground="{DynamicResource Theme.Text.Primary}"/>
-                                                        </Border>
-                                                    </Grid>
-                                                </Border>
-                                            </DataTemplate>
-                                        </ItemsControl.ItemTemplate>
-                                    </ItemsControl>
-                                </StackPanel>
-                            </StackPanel>
-
-                            <!-- Fallback if no rack/section selected -->
-                            <StackPanel Visibility="{Binding SelectedSection, Converter={StaticResource InverseNullToVisibilityConverter}}" 
-                                        HorizontalAlignment="Center" VerticalAlignment="Center">
-                                <Path Data="{StaticResource Icon.Warehouse}" Fill="{DynamicResource Theme.Text.Muted}" Width="36" Height="36" Stretch="Uniform" Margin="0,0,0,10" HorizontalAlignment="Center"/>
-                                <TextBlock Text="Select a Rack Shelf Tier to Inspect" FontSize="14" FontWeight="SemiBold" HorizontalAlignment="Center" Foreground="{DynamicResource Theme.Text.Secondary}"/>
+                                <!-- Edit Layout Mode Button -->
+                                <Button Style="{StaticResource QuickActionButton}" 
+                                        Command="{Binding ToggleEditLayoutCommand}"
+                                        Height="30" Padding="12,0"
+                                        ToolTip="Toggle drag-and-drop rack positioning">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Path Data="{StaticResource Icon.Edit}" Fill="{DynamicResource Theme.Text.Primary}" Width="12" Height="12" Stretch="Uniform" Margin="0,0,6,0"/>
+                                        <TextBlock Text="Edit Layout">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock">
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsEditingLayout}" Value="True">
+                                                            <Setter Property="Text" Value="Done Editing"/>
+                                                            <Setter Property="FontWeight" Value="Bold"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+                                    </StackPanel>
+                                </Button>
                             </StackPanel>
                         </Grid>
-                    </Border>
-                </Grid>
 
-                <!-- SECTION 4 & 5: RECENT STOCK MOVEMENTS & ALERTS (TWO COLUMNS) -->
+                        <!-- WORKSPACE BODY: 2-COLUMN SPLIT (FLOORPLAN CANVAS + INSPECTOR PANEL) -->
+                        <Grid Grid.Row="1">
+                            <Grid.ColumnDefinitions>
+                                <!-- Interactive Canvas Floorplan -->
+                                <ColumnDefinition Width="*"/>
+                                <!-- Spacing -->
+                                <ColumnDefinition Width="14"/>
+                                <!-- Rack & Tier Inspector Panel -->
+                                <ColumnDefinition Width="340"/>
+                            </Grid.ColumnDefinitions>
+
+                            <!-- COLUMN 1: WAREHOUSE CANVAS FLOORPLAN -->
+                            <Border Grid.Column="0" 
+                                    Background="{DynamicResource Theme.Canvas.Background}" 
+                                    BorderBrush="{DynamicResource Theme.Border}" 
+                                    BorderThickness="1" 
+                                    CornerRadius="6" 
+                                    ClipToBounds="True">
+                                <Grid>
+                                    <!-- Edit Mode Active Notification Banner -->
+                                    <Border Background="#1A2563EB" 
+                                            BorderBrush="{StaticResource BrandPrimaryBrush}" 
+                                            BorderThickness="0,0,0,1" 
+                                            Padding="10,6" 
+                                            Panel.ZIndex="10"
+                                            VerticalAlignment="Top"
+                                            Visibility="{Binding IsEditingLayout, Converter={StaticResource BoolToVisibilityConverter}}">
+                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                            <Path Data="{StaticResource Icon.Edit}" Fill="{StaticResource BrandPrimaryBrush}" Width="12" Height="12" Stretch="Uniform" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                                            <TextBlock Text="Layout Edit Mode Active — Click and drag racks to reposition. Positions snap to 20px grid." 
+                                                       FontSize="11.5" FontWeight="SemiBold" Foreground="{StaticResource BrandPrimaryBrush}" VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                    </Border>
+
+                                    <!-- Canvas Viewport with Pan and Zoom -->
+                                    <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+                                        <!-- Floorplan Canvas -->
+                                        <ItemsControl ItemsSource="{Binding Racks}">
+                                            <ItemsControl.LayoutTransform>
+                                                <ScaleTransform ScaleX="{Binding ZoomLevel}" ScaleY="{Binding ZoomLevel}"/>
+                                            </ItemsControl.LayoutTransform>
+
+                                            <!-- Canvas Panel -->
+                                            <ItemsControl.ItemsPanel>
+                                                <ItemsPanelTemplate>
+                                                    <Canvas x:Name="WarehouseFloorCanvas" Width="980" Height="420" Background="Transparent"/>
+                                                </ItemsPanelTemplate>
+                                            </ItemsControl.ItemsPanel>
+
+                                            <!-- Canvas Position Mapping -->
+                                            <ItemsControl.ItemContainerStyle>
+                                                <Style TargetType="ContentPresenter">
+                                                    <Setter Property="Canvas.Left" Value="{Binding CanvasX}"/>
+                                                    <Setter Property="Canvas.Top" Value="{Binding CanvasY}"/>
+                                                </Style>
+                                            </ItemsControl.ItemContainerStyle>
+
+                                            <!-- Individual Visual Rack Structure Template -->
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate DataType="{x:Type models:Rack}">
+                                                    <Border x:Name="RackCardBorder" 
+                                                            Width="{Binding Width}" 
+                                                            Height="{Binding Height}" 
+                                                            Background="{DynamicResource Theme.Surface.Card}" 
+                                                            CornerRadius="6" 
+                                                            Padding="10" 
+                                                            Cursor="Hand"
+                                                            PreviewMouseLeftButtonDown="RackCard_PreviewMouseLeftButtonDown"
+                                                            PreviewMouseMove="RackCard_PreviewMouseMove"
+                                                            PreviewMouseLeftButtonUp="RackCard_PreviewMouseLeftButtonUp">
+
+                                                        <!-- Selection & Steel Border Styling -->
+                                                        <Border.Style>
+                                                            <Style TargetType="Border">
+                                                                <Setter Property="BorderBrush" Value="{DynamicResource Theme.Border}"/>
+                                                                <Setter Property="BorderThickness" Value="1"/>
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                                                        <Setter Property="BorderBrush" Value="{StaticResource BrandPrimaryBrush}"/>
+                                                                        <Setter Property="BorderThickness" Value="2"/>
+                                                                    </DataTrigger>
+                                                                    <DataTrigger Binding="{Binding DataContext.IsEditingLayout, RelativeSource={RelativeSource AncestorType=UserControl}}" Value="True">
+                                                                        <Setter Property="Cursor" Value="SizeAll"/>
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </Border.Style>
+
+                                                        <Grid>
+                                                            <Grid.RowDefinitions>
+                                                                <!-- Rack Header -->
+                                                                <RowDefinition Height="Auto"/>
+                                                                <!-- Capacity Bar -->
+                                                                <RowDefinition Height="Auto"/>
+                                                                <!-- Shelf Tiers -->
+                                                                <RowDefinition Height="*"/>
+                                                            </Grid.RowDefinitions>
+
+                                                            <!-- Row 0: Top Bar with Rack Code & Status -->
+                                                            <Grid Grid.Row="0" Margin="0,0,0,6">
+                                                                <Grid.ColumnDefinitions>
+                                                                    <ColumnDefinition Width="*"/>
+                                                                    <ColumnDefinition Width="Auto"/>
+                                                                </Grid.ColumnDefinitions>
+
+                                                                <StackPanel Grid.Column="0">
+                                                                    <TextBlock Text="{Binding Zone}" FontSize="9.5" Foreground="{DynamicResource Theme.Text.Muted}" TextTrimming="CharacterEllipsis"/>
+                                                                    <TextBlock Text="{Binding RackCode}" FontWeight="Bold" FontSize="13" Foreground="{DynamicResource Theme.Text.Primary}"/>
+                                                                </StackPanel>
+
+                                                                <!-- Status Badge Pill -->
+                                                                <Border Grid.Column="1" 
+                                                                        Background="{Binding OverallStatus, Converter={StaticResource StockStatusToBgColorConverter}}" 
+                                                                        CornerRadius="3" 
+                                                                        Padding="6,2" 
+                                                                        VerticalAlignment="Center">
+                                                                    <TextBlock Text="{Binding StatusBadgeText}" FontSize="9.5" FontWeight="Bold" 
+                                                                               Foreground="{Binding OverallStatus, Converter={StaticResource StockStatusToColorConverter}}"/>
+                                                                </Border>
+                                                            </Grid>
+
+                                                            <!-- Row 1: Simple Occupancy Indicator Bar -->
+                                                            <Grid Grid.Row="1" Margin="0,0,0,8">
+                                                                <Grid.ColumnDefinitions>
+                                                                    <ColumnDefinition Width="*"/>
+                                                                    <ColumnDefinition Width="Auto"/>
+                                                                </Grid.ColumnDefinitions>
+
+                                                                <!-- Progress Bar -->
+                                                                <ProgressBar Grid.Column="0" 
+                                                                             Height="4" 
+                                                                             Value="{Binding OccupancyPercentage, Mode=OneWay}" 
+                                                                             Maximum="100" 
+                                                                             Foreground="{Binding OccupancyPercentage, Converter={StaticResource OccupancyColorConverter}}" 
+                                                                             Background="{DynamicResource Theme.Border}" 
+                                                                             BorderThickness="0" 
+                                                                             VerticalAlignment="Center" 
+                                                                             Margin="0,0,8,0"/>
+
+                                                                <!-- Occupancy Text -->
+                                                                <TextBlock Grid.Column="1" Text="{Binding OccupancyDisplay}" FontSize="10" FontWeight="SemiBold" 
+                                                                           Foreground="{Binding OccupancyPercentage, Converter={StaticResource OccupancyColorConverter}}"/>
+                                                            </Grid>
+
+                                                            <!-- Row 2: Shelf Tiers Display -->
+                                                            <ItemsControl Grid.Row="2" ItemsSource="{Binding Sections}">
+                                                                <ItemsControl.ItemTemplate>
+                                                                    <DataTemplate DataType="{x:Type models:RackSection}">
+                                                                        <Border Background="{DynamicResource Theme.Surface.CardAlt}" 
+                                                                                BorderBrush="{DynamicResource Theme.Border.Subtle}" 
+                                                                                BorderThickness="0,0,0,1" 
+                                                                                Padding="4,2" 
+                                                                                Margin="0,1">
+                                                                            <Grid>
+                                                                                <Grid.ColumnDefinitions>
+                                                                                    <ColumnDefinition Width="Auto"/>
+                                                                                    <ColumnDefinition Width="*"/>
+                                                                                    <ColumnDefinition Width="Auto"/>
+                                                                                </Grid.ColumnDefinitions>
+
+                                                                                <TextBlock Grid.Column="0" Text="{Binding SectionCode}" FontWeight="SemiBold" FontSize="10" Foreground="{DynamicResource Theme.Text.Secondary}" Margin="0,0,6,0"/>
+                                                                                <TextBlock Grid.Column="1" Text="{Binding SummaryDescription}" FontSize="9.5" Foreground="{DynamicResource Theme.Text.Muted}" TextTrimming="CharacterEllipsis"/>
+                                                                                <Ellipse Grid.Column="2" Width="6" Height="6" Fill="{Binding WorstStatus, Converter={StaticResource StockStatusToColorConverter}}" VerticalAlignment="Center"/>
+                                                                            </Grid>
+                                                                        </Border>
+                                                                    </DataTemplate>
+                                                                </ItemsControl.ItemTemplate>
+                                                            </ItemsControl>
+
+                                                            <!-- Transparent Button Overlay to Select Rack when not dragging -->
+                                                            <Button Grid.RowSpan="3" Background="Transparent" BorderThickness="0" Cursor="Hand"
+                                                                    Command="{Binding DataContext.SelectRackCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                                    CommandParameter="{Binding}"
+                                                                    Visibility="{Binding DataContext.IsEditingLayout, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
+                                                        </Grid>
+                                                    </Border>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </ScrollViewer>
+                                </Grid>
+                            </Border>
+
+                            <!-- COLUMN 2: RACK & SHELF TIER INSPECTOR PANEL -->
+                            <Border Grid.Column="2" 
+                                    Background="{DynamicResource Theme.Surface.CardAlt}" 
+                                    BorderBrush="{DynamicResource Theme.Border}" 
+                                    BorderThickness="1" 
+                                    CornerRadius="6" 
+                                    Padding="14">
+                                <Grid>
+                                    <!-- When a rack is selected -->
+                                    <ScrollViewer VerticalScrollBarVisibility="Auto" 
+                                                  Visibility="{Binding SelectedRack, Converter={StaticResource NullToVisibilityConverter}}">
+                                        <StackPanel>
+                                            <!-- Rack Header Info -->
+                                            <Grid Margin="0,0,0,10">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+
+                                                <StackPanel Grid.Column="0">
+                                                    <TextBlock Text="{Binding SelectedRack.RackCode}" FontSize="15" FontWeight="Bold"/>
+                                                    <TextBlock Text="{Binding SelectedRack.Name}" FontSize="11.5" Foreground="{DynamicResource Theme.Text.Secondary}" TextWrapping="Wrap"/>
+                                                    <TextBlock Text="{Binding SelectedRack.WarehouseName}" FontSize="10" Foreground="{DynamicResource Theme.Text.Muted}" Margin="0,2,0,0"/>
+                                                </StackPanel>
+
+                                                <Border Grid.Column="1" 
+                                                        Background="{Binding SelectedRack.OverallStatus, Converter={StaticResource StockStatusToBgColorConverter}}" 
+                                                        CornerRadius="4" 
+                                                        Padding="6,3" 
+                                                        VerticalAlignment="Top">
+                                                    <TextBlock Text="{Binding SelectedRack.StatusBadgeText}" FontSize="9.5" FontWeight="Bold" 
+                                                               Foreground="{Binding SelectedRack.OverallStatus, Converter={StaticResource StockStatusToColorConverter}}"/>
+                                                </Border>
+                                            </Grid>
+
+                                            <!-- Capacity Metrics -->
+                                            <Border Background="{DynamicResource Theme.Surface.Card}" 
+                                                    BorderBrush="{DynamicResource Theme.Border}" 
+                                                    BorderThickness="1" 
+                                                    CornerRadius="4" 
+                                                    Padding="10,8" 
+                                                    Margin="0,0,0,12">
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <StackPanel Grid.Column="0">
+                                                        <TextBlock Text="CAPACITY &amp; OCCUPANCY" FontSize="9.5" FontWeight="Bold" Foreground="{DynamicResource Theme.Text.Muted}"/>
+                                                        <TextBlock Text="{Binding SelectedRack.CapacityDetailsDisplay}" FontSize="11.5" FontWeight="SemiBold" Foreground="{DynamicResource Theme.Text.Primary}"/>
+                                                    </StackPanel>
+                                                    <TextBlock Grid.Column="1" Text="{Binding SelectedRack.OccupancyDisplay}" FontSize="14" FontWeight="Bold" VerticalAlignment="Center"
+                                                               Foreground="{Binding SelectedRack.OccupancyPercentage, Converter={StaticResource OccupancyColorConverter}}"/>
+                                                </Grid>
+                                            </Border>
+
+                                            <!-- Shelf Tiers Selector -->
+                                            <TextBlock Text="SELECT SHELF TIER" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource Theme.Text.Muted}" Margin="0,0,0,6"/>
+                                            <ItemsControl ItemsSource="{Binding SelectedRack.Sections}" Margin="0,0,0,12">
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate DataType="{x:Type models:RackSection}">
+                                                        <Button Style="{StaticResource SecondaryButton}" 
+                                                                Margin="0,2" Padding="8,6" 
+                                                                HorizontalContentAlignment="Stretch"
+                                                                Command="{Binding DataContext.SelectSectionCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                                CommandParameter="{Binding}">
+                                                            <Grid>
+                                                                <Grid.ColumnDefinitions>
+                                                                    <ColumnDefinition Width="Auto"/>
+                                                                    <ColumnDefinition Width="*"/>
+                                                                    <ColumnDefinition Width="Auto"/>
+                                                                </Grid.ColumnDefinitions>
+
+                                                                <TextBlock Grid.Column="0" Text="{Binding SectionCode}" FontWeight="Bold" FontSize="11" Width="55"/>
+                                                                <TextBlock Grid.Column="1" Text="{Binding Name}" FontSize="11" Foreground="{DynamicResource Theme.Text.Secondary}" TextTrimming="CharacterEllipsis"/>
+                                                                <StackPanel Grid.Column="2" Orientation="Horizontal">
+                                                                    <Ellipse Width="6" Height="6" Fill="{Binding WorstStatus, Converter={StaticResource StockStatusToColorConverter}}" Margin="0,0,4,0"/>
+                                                                    <TextBlock Text="{Binding TotalStockQuantity, StringFormat='{}{0:N0} qty'}" FontSize="10" Foreground="{DynamicResource Theme.Text.Muted}"/>
+                                                                </StackPanel>
+                                                            </Grid>
+                                                        </Button>
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                            </ItemsControl>
+
+                                            <!-- Stored Products In Selected Tier -->
+                                            <StackPanel Visibility="{Binding SelectedSection, Converter={StaticResource NullToVisibilityConverter}}">
+                                                <Grid Margin="0,0,0,6">
+                                                    <TextBlock Text="{Binding SelectedSection.SectionCode, StringFormat='TIER {0} INVENTORY'}" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource Theme.Text.Muted}"/>
+                                                    <TextBlock Text="{Binding SelectedSection.OccupancyDisplay}" FontSize="10" Foreground="{DynamicResource Theme.Text.Secondary}" HorizontalAlignment="Right"/>
+                                                </Grid>
+
+                                                <!-- Empty Tier State -->
+                                                <Border Background="{DynamicResource Theme.Surface.Card}" 
+                                                        BorderBrush="{DynamicResource Theme.Border}" 
+                                                        BorderThickness="1" 
+                                                        CornerRadius="4" 
+                                                        Padding="16" 
+                                                        Visibility="{Binding SelectedSection.IsEmpty, Converter={StaticResource BoolToVisibilityConverter}}">
+                                                    <StackPanel HorizontalAlignment="Center">
+                                                        <Path Data="{StaticResource Icon.Warehouse}" Fill="{DynamicResource Theme.Text.Muted}" Width="20" Height="20" Stretch="Uniform" HorizontalAlignment="Center" Margin="0,0,0,6"/>
+                                                        <TextBlock Text="Empty Shelf Tier" FontWeight="Bold" FontSize="12" HorizontalAlignment="Center"/>
+                                                        <TextBlock Text="Available for Goods Inward allocation." FontSize="10.5" Foreground="{DynamicResource Theme.Text.Muted}" HorizontalAlignment="Center"/>
+                                                    </StackPanel>
+                                                </Border>
+
+                                                <!-- Products List -->
+                                                <ItemsControl ItemsSource="{Binding SelectedSection.Products}" 
+                                                              Visibility="{Binding SelectedSection.IsEmpty, Converter={StaticResource InverseBoolToVisibilityConverter}}">
+                                                    <ItemsControl.ItemTemplate>
+                                                        <DataTemplate DataType="{x:Type models:StoredProductItem}">
+                                                            <Border Background="{DynamicResource Theme.Surface.Card}" 
+                                                                    BorderBrush="{DynamicResource Theme.Border}" 
+                                                                    BorderThickness="1" 
+                                                                    CornerRadius="4" 
+                                                                    Padding="8" 
+                                                                    Margin="0,0,0,6">
+                                                                <Grid>
+                                                                    <Grid.ColumnDefinitions>
+                                                                        <ColumnDefinition Width="*"/>
+                                                                        <ColumnDefinition Width="Auto"/>
+                                                                    </Grid.ColumnDefinitions>
+
+                                                                    <StackPanel Grid.Column="0">
+                                                                        <TextBlock Text="{Binding Sku}" FontWeight="Bold" FontSize="11" Foreground="{DynamicResource Theme.Text.Primary}"/>
+                                                                        <TextBlock Text="{Binding Name}" FontSize="11" Foreground="{DynamicResource Theme.Text.Secondary}" TextTrimming="CharacterEllipsis"/>
+                                                                        <TextBlock Text="{Binding BatchNumber, StringFormat='Batch: {0}'}" FontSize="10" Foreground="{DynamicResource Theme.Text.Muted}"/>
+                                                                    </StackPanel>
+
+                                                                    <StackPanel Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                                                        <Border Background="{DynamicResource Theme.Badge.Background}" CornerRadius="3" Padding="6,2" HorizontalAlignment="Right">
+                                                                            <TextBlock Text="{Binding QuantityDisplay}" FontWeight="Bold" FontSize="11" Foreground="{DynamicResource Theme.Text.Primary}"/>
+                                                                        </Border>
+                                                                        <TextBlock Text="{Binding StatusDisplay}" FontSize="9.5" FontWeight="SemiBold" HorizontalAlignment="Right" Margin="0,2,0,0"
+                                                                                   Foreground="{Binding Status, Converter={StaticResource StockStatusToColorConverter}}"/>
+                                                                    </StackPanel>
+                                                                </Grid>
+                                                            </Border>
+                                                        </DataTemplate>
+                                                    </ItemsControl.ItemTemplate>
+                                                </ItemsControl>
+                                            </StackPanel>
+                                        </StackPanel>
+                                    </ScrollViewer>
+
+                                    <!-- Placeholder when no rack selected -->
+                                    <StackPanel Visibility="{Binding SelectedRack, Converter={StaticResource InverseNullToVisibilityConverter}}" 
+                                                HorizontalAlignment="Center" VerticalAlignment="Center">
+                                        <Path Data="{StaticResource Icon.Warehouse}" Fill="{DynamicResource Theme.Text.Muted}" Width="32" Height="32" Stretch="Uniform" Margin="0,0,0,10" HorizontalAlignment="Center"/>
+                                        <TextBlock Text="Select a Rack on Floorplan" FontSize="13" FontWeight="SemiBold" HorizontalAlignment="Center" Foreground="{DynamicResource Theme.Text.Secondary}"/>
+                                        <TextBlock Text="Click any rack to inspect shelf tiers &amp; stored items." FontSize="11" Foreground="{DynamicResource Theme.Text.Muted}" HorizontalAlignment="Center" Margin="0,2,0,0"/>
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+                        </Grid>
+                    </Grid>
+                </Border>
+
+                <!-- SECTION 3: RECENT STOCK MOVEMENTS (LEFT) & ALERTS (RIGHT) -->
                 <Grid Margin="0,0,0,12">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="2*"/>
+                        <!-- Recent Stock Movements Table (62%) -->
+                        <ColumnDefinition Width="1.6*"/>
+                        <!-- Spacing -->
                         <ColumnDefinition Width="16"/>
-                        <ColumnDefinition Width="1.2*"/>
+                        <!-- Alerts & Notifications (38%) -->
+                        <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
 
-                    <!-- Column 1: Recent Stock Movements Ledger -->
-                    <Border Grid.Column="0" Style="{StaticResource IndustrialCard}">
+                    <!-- COLUMN 1: RECENT STOCK MOVEMENTS LEDGER -->
+                    <Border Grid.Column="0" Style="{StaticResource IndustrialCard}" Padding="16,14">
                         <Grid>
                             <Grid.RowDefinitions>
+                                <!-- Header -->
                                 <RowDefinition Height="Auto"/>
+                                <!-- Table Column Headers -->
+                                <RowDefinition Height="Auto"/>
+                                <!-- Table Data Rows -->
                                 <RowDefinition Height="*"/>
-                                <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
 
-                            <!-- Table Header & Filter -->
+                            <!-- Table Header -->
                             <Grid Grid.Row="0" Margin="0,0,0,12">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
@@ -528,8 +692,8 @@
                                 </Grid.ColumnDefinitions>
 
                                 <StackPanel Grid.Column="0">
-                                    <TextBlock Text="RECENT STOCK MOVEMENTS LEDGER" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource Theme.Text.Muted}"/>
-                                    <TextBlock Text="Live auditable transaction records" FontSize="12" Foreground="{DynamicResource Theme.Text.Secondary}"/>
+                                    <TextBlock Text="Recent Stock Movements" FontSize="13" FontWeight="Bold"/>
+                                    <TextBlock Text="Auditable inventory ledger transactions" FontSize="11" Foreground="{DynamicResource Theme.Text.Muted}"/>
                                 </StackPanel>
 
                                 <Button Grid.Column="1" Style="{StaticResource SecondaryButton}" 
@@ -540,64 +704,89 @@
                                 </Button>
                             </Grid>
 
-                            <!-- Table of Transactions -->
-                            <ListView Grid.Row="1" ItemsSource="{Binding RecentMovements}" 
-                                      Background="Transparent" 
-                                      BorderThickness="0" 
-                                      ScrollViewer.HorizontalScrollBarVisibility="Disabled">
-                                <ListView.ItemTemplate>
+                            <!-- Column Headers -->
+                            <Border Grid.Row="1" Background="{DynamicResource Theme.Surface.CardAlt}" BorderBrush="{DynamicResource Theme.Border}" BorderThickness="0,1,0,1" Padding="6,6">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="105"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="90"/>
+                                        <ColumnDefinition Width="80"/>
+                                        <ColumnDefinition Width="120"/>
+                                        <ColumnDefinition Width="80"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <TextBlock Grid.Column="0" Text="DATE" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource Theme.Text.Muted}"/>
+                                    <TextBlock Grid.Column="1" Text="PRODUCT &amp; SKU" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource Theme.Text.Muted}"/>
+                                    <TextBlock Grid.Column="2" Text="TYPE" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource Theme.Text.Muted}"/>
+                                    <TextBlock Grid.Column="3" Text="QUANTITY" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource Theme.Text.Muted}" HorizontalAlignment="Right"/>
+                                    <TextBlock Grid.Column="4" Text="LOCATION" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource Theme.Text.Muted}" Margin="10,0,0,0"/>
+                                    <TextBlock Grid.Column="5" Text="STATUS" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource Theme.Text.Muted}" HorizontalAlignment="Right"/>
+                                </Grid>
+                            </Border>
+
+                            <!-- Table Items -->
+                            <ItemsControl Grid.Row="2" ItemsSource="{Binding RecentMovements}">
+                                <ItemsControl.ItemTemplate>
                                     <DataTemplate DataType="{x:Type models:StockMovement}">
-                                        <Border BorderBrush="{DynamicResource Theme.Border.Subtle}" BorderThickness="0,0,0,1" Padding="4,8">
+                                        <Border BorderBrush="{DynamicResource Theme.Border.Subtle}" BorderThickness="0,0,0,1" Padding="6,8">
                                             <Grid>
                                                 <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="90"/>
+                                                    <ColumnDefinition Width="105"/>
                                                     <ColumnDefinition Width="*"/>
-                                                    <ColumnDefinition Width="140"/>
                                                     <ColumnDefinition Width="90"/>
+                                                    <ColumnDefinition Width="80"/>
+                                                    <ColumnDefinition Width="120"/>
+                                                    <ColumnDefinition Width="80"/>
                                                 </Grid.ColumnDefinitions>
 
-                                                <!-- Type & Badge -->
-                                                <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                                                    <Border CornerRadius="3" Padding="4,2" HorizontalAlignment="Left" Background="{DynamicResource Theme.Badge.Background}">
-                                                        <TextBlock Text="{Binding TypeDisplay}" FontSize="9" FontWeight="Bold"
-                                                                   Foreground="{Binding Type, Converter={StaticResource StockStatusToColorConverter}}"/>
-                                                    </Border>
-                                                    <TextBlock Text="{Binding FormattedTimestamp}" FontSize="10" Foreground="{DynamicResource Theme.Text.Muted}" Margin="0,2,0,0"/>
-                                                </StackPanel>
+                                                <!-- Date -->
+                                                <TextBlock Grid.Column="0" Text="{Binding FormattedTimestamp}" FontSize="11" Foreground="{DynamicResource Theme.Text.Muted}" VerticalAlignment="Center"/>
 
                                                 <!-- Product & SKU -->
-                                                <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="8,0">
-                                                    <TextBlock Text="{Binding ProductName}" FontWeight="SemiBold" FontSize="12" TextTrimming="CharacterEllipsis"/>
-                                                    <TextBlock Text="{Binding Sku, StringFormat='SKU: {0}'}" FontSize="10" Foreground="{DynamicResource Theme.Text.Muted}"/>
-                                                    <TextBlock Text="{Binding Remarks}" FontSize="10" Foreground="{DynamicResource Theme.Text.Secondary}" TextTrimming="CharacterEllipsis"/>
+                                                <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="0,0,8,0">
+                                                    <TextBlock Text="{Binding ProductName}" FontSize="12" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"/>
+                                                    <TextBlock Text="{Binding Sku}" FontSize="10" Foreground="{DynamicResource Theme.Text.Muted}"/>
                                                 </StackPanel>
 
-                                                <!-- Locations & User -->
-                                                <StackPanel Grid.Column="2" VerticalAlignment="Center" Margin="4,0">
-                                                    <TextBlock Text="{Binding SourceLocation}" FontSize="10" TextTrimming="CharacterEllipsis" Foreground="{DynamicResource Theme.Text.Secondary}"/>
-                                                    <TextBlock Text="{Binding DestinationLocation, StringFormat='→ {0}'}" FontSize="10" TextTrimming="CharacterEllipsis" Foreground="{DynamicResource Theme.Text.Secondary}"/>
-                                                    <TextBlock Text="{Binding InitiatedBy, StringFormat='By: {0}'}" FontSize="9" Foreground="{DynamicResource Theme.Text.Muted}"/>
-                                                </StackPanel>
-
-                                                <!-- Quantity & Status -->
-                                                <StackPanel Grid.Column="3" VerticalAlignment="Center" HorizontalAlignment="Right">
-                                                    <TextBlock Text="{Binding SignedQuantityDisplay}" FontWeight="Bold" FontSize="12" HorizontalAlignment="Right"
+                                                <!-- Type Badge -->
+                                                <Border Grid.Column="2" 
+                                                        Background="{Binding Type, Converter={StaticResource StockStatusToBgColorConverter}}" 
+                                                        CornerRadius="3" 
+                                                        Padding="6,2" 
+                                                        HorizontalAlignment="Left" 
+                                                        VerticalAlignment="Center">
+                                                    <TextBlock Text="{Binding TypeDisplay}" FontSize="9.5" FontWeight="Bold" 
                                                                Foreground="{Binding Type, Converter={StaticResource StockStatusToColorConverter}}"/>
-                                                    <TextBlock Text="{Binding StatusDisplay}" FontSize="10" Foreground="{DynamicResource Theme.Text.Muted}" HorizontalAlignment="Right"/>
-                                                </StackPanel>
+                                                </Border>
+
+                                                <!-- Quantity -->
+                                                <TextBlock Grid.Column="3" Text="{Binding SignedQuantityDisplay}" FontSize="12" FontWeight="Bold" 
+                                                           Foreground="{Binding Type, Converter={StaticResource StockStatusToColorConverter}}" 
+                                                           HorizontalAlignment="Right" VerticalAlignment="Center"/>
+
+                                                <!-- Location -->
+                                                <TextBlock Grid.Column="4" Text="{Binding SourceLocation}" FontSize="10.5" Foreground="{DynamicResource Theme.Text.Secondary}" 
+                                                           TextTrimming="CharacterEllipsis" VerticalAlignment="Center" Margin="10,0,0,0"/>
+
+                                                <!-- Status -->
+                                                <TextBlock Grid.Column="5" Text="{Binding StatusDisplay}" FontSize="10.5" Foreground="{DynamicResource Theme.Text.Muted}" 
+                                                           HorizontalAlignment="Right" VerticalAlignment="Center"/>
                                             </Grid>
                                         </Border>
                                     </DataTemplate>
-                                </ListView.ItemTemplate>
-                            </ListView>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
                         </Grid>
                     </Border>
 
-                    <!-- Column 2: Active Alerts & Notifications Panel -->
-                    <Border Grid.Column="2" Style="{StaticResource IndustrialCard}">
+                    <!-- COLUMN 2: ACTIVE ALERTS & NOTIFICATIONS -->
+                    <Border Grid.Column="2" Style="{StaticResource IndustrialCard}" Padding="16,14">
                         <Grid>
                             <Grid.RowDefinitions>
+                                <!-- Header -->
                                 <RowDefinition Height="Auto"/>
+                                <!-- Alerts List -->
                                 <RowDefinition Height="*"/>
                             </Grid.RowDefinitions>
 
@@ -606,11 +795,13 @@
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
+
                                 <StackPanel Grid.Column="0">
-                                    <TextBlock Text="ACTIVE WAREHOUSE ALERTS" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource Theme.Text.Muted}"/>
-                                    <TextBlock Text="Actionable exceptions &amp; warnings" FontSize="12" Foreground="{DynamicResource Theme.Text.Secondary}"/>
+                                    <TextBlock Text="Alerts &amp; Notifications" FontSize="13" FontWeight="Bold"/>
+                                    <TextBlock Text="Exceptions requiring warehouse action" FontSize="11" Foreground="{DynamicResource Theme.Text.Muted}"/>
                                 </StackPanel>
-                                <Border Grid.Column="1" Background="{StaticResource WarningBrush}" CornerRadius="10" Padding="6,2" VerticalAlignment="Center">
+
+                                <Border Grid.Column="1" Background="{StaticResource WarningBrush}" CornerRadius="10" Padding="8,2" VerticalAlignment="Center">
                                     <TextBlock Text="{Binding ActiveAlerts.Count}" FontWeight="Bold" FontSize="11" Foreground="#000000"/>
                                 </Border>
                             </Grid>
@@ -620,36 +811,42 @@
                                 <ItemsControl ItemsSource="{Binding ActiveAlerts}">
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate DataType="{x:Type models:InventoryAlert}">
-                                            <Border Style="{StaticResource IndustrialCardAlt}" Margin="0,0,0,8" Padding="10">
+                                            <Border Background="{DynamicResource Theme.Surface.CardAlt}" 
+                                                    BorderBrush="{DynamicResource Theme.Border}" 
+                                                    BorderThickness="1" 
+                                                    CornerRadius="6" 
+                                                    Margin="0,0,0,8" 
+                                                    Padding="10,8">
                                                 <Grid>
                                                     <Grid.ColumnDefinitions>
-                                                        <ColumnDefinition Width="Auto"/>
+                                                        <!-- Severity Left Accent Stripe -->
+                                                        <ColumnDefinition Width="3"/>
+                                                        <ColumnDefinition Width="8"/>
+                                                        <!-- Alert Details -->
                                                         <ColumnDefinition Width="*"/>
+                                                        <!-- Dismiss Action -->
                                                         <ColumnDefinition Width="Auto"/>
                                                     </Grid.ColumnDefinitions>
 
-                                                    <!-- Icon -->
-                                                    <Path Grid.Column="0" Data="{StaticResource Icon.Alert}" 
-                                                          Fill="{Binding Severity, Converter={StaticResource StockStatusToColorConverter}}" 
-                                                          Width="14" Height="14" Stretch="Uniform" Margin="0,2,8,0" VerticalAlignment="Top"/>
+                                                    <!-- Severity Stripe -->
+                                                    <Border Grid.Column="0" Background="{Binding Severity, Converter={StaticResource StockStatusToColorConverter}}" CornerRadius="1.5"/>
 
-                                                    <!-- Text -->
-                                                    <StackPanel Grid.Column="1">
-                                                        <TextBlock Text="{Binding Title}" FontWeight="Bold" FontSize="12" TextWrapping="Wrap"/>
-                                                        <TextBlock Text="{Binding Description}" FontSize="11" Foreground="{DynamicResource Theme.Text.Secondary}" TextWrapping="Wrap" Margin="0,2,0,4"/>
+                                                    <!-- Alert Info -->
+                                                    <StackPanel Grid.Column="2" VerticalAlignment="Center">
+                                                        <TextBlock Text="{Binding Title}" FontWeight="Bold" FontSize="11.5" Foreground="{DynamicResource Theme.Text.Primary}" TextWrapping="Wrap"/>
+                                                        <TextBlock Text="{Binding Description}" FontSize="10.5" Foreground="{DynamicResource Theme.Text.Secondary}" TextWrapping="Wrap" Margin="0,2,0,4"/>
                                                         <StackPanel Orientation="Horizontal">
-                                                            <TextBlock Text="{Binding Location}" FontSize="10" Foreground="{DynamicResource Theme.Text.Muted}" Margin="0,0,8,0"/>
-                                                            <TextBlock Text="{Binding TimeAgo}" FontSize="10" Foreground="{DynamicResource Theme.Text.Muted}"/>
+                                                            <TextBlock Text="{Binding Location}" FontSize="9.5" Foreground="{DynamicResource Theme.Text.Muted}" Margin="0,0,8,0"/>
+                                                            <TextBlock Text="{Binding TimeAgo}" FontSize="9.5" Foreground="{DynamicResource Theme.Text.Muted}"/>
                                                         </StackPanel>
                                                     </StackPanel>
 
-                                                    <!-- Dismiss / Acknowledge Action -->
-                                                    <Button Grid.Column="2" Style="{StaticResource IconButton}" 
-                                                            Padding="4" VerticalAlignment="Top"
+                                                    <!-- Dismiss Button -->
+                                                    <Button Grid.Column="3" Style="{StaticResource IconButton}" Padding="4" VerticalAlignment="Top"
                                                             Command="{Binding DataContext.DismissAlertCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                             CommandParameter="{Binding}"
-                                                            ToolTip="Acknowledge &amp; Dismiss Alert">
-                                                        <TextBlock Text="✕" FontSize="11" Foreground="{DynamicResource Theme.Text.Muted}"/>
+                                                            ToolTip="Acknowledge &amp; Dismiss">
+                                                        <TextBlock Text="✕" FontSize="10.5" Foreground="{DynamicResource Theme.Text.Muted}"/>
                                                     </Button>
                                                 </Grid>
                                             </Border>
@@ -668,22 +865,22 @@
         <Grid Background="#7F000000" 
               Visibility="{Binding ShowActionFeedbackDialog, Converter={StaticResource BoolToVisibilityConverter}}">
             <Border Style="{StaticResource IndustrialCard}" 
-                    MaxWidth="520" 
+                    MaxWidth="500" 
                     HorizontalAlignment="Center" 
                     VerticalAlignment="Center" 
-                    Padding="24">
+                    Padding="22">
                 <StackPanel>
                     <Grid Margin="0,0,0,12">
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                            <Path Data="{StaticResource Icon.Alert}" Fill="{StaticResource BrandAccentBrush}" Width="16" Height="16" Stretch="Uniform" Margin="0,0,8,0"/>
+                            <Path Data="{StaticResource Icon.Alert}" Fill="{StaticResource BrandAccentBrush}" Width="15" Height="15" Stretch="Uniform" Margin="0,0,8,0"/>
                             <TextBlock Text="{Binding ActionFeedbackTitle}" FontSize="15" FontWeight="Bold"/>
                         </StackPanel>
                         <Button Style="{StaticResource IconButton}" HorizontalAlignment="Right" Command="{Binding CloseFeedbackDialogCommand}">
-                            <TextBlock Text="✕" FontSize="13" Foreground="{DynamicResource Theme.Text.Muted}"/>
+                            <TextBlock Text="✕" FontSize="12" Foreground="{DynamicResource Theme.Text.Muted}"/>
                         </Button>
                     </Grid>
 
-                    <TextBlock Text="{Binding ActionFeedbackBody}" FontSize="13" Foreground="{DynamicResource Theme.Text.Secondary}" TextWrapping="Wrap" Margin="0,0,0,20" LineHeight="18"/>
+                    <TextBlock Text="{Binding ActionFeedbackBody}" FontSize="12.5" Foreground="{DynamicResource Theme.Text.Secondary}" TextWrapping="Wrap" Margin="0,0,0,18" LineHeight="18"/>
 
                     <Button Style="{StaticResource PrimaryButton}" 
                             Content="Acknowledge" 

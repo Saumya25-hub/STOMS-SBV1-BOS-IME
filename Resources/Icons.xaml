@@ -1,7 +1,7 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
-    <!-- Vector Path Geometries for Industrial UI -->
+    <!-- Vector Path Geometries for Industrial ERP UI -->
     
     <!-- Dashboard: 4-square grid -->
     <Geometry x:Key="Icon.Dashboard">M3,3H10V10H3V3M14,3H21V10H14V3M14,14H21V21H14V14M3,14H10V21H3V14Z</Geometry>
@@ -49,10 +49,10 @@
     <!-- Near Expiry / Clock timer -->
     <Geometry x:Key="Icon.Expiry">M12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12.5,7V12.25L17,14.92L16.25,16.15L11,13V7H12.5Z</Geometry>
 
-    <!-- Expired Stock (Skull / Warning Shield) -->
+    <!-- Expired Stock (Shield warning) -->
     <Geometry x:Key="Icon.Expired">M12,1L3,5V11C3,16.55 6.84,21.74 12,23C17.16,21.74 21,16.55 21,11V5L12,1M11,7H13V13H11V7M11,15H13V17H11V15Z</Geometry>
 
-    <!-- Pending Approvals (Hourglass / Shield clock) -->
+    <!-- Pending Approvals (Hourglass / Clipboard clock) -->
     <Geometry x:Key="Icon.Pending">M6,2V8H6V8L10,12L6,16V16H6V22H18V16H18V16L14,12L18,8V8H18V2H6M16,16.5V20H8V16.5L12,12.5L16,16.5M12,11.5L8,7.5V4H16V7.5L12,11.5Z</Geometry>
 
     <!-- Chevrons -->
@@ -67,5 +67,12 @@
     <Geometry x:Key="Icon.Refresh">M17.65,6.35C16.2,4.9 14.21,4 12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20C15.73,20 18.84,17.45 19.73,14H17.65C16.83,16.33 14.61,18 12,18A6,6 0 0,1 6,12A6,6 0 0,1 12,6C13.66,6 15.14,6.69 16.22,7.78L13,11H20V4L17.65,6.35Z</Geometry>
     <Geometry x:Key="Icon.Filter">M14,12V19.88C14.04,20.18 13.94,20.5 13.71,20.71C13.32,21.1 12.69,21.1 12.3,20.71L10.29,18.7C10.06,18.47 9.96,18.16 10,17.87V12H9.97L4.21,4.62C3.87,4.19 3.95,3.56 4.38,3.22C4.57,3.08 4.78,3 5,3V3H19V3C19.22,3 19.43,3.08 19.62,3.22C20.05,3.56 20.13,4.19 19.79,4.62L14.03,12H14Z</Geometry>
     <Geometry x:Key="Icon.Menu">M3,6H21V8H3V6M3,11H21V13H3V11M3,16H21V18H3V16Z</Geometry>
-</ResourceDictionary>
 
+    <!-- Canvas Workspace & Layout Editing Icons -->
+    <Geometry x:Key="Icon.ZoomIn">M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z</Geometry>
+    <Geometry x:Key="Icon.ZoomOut">M19,13H5V11H19V13Z</Geometry>
+    <Geometry x:Key="Icon.Reset">M12,4V1L8,5L12,9V6A6,6 0 0,1 18,12A6,6 0 0,1 12,18A6,6 0 0,1 6,12H4A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4Z</Geometry>
+    <Geometry x:Key="Icon.Edit">M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.12,5.12L18.87,8.87M3,17.25V21H6.75L17.81,9.93L14.06,6.18L3,17.25Z</Geometry>
+    <Geometry x:Key="Icon.Check">M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z</Geometry>
+    <Geometry x:Key="Icon.DragHandle">M9,3H11V5H9V3M13,3H15V5H13V3M9,7H11V9H9V7M13,7H15V9H13V7M9,11H11V13H9V11M13,11H15V13H13V11M9,15H11V17H9V15M13,15H15V17H13V15M9,19H11V21H9V19M13,19H15V21H13V19Z</Geometry>
+</ResourceDictionary>

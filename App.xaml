@@ -19,7 +19,9 @@
             <converters:NullToVisibilityConverter x:Key="NullToVisibilityConverter"/>
             <converters:NullToVisibilityConverter x:Key="InverseNullToVisibilityConverter" Invert="True"/>
             <converters:StockStatusToColorConverter x:Key="StockStatusToColorConverter"/>
+            <converters:StockStatusToBgColorConverter x:Key="StockStatusToBgColorConverter"/>
             <converters:OccupancyColorConverter x:Key="OccupancyColorConverter"/>
+            <converters:ZoomToPercentConverter x:Key="ZoomToPercentConverter"/>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

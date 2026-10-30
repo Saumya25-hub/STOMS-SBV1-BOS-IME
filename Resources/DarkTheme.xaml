@@ -7,14 +7,14 @@
     <SolidColorBrush x:Key="Theme.Background.Tertiary" Color="#1E293B"/>
 
     <!-- Dark Theme Surfaces & Cards -->
-    <SolidColorBrush x:Key="Theme.Surface.Card" Color="#151E2E"/>
-    <SolidColorBrush x:Key="Theme.Surface.CardAlt" Color="#1A2436"/>
-    <SolidColorBrush x:Key="Theme.Surface.Hover" Color="#243147"/>
-    <SolidColorBrush x:Key="Theme.Surface.Selected" Color="#2A3852"/>
+    <SolidColorBrush x:Key="Theme.Surface.Card" Color="#131B2A"/>
+    <SolidColorBrush x:Key="Theme.Surface.CardAlt" Color="#182234"/>
+    <SolidColorBrush x:Key="Theme.Surface.Hover" Color="#1F2C42"/>
+    <SolidColorBrush x:Key="Theme.Surface.Selected" Color="#1E3A8A"/>
 
     <!-- Dark Theme Borders -->
-    <SolidColorBrush x:Key="Theme.Border" Color="#2A3852"/>
-    <SolidColorBrush x:Key="Theme.Border.Subtle" Color="#1E293B"/>
+    <SolidColorBrush x:Key="Theme.Border" Color="#202D42"/>
+    <SolidColorBrush x:Key="Theme.Border.Subtle" Color="#182335"/>
     <SolidColorBrush x:Key="Theme.Border.Focus" Color="#38BDF8"/>
 
     <!-- Dark Theme Typography -->
@@ -24,24 +24,33 @@
     <SolidColorBrush x:Key="Theme.Text.Inverse" Color="#0F172A"/>
 
     <!-- Dark Navigation & Header -->
-    <SolidColorBrush x:Key="Theme.Sidebar.Background" Color="#0F172A"/>
-    <SolidColorBrush x:Key="Theme.Sidebar.Border" Color="#1E293B"/>
-    <SolidColorBrush x:Key="Theme.Sidebar.ItemHover" Color="#1E293B"/>
+    <SolidColorBrush x:Key="Theme.Sidebar.Background" Color="#0D131F"/>
+    <SolidColorBrush x:Key="Theme.Sidebar.Border" Color="#1C2739"/>
+    <SolidColorBrush x:Key="Theme.Sidebar.ItemHover" Color="#162030"/>
     <SolidColorBrush x:Key="Theme.Sidebar.ActiveItem" Color="#1E3A8A"/>
 
-    <SolidColorBrush x:Key="Theme.Header.Background" Color="#0F172A"/>
-    <SolidColorBrush x:Key="Theme.Header.Border" Color="#1E293B"/>
+    <SolidColorBrush x:Key="Theme.Header.Background" Color="#0D131F"/>
+    <SolidColorBrush x:Key="Theme.Header.Border" Color="#1C2739"/>
 
-    <!-- Dark Warehouse Rack Representation -->
-    <SolidColorBrush x:Key="Theme.Rack.SteelFrame" Color="#334155"/>
-    <SolidColorBrush x:Key="Theme.Rack.ShelfSurface" Color="#1E293B"/>
-    <SolidColorBrush x:Key="Theme.Rack.ShelfBorder" Color="#475569"/>
-    <SolidColorBrush x:Key="Theme.Rack.ShelfHover" Color="#2E3C51"/>
+    <!-- Warehouse Canvas & Rack Representation -->
+    <SolidColorBrush x:Key="Theme.Canvas.Background" Color="#0A0E17"/>
+    <SolidColorBrush x:Key="Theme.Canvas.GridLine" Color="#162030"/>
+    <SolidColorBrush x:Key="Theme.Rack.SteelFrame" Color="#2A3852"/>
+    <SolidColorBrush x:Key="Theme.Rack.ShelfSurface" Color="#131B2A"/>
+    <SolidColorBrush x:Key="Theme.Rack.ShelfBorder" Color="#24334C"/>
+    <SolidColorBrush x:Key="Theme.Rack.ShelfHover" Color="#1C2940"/>
+
+    <!-- Subtle Badge & Accent Backgrounds -->
+    <SolidColorBrush x:Key="Theme.Status.Success.Bg" Color="#122C24"/>
+    <SolidColorBrush x:Key="Theme.Status.Warning.Bg" Color="#2F2412"/>
+    <SolidColorBrush x:Key="Theme.Status.Danger.Bg" Color="#351518"/>
+    <SolidColorBrush x:Key="Theme.Status.Info.Bg" Color="#12243F"/>
+    <SolidColorBrush x:Key="Theme.Status.Purple.Bg" Color="#28163D"/>
+    <SolidColorBrush x:Key="Theme.Status.Orange.Bg" Color="#331C0E"/>
 
     <!-- Inputs & Controls -->
     <SolidColorBrush x:Key="Theme.Input.Background" Color="#111827"/>
-    <SolidColorBrush x:Key="Theme.Input.Border" Color="#334155"/>
+    <SolidColorBrush x:Key="Theme.Input.Border" Color="#2A3B54"/>
     <SolidColorBrush x:Key="Theme.Input.FocusBorder" Color="#38BDF8"/>
-    <SolidColorBrush x:Key="Theme.Badge.Background" Color="#1E293B"/>
+    <SolidColorBrush x:Key="Theme.Badge.Background" Color="#1A2436"/>
 </ResourceDictionary>
-

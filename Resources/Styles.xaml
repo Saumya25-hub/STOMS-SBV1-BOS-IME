@@ -22,6 +22,112 @@
         <Setter Property="Padding" Value="12"/>
     </Style>
 
+    <!-- Summary Metric Card Button -->
+    <Style x:Key="SummaryCardButton" TargetType="Button">
+        <Setter Property="Background" Value="{DynamicResource Theme.Surface.Card}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource Theme.Border}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Padding" Value="14,12"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="border" 
+                            Background="{TemplateBinding Background}" 
+                            BorderBrush="{TemplateBinding BorderBrush}" 
+                            BorderThickness="{TemplateBinding BorderThickness}" 
+                            CornerRadius="8" 
+                            Padding="{TemplateBinding Padding}">
+                        <ContentPresenter/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="border" Property="BorderBrush" Value="{DynamicResource Theme.Border.Focus}"/>
+                            <Setter TargetName="border" Property="Background" Value="{DynamicResource Theme.Surface.Hover}"/>
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="border" Property="Background" Value="{DynamicResource Theme.Surface.Selected}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Quick Action Toolbar Button -->
+    <Style x:Key="QuickActionButton" TargetType="Button">
+        <Setter Property="Background" Value="{DynamicResource Theme.Surface.Card}"/>
+        <Setter Property="Foreground" Value="{DynamicResource Theme.Text.Primary}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource Theme.Border}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="FontSize" Value="12.5"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="Padding" Value="14,0"/>
+        <Setter Property="Height" Value="34"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="border" 
+                            Background="{TemplateBinding Background}" 
+                            BorderBrush="{TemplateBinding BorderBrush}" 
+                            BorderThickness="{TemplateBinding BorderThickness}" 
+                            CornerRadius="6" 
+                            Padding="{TemplateBinding Padding}">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="border" Property="Background" Value="{DynamicResource Theme.Surface.Hover}"/>
+                            <Setter TargetName="border" Property="BorderBrush" Value="{DynamicResource Theme.Border.Focus}"/>
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="border" Property="Background" Value="{DynamicResource Theme.Surface.Selected}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Canvas Tool Button (Zoom, Reset, Layout) -->
+    <Style x:Key="CanvasToolButton" TargetType="Button">
+        <Setter Property="Background" Value="{DynamicResource Theme.Surface.Card}"/>
+        <Setter Property="Foreground" Value="{DynamicResource Theme.Text.Primary}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource Theme.Border}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Height" Value="28"/>
+        <Setter Property="Padding" Value="8,0"/>
+        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="border" 
+                            Background="{TemplateBinding Background}" 
+                            BorderBrush="{TemplateBinding BorderBrush}" 
+                            BorderThickness="{TemplateBinding BorderThickness}" 
+                            CornerRadius="4" 
+                            Padding="{TemplateBinding Padding}">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="border" Property="Background" Value="{DynamicResource Theme.Surface.Hover}"/>
+                            <Setter TargetName="border" Property="BorderBrush" Value="{DynamicResource Theme.Border.Focus}"/>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="border" Property="Opacity" Value="0.4"/>
+                            <Setter Property="Cursor" Value="No"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <!-- Primary Action Button -->
     <Style x:Key="PrimaryButton" TargetType="Button">
         <Setter Property="Background" Value="{StaticResource BrandPrimaryBrush}"/>
@@ -57,7 +163,7 @@
         <Setter Property="Foreground" Value="{DynamicResource Theme.Text.Primary}"/>
         <Setter Property="BorderBrush" Value="{DynamicResource Theme.Border}"/>
         <Setter Property="BorderThickness" Value="1"/>
-        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="FontSize" Value="12.5"/>
         <Setter Property="FontWeight" Value="Medium"/>
         <Setter Property="Padding" Value="12,6"/>
         <Setter Property="Cursor" Value="Hand"/>
@@ -116,7 +222,7 @@
         <Setter Property="BorderBrush" Value="{DynamicResource Theme.Input.Border}"/>
         <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="Padding" Value="10,6"/>
-        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="FontSize" Value="12.5"/>
         <Setter Property="VerticalContentAlignment" Value="Center"/>
         <Setter Property="Template">
             <Setter.Value>
@@ -144,14 +250,15 @@
         <Setter Property="Foreground" Value="{DynamicResource Theme.Text.Primary}"/>
         <Setter Property="BorderBrush" Value="{DynamicResource Theme.Input.Border}"/>
         <Setter Property="BorderThickness" Value="1"/>
-        <Setter Property="Padding" Value="10,6"/>
-        <Setter Property="FontSize" Value="13"/>
-        <Setter Property="MinHeight" Value="34"/>
+        <Setter Property="Padding" Value="10,4"/>
+        <Setter Property="FontSize" Value="12.5"/>
+        <Setter Property="MinHeight" Value="30"/>
     </Style>
 
     <!-- Custom Modern ScrollBar -->
     <Style TargetType="ScrollBar">
         <Setter Property="Width" Value="8"/>
+        <Setter Property="Height" Value="8"/>
         <Setter Property="Background" Value="Transparent"/>
         <Setter Property="Template">
             <Setter.Value>
@@ -175,4 +282,3 @@
     </Style>
 
 </ResourceDictionary>
-

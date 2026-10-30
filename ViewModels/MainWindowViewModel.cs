@@ -17,7 +17,8 @@ namespace STOMS_SBV1_BOS_IME.ViewModels
         private object _currentViewModel;
         private string _activeNavKey = "Dashboard";
         private string _pageTitle = "Home Dashboard";
-        private string _breadcrumb = "STOMS ERP / Operations / Home Dashboard";
+        private string _pageSubtitle = "Warehouse overview";
+        private string _breadcrumb = "Dashboard";
         private bool _isSidebarCollapsed;
         private bool _isDarkMode = true;
         private bool _isUserMenuOpen;
@@ -41,7 +42,21 @@ namespace STOMS_SBV1_BOS_IME.ViewModels
         public string PageTitle
         {
             get => _pageTitle;
-            private set => SetProperty(ref _pageTitle, value);
+            private set
+            {
+                if (SetProperty(ref _pageTitle, value))
+                {
+                    OnPropertyChanged(nameof(HeaderDisplayTitle));
+                }
+            }
+        }
+
+        public string HeaderDisplayTitle => _pageTitle == "Home Dashboard" ? "Dashboard" : _pageTitle;
+
+        public string PageSubtitle
+        {
+            get => _pageSubtitle;
+            private set => SetProperty(ref _pageSubtitle, value);
         }
 
         public string Breadcrumb
@@ -144,7 +159,8 @@ namespace STOMS_SBV1_BOS_IME.ViewModels
             {
                 case "Dashboard":
                     PageTitle = "Home Dashboard";
-                    Breadcrumb = "STOMS ERP / Operations / Home Dashboard";
+                    PageSubtitle = "Warehouse overview";
+                    Breadcrumb = "Dashboard";
                     CurrentViewModel = _dashboardViewModel;
                     break;
 
