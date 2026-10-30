@@ -3,14 +3,21 @@
 
     <!-- Light Theme Backgrounds -->
     <SolidColorBrush x:Key="Theme.Background.Primary" Color="#F8FAFC"/>
+    <SolidColorBrush x:Key="Theme.Background.Main" Color="#F8FAFC"/>
     <SolidColorBrush x:Key="Theme.Background.Secondary" Color="#F1F5F9"/>
     <SolidColorBrush x:Key="Theme.Background.Tertiary" Color="#E2E8F0"/>
 
-    <!-- Light Theme Surfaces & Cards -->
+    <!-- Light Theme Surfaces & Cards (Solid Opaque - Zero Transparency) -->
+    <SolidColorBrush x:Key="Theme.Surface.Primary" Color="#FFFFFF"/>
+    <SolidColorBrush x:Key="Theme.Surface.Secondary" Color="#F8FAFC"/>
     <SolidColorBrush x:Key="Theme.Surface.Card" Color="#FFFFFF"/>
     <SolidColorBrush x:Key="Theme.Surface.CardAlt" Color="#F8FAFC"/>
+    <SolidColorBrush x:Key="Theme.Surface.Modal" Color="#FFFFFF"/>
     <SolidColorBrush x:Key="Theme.Surface.Hover" Color="#F1F5F9"/>
     <SolidColorBrush x:Key="Theme.Surface.Selected" Color="#EFF6FF"/>
+
+    <!-- Light Modal Backdrop Overlay -->
+    <SolidColorBrush x:Key="Theme.Modal.Backdrop" Color="#80000000"/>
 
     <!-- Light Theme Borders -->
     <SolidColorBrush x:Key="Theme.Border" Color="#E2E8F0"/>
@@ -48,9 +55,21 @@
     <SolidColorBrush x:Key="Theme.Status.Purple.Bg" Color="#FAF5FF"/>
     <SolidColorBrush x:Key="Theme.Status.Orange.Bg" Color="#FFF7ED"/>
 
-    <!-- Inputs & Controls -->
+    <!-- Light Inputs & Form Controls -->
     <SolidColorBrush x:Key="Theme.Input.Background" Color="#FFFFFF"/>
     <SolidColorBrush x:Key="Theme.Input.Border" Color="#CBD5E1"/>
     <SolidColorBrush x:Key="Theme.Input.FocusBorder" Color="#2563EB"/>
+    <SolidColorBrush x:Key="Theme.Input.HoverBorder" Color="#94A3B8"/>
     <SolidColorBrush x:Key="Theme.Badge.Background" Color="#F1F5F9"/>
+
+    <!-- Popups, Dropdowns & Menus -->
+    <SolidColorBrush x:Key="Theme.Popup.Background" Color="#FFFFFF"/>
+    <SolidColorBrush x:Key="Theme.Popup.Border" Color="#E2E8F0"/>
+
+    <!-- DataGrid Custom Tokens -->
+    <SolidColorBrush x:Key="Theme.DataGrid.RowBg" Color="#FFFFFF"/>
+    <SolidColorBrush x:Key="Theme.DataGrid.AlternatingRowBg" Color="#F8FAFC"/>
+    <SolidColorBrush x:Key="Theme.DataGrid.RowHover" Color="#F1F5F9"/>
+    <SolidColorBrush x:Key="Theme.DataGrid.HeaderBg" Color="#F1F5F9"/>
+    <SolidColorBrush x:Key="Theme.DataGrid.HeaderFg" Color="#475569"/>
 </ResourceDictionary>

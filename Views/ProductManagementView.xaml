@@ -468,22 +468,22 @@
         <!-- MODAL OVERLAYS (FROSTED BACKDROP) -->
 
         <!-- 1. Product Form Modal (Add / Edit) -->
-        <Grid Background="#80000000" Visibility="{Binding IsProductFormOpen, Converter={StaticResource BoolToVisibilityConverter}}">
+        <Grid Background="{DynamicResource Theme.Modal.Backdrop}" Visibility="{Binding IsProductFormOpen, Converter={StaticResource BoolToVisibilityConverter}}">
             <local:ProductFormDialog DataContext="{Binding CurrentProductForm}"/>
         </Grid>
 
         <!-- 2. Stock Receive Modal -->
-        <Grid Background="#80000000" Visibility="{Binding IsReceiveFormOpen, Converter={StaticResource BoolToVisibilityConverter}}">
+        <Grid Background="{DynamicResource Theme.Modal.Backdrop}" Visibility="{Binding IsReceiveFormOpen, Converter={StaticResource BoolToVisibilityConverter}}">
             <local:StockReceiveDialog DataContext="{Binding CurrentReceiveForm}"/>
         </Grid>
 
         <!-- 3. Stock Issue Modal -->
-        <Grid Background="#80000000" Visibility="{Binding IsIssueFormOpen, Converter={StaticResource BoolToVisibilityConverter}}">
+        <Grid Background="{DynamicResource Theme.Modal.Backdrop}" Visibility="{Binding IsIssueFormOpen, Converter={StaticResource BoolToVisibilityConverter}}">
             <local:StockIssueDialog DataContext="{Binding CurrentIssueForm}"/>
         </Grid>
 
         <!-- 4. Product Details Modal -->
-        <Grid Background="#80000000" Visibility="{Binding IsDetailsOpen, Converter={StaticResource BoolToVisibilityConverter}}">
+        <Grid Background="{DynamicResource Theme.Modal.Backdrop}" Visibility="{Binding IsDetailsOpen, Converter={StaticResource BoolToVisibilityConverter}}">
             <local:ProductDetailsView DataContext="{Binding CurrentProductDetails}"/>
         </Grid>
 

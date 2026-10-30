@@ -3,14 +3,21 @@
 
     <!-- Dark Theme Backgrounds -->
     <SolidColorBrush x:Key="Theme.Background.Primary" Color="#0B0F19"/>
+    <SolidColorBrush x:Key="Theme.Background.Main" Color="#0B0F19"/>
     <SolidColorBrush x:Key="Theme.Background.Secondary" Color="#111827"/>
     <SolidColorBrush x:Key="Theme.Background.Tertiary" Color="#1E293B"/>
 
-    <!-- Dark Theme Surfaces & Cards -->
+    <!-- Dark Theme Surfaces & Cards (Solid Opaque - Zero Transparency) -->
+    <SolidColorBrush x:Key="Theme.Surface.Primary" Color="#131B2A"/>
+    <SolidColorBrush x:Key="Theme.Surface.Secondary" Color="#182234"/>
     <SolidColorBrush x:Key="Theme.Surface.Card" Color="#131B2A"/>
     <SolidColorBrush x:Key="Theme.Surface.CardAlt" Color="#182234"/>
+    <SolidColorBrush x:Key="Theme.Surface.Modal" Color="#151E2E"/>
     <SolidColorBrush x:Key="Theme.Surface.Hover" Color="#1F2C42"/>
     <SolidColorBrush x:Key="Theme.Surface.Selected" Color="#1E3A8A"/>
+
+    <!-- Dark Modal Backdrop Overlay -->
+    <SolidColorBrush x:Key="Theme.Modal.Backdrop" Color="#B8000000"/>
 
     <!-- Dark Theme Borders -->
     <SolidColorBrush x:Key="Theme.Border" Color="#202D42"/>
@@ -48,9 +55,21 @@
     <SolidColorBrush x:Key="Theme.Status.Purple.Bg" Color="#28163D"/>
     <SolidColorBrush x:Key="Theme.Status.Orange.Bg" Color="#331C0E"/>
 
-    <!-- Inputs & Controls -->
-    <SolidColorBrush x:Key="Theme.Input.Background" Color="#111827"/>
-    <SolidColorBrush x:Key="Theme.Input.Border" Color="#2A3B54"/>
+    <!-- Dark Inputs & Form Controls (Clean Dark Slate - NOT Stark White) -->
+    <SolidColorBrush x:Key="Theme.Input.Background" Color="#141C2B"/>
+    <SolidColorBrush x:Key="Theme.Input.Border" Color="#27384F"/>
     <SolidColorBrush x:Key="Theme.Input.FocusBorder" Color="#38BDF8"/>
+    <SolidColorBrush x:Key="Theme.Input.HoverBorder" Color="#3A5274"/>
     <SolidColorBrush x:Key="Theme.Badge.Background" Color="#1A2436"/>
+
+    <!-- Popups, Dropdowns & Menus -->
+    <SolidColorBrush x:Key="Theme.Popup.Background" Color="#162032"/>
+    <SolidColorBrush x:Key="Theme.Popup.Border" Color="#2A3B54"/>
+
+    <!-- DataGrid Custom Tokens -->
+    <SolidColorBrush x:Key="Theme.DataGrid.RowBg" Color="#131B2A"/>
+    <SolidColorBrush x:Key="Theme.DataGrid.AlternatingRowBg" Color="#101724"/>
+    <SolidColorBrush x:Key="Theme.DataGrid.RowHover" Color="#1C2940"/>
+    <SolidColorBrush x:Key="Theme.DataGrid.HeaderBg" Color="#0D1320"/>
+    <SolidColorBrush x:Key="Theme.DataGrid.HeaderFg" Color="#94A3B8"/>
 </ResourceDictionary>
