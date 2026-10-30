@@ -166,3 +166,4 @@ namespace STOMS_SBV1_BOS_IME.Models
             : (Status == StockSerialStatus.Issued ? "Dispatched" : "Unassigned");
     }
 }
+

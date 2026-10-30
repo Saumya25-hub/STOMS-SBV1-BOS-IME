@@ -464,5 +464,49 @@ namespace STOMS_SBV1_BOS_IME.Tests
             vm.CloseAllModals();
             Assert.IsFalse(vm.IsReceiveFormOpen);
         }
+
+        [TestMethod]
+        public void ProductManagementView_InitializesWithoutMissingResources()
+        {
+            Exception? caughtException = null;
+            var thread = new System.Threading.Thread(() =>
+            {
+                try
+                {
+                    if (System.Windows.Application.Current == null)
+                    {
+                        var app = new System.Windows.Application();
+                        app.Resources.MergedDictionaries.Add(new System.Windows.ResourceDictionary { Source = new Uri("pack://application:,,,/STOMS-SBV1-BOS-IME;component/Resources/Colors.xaml") });
+                        app.Resources.MergedDictionaries.Add(new System.Windows.ResourceDictionary { Source = new Uri("pack://application:,,,/STOMS-SBV1-BOS-IME;component/Resources/DarkTheme.xaml") });
+                        app.Resources.MergedDictionaries.Add(new System.Windows.ResourceDictionary { Source = new Uri("pack://application:,,,/STOMS-SBV1-BOS-IME;component/Resources/Icons.xaml") });
+                        app.Resources.MergedDictionaries.Add(new System.Windows.ResourceDictionary { Source = new Uri("pack://application:,,,/STOMS-SBV1-BOS-IME;component/Resources/Styles.xaml") });
+
+                        // Add converters
+                        app.Resources.Add("BoolToVisibilityConverter", new Converters.BoolToVisibilityConverter());
+                        app.Resources.Add("StockStatusToColorConverter", new Converters.StockStatusToColorConverter());
+                        app.Resources.Add("StockStatusToBgColorConverter", new Converters.StockStatusToBgColorConverter());
+                    }
+
+                    var view = new Views.ProductManagementView
+                    {
+                        DataContext = new ProductManagementViewModel()
+                    };
+                    Assert.IsNotNull(view);
+                }
+                catch (Exception ex)
+                {
+                    caughtException = ex;
+                }
+            });
+
+            thread.SetApartmentState(System.Threading.ApartmentState.STA);
+            thread.Start();
+            thread.Join();
+
+            if (caughtException != null)
+            {
+                Assert.Fail($"ProductManagementView failed to initialize: {caughtException}");
+            }
+        }
     }
 }

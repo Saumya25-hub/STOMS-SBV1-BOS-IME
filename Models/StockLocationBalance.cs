@@ -115,3 +115,4 @@ namespace STOMS_SBV1_BOS_IME.Models
         public string AvailableDisplay => $"{AvailableQuantity:N0} {Unit}";
     }
 }
+

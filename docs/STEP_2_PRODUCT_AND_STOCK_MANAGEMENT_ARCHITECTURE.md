@@ -145,3 +145,4 @@ When issuing batch-tracked items with expiration dates:
 2. Any batch with `ExpiryDate < DateTime.Today` is flagged as `Expired` and locked from standard issue.
 3. Batches with valid future expiration dates are evaluated. The earliest expiring batch with sufficient remaining balance is prioritized as the default recommendation.
 4. Users can manually choose another valid batch if approved by supervisor.
+

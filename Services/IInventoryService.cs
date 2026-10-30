@@ -56,3 +56,4 @@ namespace STOMS_SBV1_BOS_IME.Services
         Task<List<RackSection>> GetSectionsByRackAsync(string rackId);
     }
 }
+
