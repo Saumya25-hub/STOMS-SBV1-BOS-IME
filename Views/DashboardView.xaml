@@ -12,69 +12,112 @@
         <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
             <StackPanel Margin="24,18,24,28">
 
-                <!-- TOP BAR: COMPACT TELEMETRY STATUS & QUICK ACTIONS -->
+                <!-- 0. EXECUTIVE DASHBOARD HEADER -->
                 <Grid Margin="0,0,0,16">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
 
-                    <!-- Telemetry Sync Pill -->
-                    <Border Grid.Column="0" 
-                            Background="{DynamicResource Theme.Surface.Card}" 
-                            BorderBrush="{DynamicResource Theme.Border}" 
-                            BorderThickness="1" 
-                            CornerRadius="6" 
-                            Height="34" 
-                            Padding="12,0" 
-                            VerticalAlignment="Center">
-                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                            <Ellipse Width="7" Height="7" Fill="{StaticResource BrandAccentBrush}" Margin="0,0,8,0"/>
-                            <TextBlock Text="Telemetry:" FontWeight="SemiBold" FontSize="12" Foreground="{DynamicResource Theme.Text.Secondary}" Margin="0,0,6,0"/>
-                            <TextBlock Text="{Binding Summary.DataOriginDescription}" FontSize="12" Foreground="{DynamicResource Theme.Text.Muted}" Margin="0,0,10,0"/>
-                            <TextBlock Text="{Binding Summary.LastRefreshed, StringFormat='• Synced {0:HH:mm:ss}'}" FontSize="11" Foreground="{DynamicResource Theme.Text.Muted}" Margin="0,0,10,0"/>
-                            <Button Style="{StaticResource IconButton}" Command="{Binding RefreshCommand}" Padding="2" ToolTip="Refresh Telemetry">
-                                <Path Data="{StaticResource Icon.Refresh}" Fill="{DynamicResource Theme.Text.Primary}" Width="11" Height="11" Stretch="Uniform"/>
-                            </Button>
+                    <StackPanel Grid.Column="0">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Welcome Back, " FontSize="18" FontWeight="Bold" Foreground="{DynamicResource Theme.Text.Primary}"/>
+                            <TextBlock Text="{Binding DataContext.CurrentUser.FullName, RelativeSource={RelativeSource AncestorType=Window}}" FontSize="18" FontWeight="Bold" Foreground="{StaticResource BrandAccentBrush}"/>
                         </StackPanel>
-                    </Border>
+                        <StackPanel Orientation="Horizontal" Margin="0,3,0,0">
+                            <TextBlock Text="{Binding CurrentDateDisplay}" FontSize="12" Foreground="{DynamicResource Theme.Text.Secondary}" Margin="0,0,12,0"/>
+                            <TextBlock Text="• Enterprise Live Stock Telemetry" FontSize="12" Foreground="{DynamicResource Theme.Text.Muted}"/>
+                        </StackPanel>
+                    </StackPanel>
 
-                    <!-- Quick Actions Toolbar (4 Essential Operations) -->
-                    <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
-                        <!-- 1. Receive Stock -->
-                        <Button Style="{StaticResource QuickActionButton}" Command="{Binding ReceiveStockActionCommand}" Margin="0,0,8,0">
-                            <StackPanel Orientation="Horizontal">
-                                <Path Data="{StaticResource Icon.Inward}" Fill="{StaticResource SuccessBrush}" Width="12" Height="12" Stretch="Uniform" Margin="0,0,6,0"/>
-                                <TextBlock Text="Receive Stock"/>
-                            </StackPanel>
-                        </Button>
+                    <!-- Facility Picker & Sync Telemetry Pill -->
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                        <!-- Warehouse Selector -->
+                        <ComboBox ItemsSource="{Binding Warehouses}" 
+                                  SelectedItem="{Binding SelectedWarehouse}" 
+                                  DisplayMemberPath="Name" 
+                                  Style="{StaticResource FormComboBox}" 
+                                  Width="260" Height="34" Margin="0,0,10,0" 
+                                  ToolTip="Filter Dashboard by Facility"/>
 
-                        <!-- 2. Issue Stock -->
-                        <Button Style="{StaticResource QuickActionButton}" Command="{Binding IssueStockActionCommand}" Margin="0,0,8,0">
-                            <StackPanel Orientation="Horizontal">
-                                <Path Data="{StaticResource Icon.Outward}" Fill="{StaticResource DangerBrush}" Width="12" Height="12" Stretch="Uniform" Margin="0,0,6,0"/>
-                                <TextBlock Text="Issue Stock"/>
+                        <!-- Telemetry Sync Pill -->
+                        <Border Background="{DynamicResource Theme.Surface.Card}" 
+                                BorderBrush="{DynamicResource Theme.Border}" 
+                                BorderThickness="1" 
+                                CornerRadius="6" 
+                                Height="34" 
+                                Padding="12,0" 
+                                VerticalAlignment="Center">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <Ellipse Width="7" Height="7" Fill="{StaticResource SuccessBrush}" Margin="0,0,8,0"/>
+                                <TextBlock Text="{Binding Summary.LastRefreshed, StringFormat='Synced {0:HH:mm:ss}'}" FontSize="11" Foreground="{DynamicResource Theme.Text.Muted}" Margin="0,0,8,0"/>
+                                <Button Style="{StaticResource IconButton}" Command="{Binding RefreshCommand}" Padding="2" ToolTip="Refresh Telemetry">
+                                    <Path Data="{StaticResource Icon.Refresh}" Fill="{DynamicResource Theme.Text.Primary}" Width="11" Height="11" Stretch="Uniform"/>
+                                </Button>
                             </StackPanel>
-                        </Button>
-
-                        <!-- 3. Transfer Stock -->
-                        <Button Style="{StaticResource QuickActionButton}" Command="{Binding TransferStockActionCommand}" Margin="0,0,8,0">
-                            <StackPanel Orientation="Horizontal">
-                                <Path Data="{StaticResource Icon.Transfer}" Fill="{StaticResource BrandAccentBrush}" Width="12" Height="12" Stretch="Uniform" Margin="0,0,6,0"/>
-                                <TextBlock Text="Transfer Stock"/>
-                            </StackPanel>
-                        </Button>
-
-                        <!-- 4. Add Product -->
-                        <Button Style="{StaticResource QuickActionButton}" Command="{Binding AddProductActionCommand}">
-                            <StackPanel Orientation="Horizontal">
-                                <Path Data="{StaticResource Icon.Products}" Fill="{StaticResource InfoBrush}" Width="12" Height="12" Stretch="Uniform" Margin="0,0,6,0"/>
-                                <TextBlock Text="Add Product"/>
-                            </StackPanel>
-                        </Button>
+                        </Border>
                     </StackPanel>
                 </Grid>
+
+                <!-- RAPID WAREHOUSE OPERATIONS TOOLBAR -->
+                <Border Background="{DynamicResource Theme.Surface.Primary}" BorderBrush="{DynamicResource Theme.Border}" BorderThickness="1" CornerRadius="8" Padding="12,8" Margin="0,0,0,16">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="QUICK ACTIONS" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource Theme.Text.Muted}" VerticalAlignment="Center" Margin="6,0,16,0"/>
+                        <StackPanel Grid.Column="1" Orientation="Horizontal">
+                            <!-- Inward -->
+                            <Button Style="{StaticResource QuickActionButton}" Command="{Binding ReceiveStockActionCommand}" Margin="0,0,8,0">
+                                <StackPanel Orientation="Horizontal">
+                                    <Path Data="{StaticResource Icon.Inward}" Fill="{StaticResource SuccessBrush}" Width="12" Height="12" Stretch="Uniform" Margin="0,0,6,0"/>
+                                    <TextBlock Text="Receive Stock (Inward)"/>
+                                </StackPanel>
+                            </Button>
+
+                            <!-- Outward -->
+                            <Button Style="{StaticResource QuickActionButton}" Command="{Binding IssueStockActionCommand}" Margin="0,0,8,0">
+                                <StackPanel Orientation="Horizontal">
+                                    <Path Data="{StaticResource Icon.Outward}" Fill="{StaticResource DangerBrush}" Width="12" Height="12" Stretch="Uniform" Margin="0,0,6,0"/>
+                                    <TextBlock Text="Issue Stock (Outward)"/>
+                                </StackPanel>
+                            </Button>
+
+                            <!-- Add Product -->
+                            <Button Style="{StaticResource QuickActionButton}" Command="{Binding AddProductActionCommand}" Margin="0,0,8,0">
+                                <StackPanel Orientation="Horizontal">
+                                    <Path Data="{StaticResource Icon.Products}" Fill="{StaticResource InfoBrush}" Width="12" Height="12" Stretch="Uniform" Margin="0,0,6,0"/>
+                                    <TextBlock Text="Add Product (SKU)"/>
+                                </StackPanel>
+                            </Button>
+
+                            <!-- Transfer -->
+                            <Button Style="{StaticResource QuickActionButton}" Command="{Binding TransferStockActionCommand}" Margin="0,0,8,0">
+                                <StackPanel Orientation="Horizontal">
+                                    <Path Data="{StaticResource Icon.Transfer}" Fill="{StaticResource BrandAccentBrush}" Width="12" Height="12" Stretch="Uniform" Margin="0,0,6,0"/>
+                                    <TextBlock Text="Transfer Stock"/>
+                                </StackPanel>
+                            </Button>
+
+                            <!-- Barcode -->
+                            <Button Style="{StaticResource QuickActionButton}" Command="{Binding ScanBarcodeActionCommand}" Margin="0,0,8,0">
+                                <StackPanel Orientation="Horizontal">
+                                    <Path Data="{StaticResource Icon.Barcode}" Fill="{DynamicResource Theme.Text.Secondary}" Width="12" Height="12" Stretch="Uniform" Margin="0,0,6,0"/>
+                                    <TextBlock Text="Scan Barcode"/>
+                                </StackPanel>
+                            </Button>
+
+                            <!-- Visual Topology -->
+                            <Button Style="{StaticResource QuickActionButton}" Command="{Binding ViewWarehouseActionCommand}">
+                                <StackPanel Orientation="Horizontal">
+                                    <Path Data="{StaticResource Icon.Warehouse}" Fill="{DynamicResource Theme.Text.Secondary}" Width="12" Height="12" Stretch="Uniform" Margin="0,0,6,0"/>
+                                    <TextBlock Text="Warehouse Topology"/>
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+                    </Grid>
+                </Border>
 
                 <!-- ERROR BANNER (IF ANY) -->
                 <Border Background="{DynamicResource Theme.Status.Danger.Bg}" 
@@ -90,9 +133,11 @@
                     </StackPanel>
                 </Border>
 
-                <!-- SECTION 1: 6 ESSENTIAL SUMMARY CARDS -->
+                <!-- 8 ESSENTIAL SUMMARY METRIC CARDS -->
                 <Grid Margin="0,0,0,18">
                     <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="*"/>
@@ -102,7 +147,7 @@
                     </Grid.ColumnDefinitions>
 
                     <!-- Card 1: Total Products -->
-                    <Button Grid.Column="0" Style="{StaticResource SummaryCardButton}" Margin="0,0,6,0"
+                    <Button Grid.Column="0" Style="{StaticResource SummaryCardButton}" Margin="0,0,4,0"
                             Command="{Binding FilterByStatusCardCommand}" CommandParameter="totalproducts">
                         <Grid>
                             <Grid.RowDefinitions>
@@ -110,20 +155,17 @@
                                 <RowDefinition Height="*"/>
                                 <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
-
                             <Grid Grid.Row="0">
-                                <TextBlock Text="Total Products" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource Theme.Text.Secondary}" TextTrimming="CharacterEllipsis"/>
-                                <Border HorizontalAlignment="Right" Width="26" Height="26" Background="{DynamicResource Theme.Status.Info.Bg}" CornerRadius="13">
-                                    <Path Data="{StaticResource Icon.Products}" Fill="{StaticResource InfoBrush}" Width="13" Height="13" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                </Border>
+                                <TextBlock Text="Total Products" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource Theme.Text.Secondary}" TextTrimming="CharacterEllipsis"/>
+                                <Path Data="{StaticResource Icon.Products}" Fill="{StaticResource InfoBrush}" Width="12" Height="12" Stretch="Uniform" HorizontalAlignment="Right"/>
                             </Grid>
-                            <TextBlock Grid.Row="1" Text="{Binding Summary.TotalProducts, StringFormat='{}{0:N0}'}" FontSize="24" FontWeight="Bold" Margin="0,4,0,2"/>
-                            <TextBlock Grid.Row="2" Text="Active catalog SKUs" FontSize="11" Foreground="{DynamicResource Theme.Text.Muted}" TextTrimming="CharacterEllipsis"/>
+                            <TextBlock Grid.Row="1" Text="{Binding Summary.TotalProducts, StringFormat='{}{0:N0}'}" FontSize="20" FontWeight="Bold" Margin="0,4,0,2"/>
+                            <TextBlock Grid.Row="2" Text="Catalog SKUs" FontSize="10" Foreground="{DynamicResource Theme.Text.Muted}" TextTrimming="CharacterEllipsis"/>
                         </Grid>
                     </Button>
 
-                    <!-- Card 2: Total Stock Quantity -->
-                    <Button Grid.Column="1" Style="{StaticResource SummaryCardButton}" Margin="3,0,3,0"
+                    <!-- Card 2: Total Stock Units -->
+                    <Button Grid.Column="1" Style="{StaticResource SummaryCardButton}" Margin="2,0,2,0"
                             Command="{Binding FilterByStatusCardCommand}" CommandParameter="totalquantity">
                         <Grid>
                             <Grid.RowDefinitions>
@@ -131,20 +173,73 @@
                                 <RowDefinition Height="*"/>
                                 <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
-
                             <Grid Grid.Row="0">
-                                <TextBlock Text="Total Stock" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource Theme.Text.Secondary}" TextTrimming="CharacterEllipsis"/>
-                                <Border HorizontalAlignment="Right" Width="26" Height="26" Background="{DynamicResource Theme.Status.Success.Bg}" CornerRadius="13">
-                                    <Path Data="{StaticResource Icon.Stock}" Fill="{StaticResource SuccessBrush}" Width="13" Height="13" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                </Border>
+                                <TextBlock Text="Stock Units" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource Theme.Text.Secondary}" TextTrimming="CharacterEllipsis"/>
+                                <Path Data="{StaticResource Icon.Stock}" Fill="{StaticResource SuccessBrush}" Width="12" Height="12" Stretch="Uniform" HorizontalAlignment="Right"/>
                             </Grid>
-                            <TextBlock Grid.Row="1" Text="{Binding Summary.TotalStockQuantity, StringFormat='{}{0:N0}'}" FontSize="24" FontWeight="Bold" Margin="0,4,0,2"/>
-                            <TextBlock Grid.Row="2" Text="Native units tracked" FontSize="11" Foreground="{DynamicResource Theme.Text.Muted}" TextTrimming="CharacterEllipsis"/>
+                            <TextBlock Grid.Row="1" Text="{Binding Summary.TotalStockQuantity, StringFormat='{}{0:N0}'}" FontSize="20" FontWeight="Bold" Margin="0,4,0,2"/>
+                            <TextBlock Grid.Row="2" Text="Physical units" FontSize="10" Foreground="{DynamicResource Theme.Text.Muted}" TextTrimming="CharacterEllipsis"/>
                         </Grid>
                     </Button>
 
-                    <!-- Card 3: Low Stock Items -->
-                    <Button Grid.Column="2" Style="{StaticResource SummaryCardButton}" Margin="3,0,3,0"
+                    <!-- Card 3: Total Inventory Valuation -->
+                    <Button Grid.Column="2" Style="{StaticResource SummaryCardButton}" Margin="2,0,2,0"
+                            Command="{Binding FilterByStatusCardCommand}" CommandParameter="valuation">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <Grid Grid.Row="0">
+                                <TextBlock Text="Valuation" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource Theme.Text.Secondary}" TextTrimming="CharacterEllipsis"/>
+                                <Border HorizontalAlignment="Right" Width="14" Height="14" Background="{StaticResource BrandAccentBrush}" CornerRadius="2">
+                                    <TextBlock Text="₹" FontSize="9" FontWeight="Bold" Foreground="#FFFFFF" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+                            </Grid>
+                            <TextBlock Grid.Row="1" Text="{Binding Summary.FormattedValuation}" FontSize="15" FontWeight="Bold" Margin="0,6,0,2" Foreground="{StaticResource BrandAccentBrush}" TextTrimming="CharacterEllipsis"/>
+                            <TextBlock Grid.Row="2" Text="Total stock value" FontSize="10" Foreground="{DynamicResource Theme.Text.Muted}" TextTrimming="CharacterEllipsis"/>
+                        </Grid>
+                    </Button>
+
+                    <!-- Card 4: Today's Inward Receipts -->
+                    <Button Grid.Column="3" Style="{StaticResource SummaryCardButton}" Margin="2,0,2,0"
+                            Command="{Binding ReceiveStockActionCommand}">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <Grid Grid.Row="0">
+                                <TextBlock Text="Today Inward" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource Theme.Text.Secondary}" TextTrimming="CharacterEllipsis"/>
+                                <Path Data="{StaticResource Icon.Inward}" Fill="{StaticResource SuccessBrush}" Width="12" Height="12" Stretch="Uniform" HorizontalAlignment="Right"/>
+                            </Grid>
+                            <TextBlock Grid.Row="1" Text="{Binding Summary.TodayInwardQuantity, StringFormat='+{0:N0}'}" FontSize="20" FontWeight="Bold" Foreground="{StaticResource SuccessBrush}" Margin="0,4,0,2"/>
+                            <TextBlock Grid.Row="2" Text="GRN received" FontSize="10" Foreground="{DynamicResource Theme.Text.Muted}" TextTrimming="CharacterEllipsis"/>
+                        </Grid>
+                    </Button>
+
+                    <!-- Card 5: Today's Issues / Dispatches -->
+                    <Button Grid.Column="4" Style="{StaticResource SummaryCardButton}" Margin="2,0,2,0"
+                            Command="{Binding IssueStockActionCommand}">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <Grid Grid.Row="0">
+                                <TextBlock Text="Today Outward" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource Theme.Text.Secondary}" TextTrimming="CharacterEllipsis"/>
+                                <Path Data="{StaticResource Icon.Outward}" Fill="{StaticResource DangerBrush}" Width="12" Height="12" Stretch="Uniform" HorizontalAlignment="Right"/>
+                            </Grid>
+                            <TextBlock Grid.Row="1" Text="{Binding Summary.TodayOutwardQuantity, StringFormat='-{0:N0}'}" FontSize="20" FontWeight="Bold" Foreground="{StaticResource DangerBrush}" Margin="0,4,0,2"/>
+                            <TextBlock Grid.Row="2" Text="Stock dispatched" FontSize="10" Foreground="{DynamicResource Theme.Text.Muted}" TextTrimming="CharacterEllipsis"/>
+                        </Grid>
+                    </Button>
+
+                    <!-- Card 6: Low Stock Items -->
+                    <Button Grid.Column="5" Style="{StaticResource SummaryCardButton}" Margin="2,0,2,0"
                             Command="{Binding FilterByStatusCardCommand}" CommandParameter="lowstock">
                         <Grid>
                             <Grid.RowDefinitions>
@@ -152,20 +247,17 @@
                                 <RowDefinition Height="*"/>
                                 <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
-
                             <Grid Grid.Row="0">
-                                <TextBlock Text="Low Stock" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource Theme.Text.Secondary}" TextTrimming="CharacterEllipsis"/>
-                                <Border HorizontalAlignment="Right" Width="26" Height="26" Background="{DynamicResource Theme.Status.Warning.Bg}" CornerRadius="13">
-                                    <Path Data="{StaticResource Icon.LowStock}" Fill="{StaticResource WarningBrush}" Width="13" Height="13" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                </Border>
+                                <TextBlock Text="Low Stock" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource Theme.Text.Secondary}" TextTrimming="CharacterEllipsis"/>
+                                <Path Data="{StaticResource Icon.LowStock}" Fill="{StaticResource WarningBrush}" Width="12" Height="12" Stretch="Uniform" HorizontalAlignment="Right"/>
                             </Grid>
-                            <TextBlock Grid.Row="1" Text="{Binding Summary.LowStockItemsCount}" FontSize="24" FontWeight="Bold" Foreground="{StaticResource WarningBrush}" Margin="0,4,0,2"/>
-                            <TextBlock Grid.Row="2" Text="Below reorder point" FontSize="11" Foreground="{DynamicResource Theme.Text.Muted}" TextTrimming="CharacterEllipsis"/>
+                            <TextBlock Grid.Row="1" Text="{Binding Summary.LowStockItemsCount}" FontSize="20" FontWeight="Bold" Foreground="{StaticResource WarningBrush}" Margin="0,4,0,2"/>
+                            <TextBlock Grid.Row="2" Text="At reorder level" FontSize="10" Foreground="{DynamicResource Theme.Text.Muted}" TextTrimming="CharacterEllipsis"/>
                         </Grid>
                     </Button>
 
-                    <!-- Card 4: Near Expiry -->
-                    <Button Grid.Column="3" Style="{StaticResource SummaryCardButton}" Margin="3,0,3,0"
+                    <!-- Card 7: Near Expiry Batches -->
+                    <Button Grid.Column="6" Style="{StaticResource SummaryCardButton}" Margin="2,0,2,0"
                             Command="{Binding FilterByStatusCardCommand}" CommandParameter="nearexpiry">
                         <Grid>
                             <Grid.RowDefinitions>
@@ -173,41 +265,17 @@
                                 <RowDefinition Height="*"/>
                                 <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
-
                             <Grid Grid.Row="0">
-                                <TextBlock Text="Near Expiry" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource Theme.Text.Secondary}" TextTrimming="CharacterEllipsis"/>
-                                <Border HorizontalAlignment="Right" Width="26" Height="26" Background="{DynamicResource Theme.Status.Orange.Bg}" CornerRadius="13">
-                                    <Path Data="{StaticResource Icon.Expiry}" Fill="{StaticResource OrangeBrush}" Width="13" Height="13" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                </Border>
+                                <TextBlock Text="Near Expiry" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource Theme.Text.Secondary}" TextTrimming="CharacterEllipsis"/>
+                                <Path Data="{StaticResource Icon.Expiry}" Fill="{StaticResource OrangeBrush}" Width="12" Height="12" Stretch="Uniform" HorizontalAlignment="Right"/>
                             </Grid>
-                            <TextBlock Grid.Row="1" Text="{Binding Summary.NearExpiryBatchesCount}" FontSize="24" FontWeight="Bold" Foreground="{StaticResource OrangeBrush}" Margin="0,4,0,2"/>
-                            <TextBlock Grid.Row="2" Text="Expiring ≤ 30 days" FontSize="11" Foreground="{DynamicResource Theme.Text.Muted}" TextTrimming="CharacterEllipsis"/>
+                            <TextBlock Grid.Row="1" Text="{Binding Summary.NearExpiryBatchesCount}" FontSize="20" FontWeight="Bold" Foreground="{StaticResource OrangeBrush}" Margin="0,4,0,2"/>
+                            <TextBlock Grid.Row="2" Text="Expiring ≤ 30 days" FontSize="10" Foreground="{DynamicResource Theme.Text.Muted}" TextTrimming="CharacterEllipsis"/>
                         </Grid>
                     </Button>
 
-                    <!-- Card 5: Expired Stock -->
-                    <Button Grid.Column="4" Style="{StaticResource SummaryCardButton}" Margin="3,0,3,0"
-                            Command="{Binding FilterByStatusCardCommand}" CommandParameter="expired">
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="*"/>
-                                <RowDefinition Height="Auto"/>
-                            </Grid.RowDefinitions>
-
-                            <Grid Grid.Row="0">
-                                <TextBlock Text="Expired Stock" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource Theme.Text.Secondary}" TextTrimming="CharacterEllipsis"/>
-                                <Border HorizontalAlignment="Right" Width="26" Height="26" Background="{DynamicResource Theme.Status.Danger.Bg}" CornerRadius="13">
-                                    <Path Data="{StaticResource Icon.Expired}" Fill="{StaticResource DangerBrush}" Width="13" Height="13" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                </Border>
-                            </Grid>
-                            <TextBlock Grid.Row="1" Text="{Binding Summary.ExpiredStockBatchesCount}" FontSize="24" FontWeight="Bold" Foreground="{StaticResource DangerBrush}" Margin="0,4,0,2"/>
-                            <TextBlock Grid.Row="2" Text="Quarantine required" FontSize="11" Foreground="{DynamicResource Theme.Text.Muted}" TextTrimming="CharacterEllipsis"/>
-                        </Grid>
-                    </Button>
-
-                    <!-- Card 6: Pending Approvals -->
-                    <Button Grid.Column="5" Style="{StaticResource SummaryCardButton}" Margin="6,0,0,0"
+                    <!-- Card 8: Pending Approvals -->
+                    <Button Grid.Column="7" Style="{StaticResource SummaryCardButton}" Margin="4,0,0,0"
                             Command="{Binding FilterByStatusCardCommand}" CommandParameter="pendingapprovals">
                         <Grid>
                             <Grid.RowDefinitions>
@@ -215,15 +283,12 @@
                                 <RowDefinition Height="*"/>
                                 <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
-
                             <Grid Grid.Row="0">
-                                <TextBlock Text="Pending Approvals" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource Theme.Text.Secondary}" TextTrimming="CharacterEllipsis"/>
-                                <Border HorizontalAlignment="Right" Width="26" Height="26" Background="{DynamicResource Theme.Status.Purple.Bg}" CornerRadius="13">
-                                    <Path Data="{StaticResource Icon.Approvals}" Fill="{StaticResource PurpleBrush}" Width="13" Height="13" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                </Border>
+                                <TextBlock Text="Approvals" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource Theme.Text.Secondary}" TextTrimming="CharacterEllipsis"/>
+                                <Path Data="{StaticResource Icon.Approvals}" Fill="{StaticResource PurpleBrush}" Width="12" Height="12" Stretch="Uniform" HorizontalAlignment="Right"/>
                             </Grid>
-                            <TextBlock Grid.Row="1" Text="{Binding Summary.PendingApprovalsCount}" FontSize="24" FontWeight="Bold" Foreground="{StaticResource InfoBrush}" Margin="0,4,0,2"/>
-                            <TextBlock Grid.Row="2" Text="Awaiting sign-off" FontSize="11" Foreground="{DynamicResource Theme.Text.Muted}" TextTrimming="CharacterEllipsis"/>
+                            <TextBlock Grid.Row="1" Text="{Binding Summary.PendingApprovalsCount}" FontSize="20" FontWeight="Bold" Foreground="{StaticResource InfoBrush}" Margin="0,4,0,2"/>
+                            <TextBlock Grid.Row="2" Text="Awaiting sign-off" FontSize="10" Foreground="{DynamicResource Theme.Text.Muted}" TextTrimming="CharacterEllipsis"/>
                         </Grid>
                     </Button>
                 </Grid>

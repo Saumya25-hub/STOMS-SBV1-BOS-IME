@@ -104,11 +104,60 @@ namespace STOMS_SBV1_BOS_IME.ViewModels
             }
         }
 
+        private string _packagingUnit = "Box";
+        private int _unitsPerPackage = 24;
+        private decimal _purchaseRate = 125.00m;
+        private decimal _sellingRate = 175.00m;
+
         public string Unit
         {
             get => _unit;
-            set => SetProperty(ref _unit, value);
+            set
+            {
+                if (SetProperty(ref _unit, value))
+                {
+                    OnPropertyChanged(nameof(PackagingConversionPreview));
+                }
+            }
         }
+
+        public string PackagingUnit
+        {
+            get => _packagingUnit;
+            set
+            {
+                if (SetProperty(ref _packagingUnit, value))
+                {
+                    OnPropertyChanged(nameof(PackagingConversionPreview));
+                }
+            }
+        }
+
+        public int UnitsPerPackage
+        {
+            get => _unitsPerPackage;
+            set
+            {
+                if (SetProperty(ref _unitsPerPackage, Math.Max(1, value)))
+                {
+                    OnPropertyChanged(nameof(PackagingConversionPreview));
+                }
+            }
+        }
+
+        public decimal PurchaseRate
+        {
+            get => _purchaseRate;
+            set => SetProperty(ref _purchaseRate, value);
+        }
+
+        public decimal SellingRate
+        {
+            get => _sellingRate;
+            set => SetProperty(ref _sellingRate, value);
+        }
+
+        public string PackagingConversionPreview => $"1 {PackagingUnit} = {UnitsPerPackage} {Unit} (Ratio: 1:{UnitsPerPackage})";
 
         public string Description
         {

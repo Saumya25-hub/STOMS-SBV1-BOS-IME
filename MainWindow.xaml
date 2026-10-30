@@ -7,9 +7,9 @@
         xmlns:viewmodels="clr-namespace:STOMS_SBV1_BOS_IME.ViewModels"
         xmlns:views="clr-namespace:STOMS_SBV1_BOS_IME.Views"
         mc:Ignorable="d"
-        Title="STOMS Business Operating System — Inventory Management Engine (BOS-IME)" 
-        Height="840" Width="1360"
-        MinHeight="680" MinWidth="1024"
+        Title="STOMS Business Operating System — Enterprise Inventory Management Engine (BOS-IME v2.0)" 
+        Height="900" Width="1440"
+        MinHeight="720" MinWidth="1100"
         WindowStartupLocation="CenterScreen"
         Background="{DynamicResource Theme.Background.Primary}">
 
@@ -21,45 +21,26 @@
         <DataTemplate DataType="{x:Type viewmodels:ProductManagementViewModel}">
             <views:ProductManagementView/>
         </DataTemplate>
+        <DataTemplate DataType="{x:Type viewmodels:WarehouseRackViewModel}">
+            <views:WarehouseRackView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewmodels:SettingsViewModel}">
+            <views:SettingsView/>
+        </DataTemplate>
         <DataTemplate DataType="{x:Type viewmodels:PlaceholderViewModel}">
             <views:PlaceholderView/>
         </DataTemplate>
-
-        <!-- Sidebar Navigation Button Style -->
-        <Style x:Key="SidebarNavButton" TargetType="Button">
-            <Setter Property="Background" Value="Transparent"/>
-            <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Foreground" Value="{DynamicResource Theme.Text.Secondary}"/>
-            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
-            <Setter Property="Padding" Value="14,10"/>
-            <Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border x:Name="border" Background="{TemplateBinding Background}" CornerRadius="6" Padding="{TemplateBinding Padding}">
-                            <ContentPresenter VerticalAlignment="Center"/>
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="border" Property="Background" Value="{DynamicResource Theme.Sidebar.ItemHover}"/>
-                                <Setter Property="Foreground" Value="{DynamicResource Theme.Text.Primary}"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
     </Window.Resources>
 
     <Grid>
         <Grid.ColumnDefinitions>
-            <!-- Collapsible Sidebar: width bound to ViewModel state -->
+            <!-- Collapsible Sidebar -->
             <ColumnDefinition Width="Auto"/>
             <!-- Main Content Area -->
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <!-- A. LEFT SIDEBAR NAVIGATION -->
+        <!-- A. ENTERPRISE LEFT SIDEBAR NAVIGATION -->
         <Border Grid.Column="0" 
                 Background="{DynamicResource Theme.Sidebar.Background}" 
                 BorderBrush="{DynamicResource Theme.Sidebar.Border}" 
@@ -78,12 +59,9 @@
                 </Grid.Style>
 
                 <Grid.RowDefinitions>
-                    <!-- Brand Logo -->
-                    <RowDefinition Height="Auto"/>
-                    <!-- Nav Items -->
-                    <RowDefinition Height="*"/>
-                    <!-- Sidebar Footer / Collapse toggle -->
-                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/> <!-- Brand Header -->
+                    <RowDefinition Height="*"/>    <!-- Navigation Groups -->
+                    <RowDefinition Height="Auto"/> <!-- Sidebar Footer / Collapse -->
                 </Grid.RowDefinitions>
 
                 <!-- Brand Header -->
@@ -103,131 +81,169 @@
                         <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="10,0,0,0"
                                     Visibility="{Binding IsSidebarCollapsed, Converter={StaticResource InverseBoolToVisibilityConverter}}">
                             <TextBlock Text="STOMS BOS" FontWeight="Bold" FontSize="14" Foreground="{DynamicResource Theme.Text.Primary}"/>
-                            <TextBlock Text="Inventory Engine v1.0" FontSize="10" Foreground="{DynamicResource Theme.Text.Muted}"/>
+                            <TextBlock Text="Enterprise ERP v2.0" FontSize="10" Foreground="{DynamicResource Theme.Text.Muted}"/>
                         </StackPanel>
                     </Grid>
                 </Border>
 
-                <!-- Navigation List -->
+                <!-- Navigation Groups (Scrollable) -->
                 <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-                    <StackPanel Margin="8,12">
+                    <StackPanel Margin="8,10">
 
-                        <!-- Home Dashboard -->
-                        <Button Style="{StaticResource SidebarNavButton}" Command="{Binding NavigateCommand}" CommandParameter="Dashboard" Margin="0,1">
+                        <!-- GROUP 1: EXECUTIVE DASHBOARD -->
+                        <TextBlock Text="MAIN" FontSize="9.5" FontWeight="Bold" Foreground="{DynamicResource Theme.Text.Muted}" Margin="12,6,0,4"
+                                   Visibility="{Binding IsSidebarCollapsed, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
+
+                        <Button Style="{StaticResource SidebarNavButton}" Command="{Binding NavigateCommand}" CommandParameter="Dashboard" Margin="0,1" ToolTip="Home Dashboard">
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="28"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
                                 <Path Grid.Column="0" Data="{StaticResource Icon.Dashboard}" Fill="{StaticResource BrandAccentBrush}" Width="16" Height="16" Stretch="Uniform" VerticalAlignment="Center"/>
-                                <TextBlock Grid.Column="1" Text="Home Dashboard" FontWeight="SemiBold" FontSize="13" VerticalAlignment="Center"
+                                <TextBlock Grid.Column="1" Text="Home Dashboard" FontWeight="SemiBold" FontSize="12.5" VerticalAlignment="Center"
                                            Visibility="{Binding DataContext.IsSidebarCollapsed, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
                             </Grid>
                         </Button>
 
-                        <!-- Product Management -->
-                        <Button Style="{StaticResource SidebarNavButton}" Command="{Binding NavigateCommand}" CommandParameter="Products" Margin="0,1">
+                        <!-- GROUP 2: INVENTORY MANAGEMENT -->
+                        <TextBlock Text="INVENTORY MASTER" FontSize="9.5" FontWeight="Bold" Foreground="{DynamicResource Theme.Text.Muted}" Margin="12,12,0,4"
+                                   Visibility="{Binding IsSidebarCollapsed, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
+
+                        <!-- Product Master -->
+                        <Button Style="{StaticResource SidebarNavButton}" Command="{Binding NavigateCommand}" CommandParameter="Products" Margin="0,1" ToolTip="Product Master Catalog">
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="28"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
                                 <Path Grid.Column="0" Data="{StaticResource Icon.Products}" Fill="{DynamicResource Theme.Text.Secondary}" Width="16" Height="16" Stretch="Uniform" VerticalAlignment="Center"/>
-                                <TextBlock Grid.Column="1" Text="Product Catalog" FontSize="13" VerticalAlignment="Center"
+                                <TextBlock Grid.Column="1" Text="Product Master" FontSize="12.5" VerticalAlignment="Center"
                                            Visibility="{Binding DataContext.IsSidebarCollapsed, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
                             </Grid>
                         </Button>
 
-                        <!-- Stock Management -->
-                        <Button Style="{StaticResource SidebarNavButton}" Command="{Binding NavigateCommand}" CommandParameter="Stock" Margin="0,1">
+                        <!-- Stock Balances -->
+                        <Button Style="{StaticResource SidebarNavButton}" Command="{Binding NavigateCommand}" CommandParameter="Stock" Margin="0,1" ToolTip="Stock Balances Ledger">
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="28"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
                                 <Path Grid.Column="0" Data="{StaticResource Icon.Stock}" Fill="{DynamicResource Theme.Text.Secondary}" Width="16" Height="16" Stretch="Uniform" VerticalAlignment="Center"/>
-                                <TextBlock Grid.Column="1" Text="Stock Management" FontSize="13" VerticalAlignment="Center"
+                                <TextBlock Grid.Column="1" Text="Stock Balances" FontSize="12.5" VerticalAlignment="Center"
                                            Visibility="{Binding DataContext.IsSidebarCollapsed, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
                             </Grid>
                         </Button>
 
-                        <!-- Warehouse & Rack Management -->
-                        <Button Style="{StaticResource SidebarNavButton}" Command="{Binding NavigateCommand}" CommandParameter="Warehouse" Margin="0,1">
+                        <!-- Visual Warehouse & Racks -->
+                        <Button Style="{StaticResource SidebarNavButton}" Command="{Binding NavigateCommand}" CommandParameter="Warehouse" Margin="0,1" ToolTip="Visual Warehouse &amp; Rack Topology">
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="28"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
                                 <Path Grid.Column="0" Data="{StaticResource Icon.Warehouse}" Fill="{DynamicResource Theme.Text.Secondary}" Width="16" Height="16" Stretch="Uniform" VerticalAlignment="Center"/>
-                                <TextBlock Grid.Column="1" Text="Warehouse &amp; Racks" FontSize="13" VerticalAlignment="Center"
+                                <TextBlock Grid.Column="1" Text="Warehouse &amp; Racks" FontSize="12.5" VerticalAlignment="Center"
                                            Visibility="{Binding DataContext.IsSidebarCollapsed, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
                             </Grid>
                         </Button>
 
-                        <!-- Stock Movements -->
-                        <Button Style="{StaticResource SidebarNavButton}" Command="{Binding NavigateCommand}" CommandParameter="Movements" Margin="0,1">
+                        <!-- GROUP 3: OPERATIONS -->
+                        <TextBlock Text="OPERATIONS" FontSize="9.5" FontWeight="Bold" Foreground="{DynamicResource Theme.Text.Muted}" Margin="12,12,0,4"
+                                   Visibility="{Binding IsSidebarCollapsed, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
+
+                        <!-- Stock Inward (Receive) -->
+                        <Button Style="{StaticResource SidebarNavButton}" Command="{Binding NavigateCommand}" CommandParameter="Stock_Receive" Margin="0,1" ToolTip="Goods Inward Receipt (GRN)">
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="28"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
-                                <Path Grid.Column="0" Data="{StaticResource Icon.Movements}" Fill="{DynamicResource Theme.Text.Secondary}" Width="16" Height="16" Stretch="Uniform" VerticalAlignment="Center"/>
-                                <TextBlock Grid.Column="1" Text="Stock Movements" FontSize="13" VerticalAlignment="Center"
+                                <Path Grid.Column="0" Data="{StaticResource Icon.Inward}" Fill="{StaticResource SuccessBrush}" Width="15" Height="15" Stretch="Uniform" VerticalAlignment="Center"/>
+                                <TextBlock Grid.Column="1" Text="Stock Inward (GRN)" FontSize="12.5" VerticalAlignment="Center"
+                                           Visibility="{Binding DataContext.IsSidebarCollapsed, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
+                            </Grid>
+                        </Button>
+
+                        <!-- Stock Outward (Issue) -->
+                        <Button Style="{StaticResource SidebarNavButton}" Command="{Binding NavigateCommand}" CommandParameter="Stock_Issue" Margin="0,1" ToolTip="Goods Outward Requisition">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="28"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Path Grid.Column="0" Data="{StaticResource Icon.Outward}" Fill="{StaticResource DangerBrush}" Width="15" Height="15" Stretch="Uniform" VerticalAlignment="Center"/>
+                                <TextBlock Grid.Column="1" Text="Stock Outward (Issue)" FontSize="12.5" VerticalAlignment="Center"
                                            Visibility="{Binding DataContext.IsSidebarCollapsed, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
                             </Grid>
                         </Button>
 
                         <!-- Approvals -->
-                        <Button Style="{StaticResource SidebarNavButton}" Command="{Binding NavigateCommand}" CommandParameter="Approvals" Margin="0,1">
+                        <Button Style="{StaticResource SidebarNavButton}" Command="{Binding NavigateCommand}" CommandParameter="Approvals" Margin="0,1" ToolTip="Requisitions &amp; Dual Authorization">
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="28"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
                                 <Path Grid.Column="0" Data="{StaticResource Icon.Approvals}" Fill="{DynamicResource Theme.Text.Secondary}" Width="16" Height="16" Stretch="Uniform" VerticalAlignment="Center"/>
-                                <TextBlock Grid.Column="1" Text="Approvals" FontSize="13" VerticalAlignment="Center"
+                                <TextBlock Grid.Column="1" Text="Pending Approvals" FontSize="12.5" VerticalAlignment="Center"
                                            Visibility="{Binding DataContext.IsSidebarCollapsed, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
                             </Grid>
                         </Button>
 
+                        <!-- Movements Ledger -->
+                        <Button Style="{StaticResource SidebarNavButton}" Command="{Binding NavigateCommand}" CommandParameter="Movements" Margin="0,1" ToolTip="Audit Movements History">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="28"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Path Grid.Column="0" Data="{StaticResource Icon.Movements}" Fill="{DynamicResource Theme.Text.Secondary}" Width="16" Height="16" Stretch="Uniform" VerticalAlignment="Center"/>
+                                <TextBlock Grid.Column="1" Text="Stock Movements" FontSize="12.5" VerticalAlignment="Center"
+                                           Visibility="{Binding DataContext.IsSidebarCollapsed, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
+                            </Grid>
+                        </Button>
+
+                        <!-- GROUP 4: ADMINISTRATION -->
+                        <TextBlock Text="ADMINISTRATION" FontSize="9.5" FontWeight="Bold" Foreground="{DynamicResource Theme.Text.Muted}" Margin="12,12,0,4"
+                                   Visibility="{Binding IsSidebarCollapsed, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
+
                         <!-- Reports & Analytics -->
-                        <Button Style="{StaticResource SidebarNavButton}" Command="{Binding NavigateCommand}" CommandParameter="Reports" Margin="0,1">
+                        <Button Style="{StaticResource SidebarNavButton}" Command="{Binding NavigateCommand}" CommandParameter="Reports" Margin="0,1" ToolTip="Reports &amp; Analytics">
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="28"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
                                 <Path Grid.Column="0" Data="{StaticResource Icon.Reports}" Fill="{DynamicResource Theme.Text.Secondary}" Width="16" Height="16" Stretch="Uniform" VerticalAlignment="Center"/>
-                                <TextBlock Grid.Column="1" Text="Reports &amp; Analytics" FontSize="13" VerticalAlignment="Center"
+                                <TextBlock Grid.Column="1" Text="Reports &amp; Analytics" FontSize="12.5" VerticalAlignment="Center"
                                            Visibility="{Binding DataContext.IsSidebarCollapsed, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
                             </Grid>
                         </Button>
 
-                        <!-- Separator -->
-                        <Border Height="1" Background="{DynamicResource Theme.Sidebar.Border}" Margin="6,12"/>
-
                         <!-- User Management -->
-                        <Button Style="{StaticResource SidebarNavButton}" Command="{Binding NavigateCommand}" CommandParameter="Users" Margin="0,1">
+                        <Button Style="{StaticResource SidebarNavButton}" Command="{Binding NavigateCommand}" CommandParameter="Users" Margin="0,1" ToolTip="User Management &amp; Permissions">
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="28"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
                                 <Path Grid.Column="0" Data="{StaticResource Icon.Users}" Fill="{DynamicResource Theme.Text.Secondary}" Width="16" Height="16" Stretch="Uniform" VerticalAlignment="Center"/>
-                                <TextBlock Grid.Column="1" Text="User Management" FontSize="13" VerticalAlignment="Center"
+                                <TextBlock Grid.Column="1" Text="User Management" FontSize="12.5" VerticalAlignment="Center"
                                            Visibility="{Binding DataContext.IsSidebarCollapsed, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
                             </Grid>
                         </Button>
 
                         <!-- Settings -->
-                        <Button Style="{StaticResource SidebarNavButton}" Command="{Binding NavigateCommand}" CommandParameter="Settings" Margin="0,1">
+                        <Button Style="{StaticResource SidebarNavButton}" Command="{Binding NavigateCommand}" CommandParameter="Settings" Margin="0,1" ToolTip="System Settings &amp; Appearance">
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="28"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
                                 <Path Grid.Column="0" Data="{StaticResource Icon.Settings}" Fill="{DynamicResource Theme.Text.Secondary}" Width="16" Height="16" Stretch="Uniform" VerticalAlignment="Center"/>
-                                <TextBlock Grid.Column="1" Text="Settings" FontSize="13" VerticalAlignment="Center"
+                                <TextBlock Grid.Column="1" Text="System Settings" FontSize="12.5" VerticalAlignment="Center"
                                            Visibility="{Binding DataContext.IsSidebarCollapsed, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
                             </Grid>
                         </Button>
@@ -237,7 +253,7 @@
 
                 <!-- Sidebar Footer: Collapse Toggle Button -->
                 <Border Grid.Row="2" BorderBrush="{DynamicResource Theme.Sidebar.Border}" BorderThickness="0,1,0,0" Padding="10">
-                    <Button Style="{StaticResource IconButton}" Command="{Binding ToggleSidebarCommand}" HorizontalAlignment="Center">
+                    <Button Style="{StaticResource IconButton}" Command="{Binding ToggleSidebarCommand}" HorizontalAlignment="Center" ToolTip="Expand / Collapse Sidebar">
                         <StackPanel Orientation="Horizontal">
                             <Path Data="{StaticResource Icon.Menu}" Fill="{DynamicResource Theme.Text.Secondary}" Width="16" Height="16" Stretch="Uniform"/>
                         </StackPanel>
@@ -246,12 +262,12 @@
             </Grid>
         </Border>
 
-        <!-- B & C: TOP HEADER & MAIN CONTENT -->
+        <!-- B & C: TOP HEADER & MAIN WORKSPACE -->
         <Grid Grid.Column="1">
             <Grid.RowDefinitions>
                 <!-- Top Header -->
                 <RowDefinition Height="Auto"/>
-                <!-- Main Body -->
+                <!-- Main Body Content -->
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
@@ -263,33 +279,49 @@
                     Padding="24,12">
                 <Grid>
                     <Grid.ColumnDefinitions>
-                        <!-- Title & Breadcrumb -->
+                        <!-- Title & Breadcrumbs -->
                         <ColumnDefinition Width="Auto"/>
-                        <!-- Spacer / Search Bar -->
+                        <!-- Global Search & Barcode Shortcut -->
                         <ColumnDefinition Width="*"/>
-                        <!-- Actions & User Profile -->
+                        <!-- Right Controls (Telemetry, Lang, Theme, Bell, Profile) -->
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
 
                     <!-- Title & Subtitle -->
                     <StackPanel Grid.Column="0" VerticalAlignment="Center">
                         <TextBlock Text="{Binding HeaderDisplayTitle}" FontSize="18" FontWeight="Bold" Foreground="{DynamicResource Theme.Text.Primary}"/>
-                        <TextBlock Text="{Binding PageSubtitle}" FontSize="12" Foreground="{DynamicResource Theme.Text.Muted}" Margin="0,1,0,0"/>
+                        <TextBlock Text="{Binding PageSubtitle}" FontSize="11.5" Foreground="{DynamicResource Theme.Text.Muted}" Margin="0,1,0,0"/>
                     </StackPanel>
 
-                    <!-- Global Product / SKU Search Bar -->
-                    <Grid Grid.Column="1" MaxWidth="380" Margin="32,0" VerticalAlignment="Center">
-                        <TextBox Style="{StaticResource ModernTextBox}" 
-                                 Text="{Binding GlobalSearchText, UpdateSourceTrigger=PropertyChanged}" 
-                                 Padding="30,6,10,6"
-                                 ToolTip="Type SKU, Product name, or Batch number and press Enter"/>
-                        <!-- Search Icon -->
-                        <Path Data="{StaticResource Icon.Search}" Fill="{DynamicResource Theme.Text.Muted}" 
-                              Width="13" Height="13" Stretch="Uniform" 
-                              HorizontalAlignment="Left" Margin="10,0,0,0" VerticalAlignment="Center"/>
+                    <!-- Global Product / SKU Search Bar + Barcode Scanner Shortcut -->
+                    <Grid Grid.Column="1" MaxWidth="440" Margin="24,0" VerticalAlignment="Center">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="8"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Search Box -->
+                        <Grid Grid.Column="0">
+                            <TextBox Style="{StaticResource ModernTextBox}" 
+                                     Text="{Binding GlobalSearchText, UpdateSourceTrigger=PropertyChanged}" 
+                                     Padding="30,6,10,6"
+                                     ToolTip="Search SKU, Product, or Batch (Press Enter)"/>
+                            <Path Data="{StaticResource Icon.Search}" Fill="{DynamicResource Theme.Text.Muted}" 
+                                  Width="13" Height="13" Stretch="Uniform" 
+                                  HorizontalAlignment="Left" Margin="10,0,0,0" VerticalAlignment="Center"/>
+                        </Grid>
+
+                        <!-- Barcode Scanner Quick Shortcut -->
+                        <Button Grid.Column="2" Style="{StaticResource OutlineButton}" Command="{Binding BarcodeScanShortcutCommand}" Height="32" Padding="8,0" ToolTip="Quick Scan Barcode">
+                            <StackPanel Orientation="Horizontal">
+                                <Path Data="{StaticResource Icon.Barcode}" Fill="{DynamicResource Theme.Text.Secondary}" Width="14" Height="14" Stretch="Uniform" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                                <TextBlock Text="Scan" FontSize="11" FontWeight="SemiBold"/>
+                            </StackPanel>
+                        </Button>
                     </Grid>
 
-                    <!-- Header Right Actions: SignalR Status, Theme Toggle, Notifications, Profile -->
+                    <!-- Header Right Actions: SignalR Status, Lang, Theme Toggle, Notifications, Profile -->
                     <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
 
                         <!-- Real-time Status Indicator -->
@@ -298,7 +330,7 @@
                                 BorderThickness="1" 
                                 CornerRadius="4" 
                                 Padding="8,4" 
-                                Margin="0,0,12,0" 
+                                Margin="0,0,10,0" 
                                 VerticalAlignment="Center">
                             <StackPanel Orientation="Horizontal">
                                 <Ellipse Width="6" Height="6" Fill="{StaticResource SuccessBrush}" Margin="0,0,6,0" VerticalAlignment="Center"/>
@@ -306,8 +338,16 @@
                             </StackPanel>
                         </Border>
 
+                        <!-- Language Switcher Pill (EN / HI / HIN) -->
+                        <Button Style="{StaticResource OutlineButton}" Command="{Binding ToggleLanguageCommand}" Height="30" Padding="8,0" Margin="0,0,8,0" ToolTip="Switch Language (English / हिंदी / Hinglish)">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="🌐 " FontSize="11"/>
+                                <TextBlock Text="{Binding LanguageDisplay}" FontSize="11" FontWeight="Bold" Foreground="{StaticResource BrandAccentBrush}"/>
+                            </StackPanel>
+                        </Button>
+
                         <!-- Theme Toggle Button -->
-                        <Button Style="{StaticResource IconButton}" Command="{Binding ToggleThemeCommand}" ToolTip="Toggle Light / Dark Mode" Margin="0,0,8,0">
+                        <Button Style="{StaticResource IconButton}" Command="{Binding ToggleThemeCommand}" ToolTip="Toggle Light / Dark Mode" Margin="0,0,8,0" Width="32" Height="32">
                             <Path Width="16" Height="16" Stretch="Uniform" Fill="{DynamicResource Theme.Text.Primary}">
                                 <Path.Style>
                                     <Style TargetType="Path">
@@ -323,7 +363,7 @@
                         </Button>
 
                         <!-- Notifications Bell -->
-                        <Button Style="{StaticResource IconButton}" Command="{Binding ToggleNotificationsCommand}" ToolTip="Warehouse Notifications &amp; Alerts" Margin="0,0,16,0">
+                        <Button Style="{StaticResource IconButton}" Command="{Binding ToggleNotificationsCommand}" ToolTip="Warehouse Notifications &amp; Alerts" Margin="0,0,14,0" Width="32" Height="32">
                             <Grid>
                                 <Path Data="{StaticResource Icon.Bell}" Fill="{DynamicResource Theme.Text.Primary}" Width="16" Height="16" Stretch="Uniform"/>
                                 <Ellipse Width="8" Height="8" Fill="{StaticResource DangerBrush}" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,-2,-2,0"/>
@@ -331,14 +371,14 @@
                         </Button>
 
                         <!-- Vertical Divider -->
-                        <Border Width="1" Height="24" Background="{DynamicResource Theme.Border}" Margin="0,0,16,0" VerticalAlignment="Center"/>
+                        <Border Width="1" Height="22" Background="{DynamicResource Theme.Border}" Margin="0,0,14,0" VerticalAlignment="Center"/>
 
                         <!-- User Profile Info -->
                         <Button Background="Transparent" BorderThickness="0" Padding="0" Cursor="Hand" Command="{Binding ToggleUserMenuCommand}">
                             <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                                 <!-- User Avatar -->
-                                <Border Width="34" Height="34" Background="{StaticResource BrandPrimaryBrush}" CornerRadius="17" Margin="0,0,10,0">
-                                    <TextBlock Text="SC" FontWeight="Bold" FontSize="12" Foreground="#FFFFFF" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                <Border Width="32" Height="32" Background="{StaticResource BrandPrimaryBrush}" CornerRadius="16" Margin="0,0,8,0">
+                                    <TextBlock Text="SC" FontWeight="Bold" FontSize="11.5" Foreground="#FFFFFF" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                 </Border>
 
                                 <!-- Name & Role -->

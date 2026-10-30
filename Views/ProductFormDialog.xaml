@@ -164,6 +164,49 @@
                         </StackPanel>
                     </Border>
 
+                    <!-- Packaging & Commercial Rates -->
+                    <Border Background="{DynamicResource Theme.Surface.Secondary}" 
+                            BorderBrush="{DynamicResource Theme.Border}" 
+                            BorderThickness="1" 
+                            CornerRadius="6" 
+                            Padding="14" 
+                            Margin="0,16,0,0">
+                        <StackPanel>
+                            <TextBlock Text="PACKAGING UNIT &amp; VALUATION RATES" FontSize="11" FontWeight="Bold" Foreground="{StaticResource BrandAccentBrush}" Margin="0,0,0,8"/>
+                            
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="14"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="14"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <!-- Packaging Unit -->
+                                <StackPanel Grid.Column="0">
+                                    <TextBlock Text="Secondary / Packaging Unit" Style="{StaticResource SectionHeader}" Margin="0,0,0,4"/>
+                                    <TextBox Text="{Binding PackagingUnit, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FormTextBox}"/>
+                                    <TextBlock Text="e.g. Box, Carton, Pack" FontSize="10" Foreground="{DynamicResource Theme.Text.Muted}" Margin="0,2,0,0"/>
+                                </StackPanel>
+
+                                <!-- Conversion Ratio -->
+                                <StackPanel Grid.Column="2">
+                                    <TextBlock Text="Units Per Package" Style="{StaticResource SectionHeader}" Margin="0,0,0,4"/>
+                                    <TextBox Text="{Binding UnitsPerPackage, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FormTextBox}"/>
+                                    <TextBlock Text="{Binding PackagingConversionPreview}" FontSize="10" Foreground="{StaticResource BrandAccentBrush}" FontWeight="SemiBold" Margin="0,2,0,0"/>
+                                </StackPanel>
+
+                                <!-- Purchase Rate -->
+                                <StackPanel Grid.Column="4">
+                                    <TextBlock Text="Estimated Unit Cost (₹)" Style="{StaticResource SectionHeader}" Margin="0,0,0,4"/>
+                                    <TextBox Text="{Binding PurchaseRate, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FormTextBox}"/>
+                                    <TextBlock Text="Used for inventory valuation" FontSize="10" Foreground="{DynamicResource Theme.Text.Muted}" Margin="0,2,0,0"/>
+                                </StackPanel>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
                     <!-- Thresholds: Min Stock & Reorder Point -->
                     <Grid Margin="0,16,0,0">
                         <Grid.ColumnDefinitions>

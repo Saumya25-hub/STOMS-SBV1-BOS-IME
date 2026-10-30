@@ -59,6 +59,9 @@ namespace STOMS_SBV1_BOS_IME.ViewModels
             set => SetProperty(ref _isEditingLayout, value);
         }
 
+        public string CurrentDateDisplay => DateTime.Now.ToString("dddd, dd MMMM yyyy");
+        public string BusinessName => "STOMS Business Operating System — Enterprise ERP";
+
         public DashboardSummary Summary
         {
             get => _summary;
@@ -193,6 +196,7 @@ namespace STOMS_SBV1_BOS_IME.ViewModels
         public ICommand IssueStockActionCommand { get; }
         public ICommand TransferStockActionCommand { get; }
         public ICommand AddProductActionCommand { get; }
+        public ICommand ScanBarcodeActionCommand { get; }
         public ICommand ViewWarehouseActionCommand { get; }
         public ICommand ReviewApprovalsActionCommand { get; }
         public ICommand ViewAllMovementsCommand { get; }
@@ -238,6 +242,9 @@ namespace STOMS_SBV1_BOS_IME.ViewModels
 
             AddProductActionCommand = new RelayCommand(() =>
                 _navigationService.NavigateTo("Products_Add"));
+
+            ScanBarcodeActionCommand = new RelayCommand(() =>
+                _navigationService.NavigateTo("Products"));
 
             ViewWarehouseActionCommand = new RelayCommand(() =>
                 _navigationService.NavigateTo("Warehouse"));
