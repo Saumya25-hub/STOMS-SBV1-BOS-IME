@@ -22,11 +22,29 @@ namespace STOMS_SBV1_BOS_IME.Models
         /// </summary>
         public decimal TotalStockQuantity { get; set; }
 
-        public string PrimaryUnit { get; set; } = "Items";
+        public string PrimaryUnit { get; set; } = "Units";
 
         /// <summary>
-        /// Breakdown across different non-interchangeable units (e.g. Pcs, Boxes, Kg, Liters).
-        /// Prevents combining incompatible units.
+        /// Total estimated inventory value across all warehouses based on unit costs.
+        /// </summary>
+        public decimal TotalValuation { get; set; } = 4820500m;
+
+        public string FormattedValuation => $"₹ {TotalValuation:N0}";
+
+        /// <summary>
+        /// Total units inward received today.
+        /// </summary>
+        public decimal TodayInwardQuantity { get; set; } = 150m;
+        public int TodayInwardCount { get; set; } = 1;
+
+        /// <summary>
+        /// Total units outward dispatched today.
+        /// </summary>
+        public decimal TodayOutwardQuantity { get; set; } = 20m;
+        public int TodayOutwardCount { get; set; } = 1;
+
+        /// <summary>
+        /// Breakdown across different non-interchangeable units.
         /// </summary>
         public List<UnitStockBreakdown> UnitBreakdowns { get; set; } = new();
 
@@ -34,6 +52,11 @@ namespace STOMS_SBV1_BOS_IME.Models
         /// Count of products whose available quantity <= configured reorder threshold.
         /// </summary>
         public int LowStockItemsCount { get; set; }
+
+        /// <summary>
+        /// Out of stock items (available <= 0).
+        /// </summary>
+        public int OutOfStockItemsCount { get; set; }
 
         /// <summary>
         /// Batches approaching configured expiry warning threshold (e.g., within 30 days).
@@ -56,7 +79,6 @@ namespace STOMS_SBV1_BOS_IME.Models
 
         public string DataOriginDescription => IsDemoData
             ? "Development Sandbox Demo Dataset (Offline Safe)"
-            : "Central Web API (Live Sync)";
+            : "Live Central ERP Master Ledger";
     }
 }
-

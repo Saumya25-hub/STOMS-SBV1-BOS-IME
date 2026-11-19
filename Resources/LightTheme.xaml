@@ -2,15 +2,22 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
     <!-- Light Theme Backgrounds -->
-    <SolidColorBrush x:Key="Theme.Background.Primary" Color="#F1F5F9"/>
-    <SolidColorBrush x:Key="Theme.Background.Secondary" Color="#E2E8F0"/>
-    <SolidColorBrush x:Key="Theme.Background.Tertiary" Color="#CBD5E1"/>
+    <SolidColorBrush x:Key="Theme.Background.Primary" Color="#F8FAFC"/>
+    <SolidColorBrush x:Key="Theme.Background.Main" Color="#F8FAFC"/>
+    <SolidColorBrush x:Key="Theme.Background.Secondary" Color="#F1F5F9"/>
+    <SolidColorBrush x:Key="Theme.Background.Tertiary" Color="#E2E8F0"/>
 
-    <!-- Light Theme Surfaces & Cards -->
+    <!-- Light Theme Surfaces & Cards (Solid Opaque - Zero Transparency) -->
+    <SolidColorBrush x:Key="Theme.Surface.Primary" Color="#FFFFFF"/>
+    <SolidColorBrush x:Key="Theme.Surface.Secondary" Color="#F8FAFC"/>
     <SolidColorBrush x:Key="Theme.Surface.Card" Color="#FFFFFF"/>
     <SolidColorBrush x:Key="Theme.Surface.CardAlt" Color="#F8FAFC"/>
+    <SolidColorBrush x:Key="Theme.Surface.Modal" Color="#FFFFFF"/>
     <SolidColorBrush x:Key="Theme.Surface.Hover" Color="#F1F5F9"/>
-    <SolidColorBrush x:Key="Theme.Surface.Selected" Color="#E2E8F0"/>
+    <SolidColorBrush x:Key="Theme.Surface.Selected" Color="#EFF6FF"/>
+
+    <!-- Light Modal Backdrop Overlay -->
+    <SolidColorBrush x:Key="Theme.Modal.Backdrop" Color="#80000000"/>
 
     <!-- Light Theme Borders -->
     <SolidColorBrush x:Key="Theme.Border" Color="#E2E8F0"/>
@@ -20,28 +27,49 @@
     <!-- Light Theme Typography -->
     <SolidColorBrush x:Key="Theme.Text.Primary" Color="#0F172A"/>
     <SolidColorBrush x:Key="Theme.Text.Secondary" Color="#475569"/>
-    <SolidColorBrush x:Key="Theme.Text.Muted" Color="#94A3B8"/>
+    <SolidColorBrush x:Key="Theme.Text.Muted" Color="#64748B"/>
     <SolidColorBrush x:Key="Theme.Text.Inverse" Color="#FFFFFF"/>
 
     <!-- Light Navigation & Header -->
     <SolidColorBrush x:Key="Theme.Sidebar.Background" Color="#FFFFFF"/>
     <SolidColorBrush x:Key="Theme.Sidebar.Border" Color="#E2E8F0"/>
     <SolidColorBrush x:Key="Theme.Sidebar.ItemHover" Color="#F8FAFC"/>
-    <SolidColorBrush x:Key="Theme.Sidebar.ActiveItem" Color="#DBEAFE"/>
+    <SolidColorBrush x:Key="Theme.Sidebar.ActiveItem" Color="#EFF6FF"/>
 
     <SolidColorBrush x:Key="Theme.Header.Background" Color="#FFFFFF"/>
     <SolidColorBrush x:Key="Theme.Header.Border" Color="#E2E8F0"/>
 
-    <!-- Light Warehouse Rack Representation -->
-    <SolidColorBrush x:Key="Theme.Rack.SteelFrame" Color="#94A3B8"/>
-    <SolidColorBrush x:Key="Theme.Rack.ShelfSurface" Color="#F8FAFC"/>
-    <SolidColorBrush x:Key="Theme.Rack.ShelfBorder" Color="#CBD5E1"/>
-    <SolidColorBrush x:Key="Theme.Rack.ShelfHover" Color="#E2E8F0"/>
+    <!-- Warehouse Canvas & Rack Representation -->
+    <SolidColorBrush x:Key="Theme.Canvas.Background" Color="#F8FAFC"/>
+    <SolidColorBrush x:Key="Theme.Canvas.GridLine" Color="#E2E8F0"/>
+    <SolidColorBrush x:Key="Theme.Rack.SteelFrame" Color="#E2E8F0"/>
+    <SolidColorBrush x:Key="Theme.Rack.ShelfSurface" Color="#FFFFFF"/>
+    <SolidColorBrush x:Key="Theme.Rack.ShelfBorder" Color="#E2E8F0"/>
+    <SolidColorBrush x:Key="Theme.Rack.ShelfHover" Color="#F1F5F9"/>
 
-    <!-- Inputs & Controls -->
+    <!-- Subtle Badge & Accent Backgrounds -->
+    <SolidColorBrush x:Key="Theme.Status.Success.Bg" Color="#ECFDF5"/>
+    <SolidColorBrush x:Key="Theme.Status.Warning.Bg" Color="#FFFBEB"/>
+    <SolidColorBrush x:Key="Theme.Status.Danger.Bg" Color="#FEF2F2"/>
+    <SolidColorBrush x:Key="Theme.Status.Info.Bg" Color="#EFF6FF"/>
+    <SolidColorBrush x:Key="Theme.Status.Purple.Bg" Color="#FAF5FF"/>
+    <SolidColorBrush x:Key="Theme.Status.Orange.Bg" Color="#FFF7ED"/>
+
+    <!-- Light Inputs & Form Controls -->
     <SolidColorBrush x:Key="Theme.Input.Background" Color="#FFFFFF"/>
     <SolidColorBrush x:Key="Theme.Input.Border" Color="#CBD5E1"/>
     <SolidColorBrush x:Key="Theme.Input.FocusBorder" Color="#2563EB"/>
-    <SolidColorBrush x:Key="Theme.Badge.Background" Color="#E2E8F0"/>
-</ResourceDictionary>
+    <SolidColorBrush x:Key="Theme.Input.HoverBorder" Color="#94A3B8"/>
+    <SolidColorBrush x:Key="Theme.Badge.Background" Color="#F1F5F9"/>
 
+    <!-- Popups, Dropdowns & Menus -->
+    <SolidColorBrush x:Key="Theme.Popup.Background" Color="#FFFFFF"/>
+    <SolidColorBrush x:Key="Theme.Popup.Border" Color="#E2E8F0"/>
+
+    <!-- DataGrid Custom Tokens -->
+    <SolidColorBrush x:Key="Theme.DataGrid.RowBg" Color="#FFFFFF"/>
+    <SolidColorBrush x:Key="Theme.DataGrid.AlternatingRowBg" Color="#F8FAFC"/>
+    <SolidColorBrush x:Key="Theme.DataGrid.RowHover" Color="#F1F5F9"/>
+    <SolidColorBrush x:Key="Theme.DataGrid.HeaderBg" Color="#F1F5F9"/>
+    <SolidColorBrush x:Key="Theme.DataGrid.HeaderFg" Color="#475569"/>
+</ResourceDictionary>

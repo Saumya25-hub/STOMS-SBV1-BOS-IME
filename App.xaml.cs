@@ -19,6 +19,9 @@ namespace STOMS_SBV1_BOS_IME
 
         protected override void OnStartup(StartupEventArgs e)
         {
+            // Apply saved user theme before any window initializes to prevent theme flashing
+            ThemeService.Instance.Initialize();
+
             base.OnStartup(e);
 
             // Register global safety exception handlers

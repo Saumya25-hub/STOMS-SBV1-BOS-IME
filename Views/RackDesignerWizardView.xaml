@@ -1,0 +1,449 @@
+<UserControl x:Class="STOMS_SBV1_BOS_IME.Views.RackDesignerWizardView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:viewmodels="clr-namespace:STOMS_SBV1_BOS_IME.ViewModels"
+             mc:Ignorable="d" 
+             d:DataContext="{d:DesignInstance Type=viewmodels:RackDesignerViewModel}"
+             d:DesignHeight="850" d:DesignWidth="1300">
+    <Grid Background="{DynamicResource Theme.Background.Main}">
+
+        <!-- MAIN DESIGNER LAYOUT -->
+        <Grid Margin="16">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/> <!-- 0: Studio Header & Top Controls -->
+                <RowDefinition Height="*"/>    <!-- 1: Workspace Split: Left Toolbox, Center Canvas, Right Config -->
+                <RowDefinition Height="Auto"/> <!-- 2: Bottom Status & Save Ribbon -->
+            </Grid.RowDefinitions>
+
+            <!-- 0. Header Toolbar -->
+            <Border Grid.Row="0" Background="{DynamicResource Theme.Surface.Primary}" BorderBrush="{DynamicResource Theme.Border}" BorderThickness="1" CornerRadius="8" Padding="14,10" Margin="0,0,0,12">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                        <Border Background="{StaticResource BrandPrimaryBrush}" CornerRadius="6" Width="32" Height="32" Margin="0,0,10,0">
+                            <Path Data="{StaticResource Icon.Warehouse}" Fill="#FFFFFF" Width="16" Height="16" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <StackPanel>
+                            <TextBlock Text="Visual Rack &amp; Warehouse Designer" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource Theme.Text.Primary}"/>
+                            <TextBlock Text="Design storage topology, position racks &amp; staff stations, and auto-generate shelf matrices" FontSize="11" Foreground="{DynamicResource Theme.Text.Muted}"/>
+                        </StackPanel>
+                    </StackPanel>
+
+                    <!-- Studio Actions -->
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                        <!-- Undo / Redo -->
+                        <Button Style="{StaticResource CanvasToolButton}" Command="{Binding UndoCommand}" Width="32" Height="30" Margin="0,0,4,0" ToolTip="Undo Action (Ctrl+Z)">
+                            <TextBlock Text="↶" FontSize="14" FontWeight="Bold"/>
+                        </Button>
+                        <Button Style="{StaticResource CanvasToolButton}" Command="{Binding RedoCommand}" Width="32" Height="30" Margin="0,0,10,0" ToolTip="Redo Action (Ctrl+Y)">
+                            <TextBlock Text="↷" FontSize="14" FontWeight="Bold"/>
+                        </Button>
+
+                        <!-- Zoom Controls -->
+                        <Border Background="{DynamicResource Theme.Surface.Secondary}" BorderBrush="{DynamicResource Theme.Border}" BorderThickness="1" CornerRadius="6" Height="30" Margin="0,0,10,0" Padding="4,0">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <Button Style="{StaticResource CanvasToolButton}" Command="{Binding ZoomOutCommand}" Width="24" Height="24" ToolTip="Zoom Out">
+                                    <TextBlock Text="-" FontWeight="Bold" FontSize="13"/>
+                                </Button>
+                                <TextBlock Text="{Binding ZoomDisplay}" FontSize="11" FontWeight="SemiBold" VerticalAlignment="Center" Margin="6,0" Width="36" TextAlignment="Center"/>
+                                <Button Style="{StaticResource CanvasToolButton}" Command="{Binding ZoomInCommand}" Width="24" Height="24" ToolTip="Zoom In">
+                                    <TextBlock Text="+" FontWeight="Bold" FontSize="13"/>
+                                </Button>
+                                <Button Style="{StaticResource CanvasToolButton}" Command="{Binding ResetZoomCommand}" Margin="4,0,0,0" Padding="6,0" ToolTip="Reset Zoom (100%)">
+                                    <TextBlock Text="100%" FontSize="10"/>
+                                </Button>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Layout Preview Button -->
+                        <Button Style="{StaticResource OutlineButton}" Command="{Binding TogglePreviewCommand}" Height="30" Padding="12,0" Margin="0,0,10,0">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="👁 Preview Mode" FontSize="11.5" FontWeight="SemiBold"/>
+                            </StackPanel>
+                        </Button>
+
+                        <!-- Save Layout Button -->
+                        <Button Style="{StaticResource PrimaryButton}" Command="{Binding SaveLayoutCommand}" Height="30" Padding="14,0">
+                            <StackPanel Orientation="Horizontal">
+                                <Path Data="{StaticResource Icon.Check}" Fill="#FFFFFF" Width="11" Height="11" Stretch="Uniform" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                                <TextBlock Text="Save Layout" FontSize="11.5" FontWeight="SemiBold"/>
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- 1. Workspace Split -->
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="70"/>   <!-- Left Toolbox -->
+                    <ColumnDefinition Width="*"/>    <!-- Center Canvas -->
+                    <ColumnDefinition Width="340"/>  <!-- Right Configuration Inspector -->
+                </Grid.ColumnDefinitions>
+
+                <!-- A. LEFT TOOLBOX -->
+                <Border Grid.Column="0" Background="{DynamicResource Theme.Surface.Primary}" BorderBrush="{DynamicResource Theme.Border}" BorderThickness="1" CornerRadius="8" Padding="6,10" Margin="0,0,10,0">
+                    <StackPanel>
+                        <TextBlock Text="TOOLS" FontSize="9" FontWeight="Bold" Foreground="{DynamicResource Theme.Text.Muted}" HorizontalAlignment="Center" Margin="0,0,0,8"/>
+
+                        <!-- Select Tool -->
+                        <Button Style="{StaticResource CanvasToolButton}" Command="{Binding SelectToolCommand}" CommandParameter="Select" Width="52" Height="44" Margin="0,0,0,6" ToolTip="Select / Move Elements">
+                            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <TextBlock Text="↖" FontSize="15" FontWeight="Bold" HorizontalAlignment="Center"/>
+                                <TextBlock Text="Select" FontSize="9" HorizontalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+
+                        <!-- Add User Position -->
+                        <Button Style="{StaticResource CanvasToolButton}" Command="{Binding SelectToolCommand}" CommandParameter="UserPosition" Width="52" Height="44" Margin="0,0,0,6" ToolTip="Add User / Staff Station">
+                            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <TextBlock Text="👤" FontSize="14" HorizontalAlignment="Center"/>
+                                <TextBlock Text="Staff" FontSize="9" HorizontalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+
+                        <!-- Add Rack -->
+                        <Button Style="{StaticResource CanvasToolButton}" Command="{Binding SelectToolCommand}" CommandParameter="Rack" Width="52" Height="44" Margin="0,0,0,6" ToolTip="Add Storage Rack">
+                            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <TextBlock Text="🏢" FontSize="14" HorizontalAlignment="Center"/>
+                                <TextBlock Text="+ Rack" FontSize="9" HorizontalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+
+                        <!-- Add Shelf -->
+                        <Button Style="{StaticResource CanvasToolButton}" Command="{Binding SelectToolCommand}" CommandParameter="Shelf" Width="52" Height="44" Margin="0,0,0,6" ToolTip="Add Standalone Shelf">
+                            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <TextBlock Text="📦" FontSize="14" HorizontalAlignment="Center"/>
+                                <TextBlock Text="+ Shelf" FontSize="9" HorizontalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+
+                        <!-- Add Storage Area -->
+                        <Button Style="{StaticResource CanvasToolButton}" Command="{Binding SelectToolCommand}" CommandParameter="StorageArea" Width="52" Height="44" Margin="0,0,0,6" ToolTip="Add Floor Storage / Inward Area">
+                            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <TextBlock Text="⬚" FontSize="15" FontWeight="Bold" HorizontalAlignment="Center"/>
+                                <TextBlock Text="Area" FontSize="9" HorizontalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+
+                        <!-- Add Label -->
+                        <Button Style="{StaticResource CanvasToolButton}" Command="{Binding SelectToolCommand}" CommandParameter="Label" Width="52" Height="44" Margin="0,0,0,6" ToolTip="Add Aisle / Zone Label">
+                            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <TextBlock Text="🔤" FontSize="14" HorizontalAlignment="Center"/>
+                                <TextBlock Text="Label" FontSize="9" HorizontalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+
+                        <Border Height="1" Background="{DynamicResource Theme.Border}" Margin="0,6,0,10"/>
+
+                        <!-- Delete Tool -->
+                        <Button Style="{StaticResource CanvasToolButton}" Command="{Binding SelectToolCommand}" CommandParameter="Delete" Width="52" Height="44" ToolTip="Delete Tool (Click on item to remove)">
+                            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <TextBlock Text="🗑" FontSize="14" HorizontalAlignment="Center" Foreground="{StaticResource DangerBrush}"/>
+                                <TextBlock Text="Delete" FontSize="9" Foreground="{StaticResource DangerBrush}" HorizontalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+                </Border>
+
+                <!-- B. CENTER CANVAS (Dark Grid with Drag & Zoom) -->
+                <Border Grid.Column="1" Background="{DynamicResource Theme.Canvas.Background}" BorderBrush="{DynamicResource Theme.Border}" BorderThickness="1" CornerRadius="8" ClipToBounds="True" Margin="0,0,10,0">
+                    <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+                        <Grid MinWidth="1400" MinHeight="1000">
+                            <!-- Background Subtle Blueprint Grid Lines -->
+                            <Grid.Background>
+                                <DrawingBrush TileMode="Tile" Viewport="0,0,30,30" ViewportUnits="Absolute">
+                                    <DrawingBrush.Drawing>
+                                        <GeometryDrawing>
+                                            <GeometryDrawing.Pen>
+                                                <Pen Brush="{DynamicResource Theme.Canvas.GridLine}" Thickness="0.75"/>
+                                            </GeometryDrawing.Pen>
+                                            <GeometryDrawing.Geometry>
+                                                <GeometryGroup>
+                                                    <LineGeometry StartPoint="0,0" EndPoint="30,0"/>
+                                                    <LineGeometry StartPoint="0,0" EndPoint="0,30"/>
+                                                </GeometryGroup>
+                                            </GeometryDrawing.Geometry>
+                                        </GeometryDrawing>
+                                    </DrawingBrush.Drawing>
+                                </DrawingBrush>
+                            </Grid.Background>
+
+                            <!-- Layout Transform for Zoom -->
+                            <Grid.LayoutTransform>
+                                <ScaleTransform ScaleX="{Binding ZoomLevel}" ScaleY="{Binding ZoomLevel}"/>
+                            </Grid.LayoutTransform>
+
+                            <!-- Items on the Canvas -->
+                            <ItemsControl ItemsSource="{Binding Items}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <Canvas/>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemContainerStyle>
+                                    <Style TargetType="ContentPresenter">
+                                        <Setter Property="Canvas.Left" Value="{Binding X}"/>
+                                        <Setter Property="Canvas.Top" Value="{Binding Y}"/>
+                                    </Style>
+                                </ItemsControl.ItemContainerStyle>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <!-- Interactive Canvas Block -->
+                                        <Button Background="Transparent" BorderThickness="0" Padding="0" Cursor="SizeAll"
+                                                Command="{Binding DataContext.SelectItemCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                CommandParameter="{Binding}">
+                                            <Border CornerRadius="6" BorderThickness="2" Width="{Binding Width}" Height="{Binding Height}">
+                                                <Border.Style>
+                                                    <Style TargetType="Border">
+                                                        <Setter Property="BorderBrush" Value="{DynamicResource Theme.Border}"/>
+                                                        <Setter Property="Background" Value="{DynamicResource Theme.Surface.Primary}"/>
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                                                <Setter Property="BorderBrush" Value="{StaticResource BrandAccentBrush}"/>
+                                                                <Setter Property="Effect">
+                                                                    <Setter.Value>
+                                                                        <DropShadowEffect BlurRadius="15" Color="#38BDF8" Opacity="0.6"/>
+                                                                    </Setter.Value>
+                                                                </Setter>
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding ElementType}" Value="UserPosition">
+                                                                <Setter Property="CornerRadius" Value="40"/>
+                                                                <Setter Property="Background" Value="#122C24"/>
+                                                                <Setter Property="BorderBrush" Value="{StaticResource SuccessBrush}"/>
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding ElementType}" Value="StorageArea">
+                                                                <Setter Property="Background" Value="#1A1C23"/>
+                                                                <Setter Property="BorderBrush" Value="{StaticResource WarningBrush}"/>
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding ElementType}" Value="Label">
+                                                                <Setter Property="Background" Value="Transparent"/>
+                                                                <Setter Property="BorderThickness" Value="1"/>
+                                                                <Setter Property="BorderBrush" Value="{DynamicResource Theme.Border}"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Border.Style>
+
+                                                <Grid Margin="8">
+                                                    <!-- USER POSITION ELEMENT -->
+                                                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center"
+                                                                Visibility="{Binding ElementType, Converter={StaticResource BoolToVisibilityConverter}}">
+                                                        <TextBlock Text="👤" FontSize="18" HorizontalAlignment="Center"/>
+                                                        <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="10" Foreground="#FFFFFF" HorizontalAlignment="Center"/>
+                                                    </StackPanel>
+
+                                                    <!-- RACK ELEMENT CONTENT -->
+                                                    <Grid Visibility="{Binding ElementType, Converter={StaticResource BoolToVisibilityConverter}}">
+                                                        <Grid.RowDefinitions>
+                                                            <RowDefinition Height="Auto"/>
+                                                            <RowDefinition Height="*"/>
+                                                        </Grid.RowDefinitions>
+
+                                                        <StackPanel Grid.Row="0" Orientation="Horizontal">
+                                                            <Border Background="{StaticResource BrandPrimaryBrush}" CornerRadius="3" Padding="4,1" Margin="0,0,6,0">
+                                                                <TextBlock Text="{Binding Code}" FontFamily="Consolas" FontWeight="Bold" FontSize="10.5" Foreground="#FFFFFF"/>
+                                                            </Border>
+                                                            <TextBlock Text="{Binding Name}" FontWeight="SemiBold" FontSize="11" Foreground="{DynamicResource Theme.Text.Primary}" TextTrimming="CharacterEllipsis"/>
+                                                        </StackPanel>
+
+                                                        <!-- Shelves Count Indicator -->
+                                                        <StackPanel Grid.Row="1" VerticalAlignment="Bottom">
+                                                            <TextBlock Text="{Binding Zone}" FontSize="9.5" Foreground="{DynamicResource Theme.Text.Muted}" TextTrimming="CharacterEllipsis"/>
+                                                            <TextBlock Text="{Binding TotalShelvesCount, StringFormat='{}{0} Shelves'}" FontSize="10" FontWeight="Bold" Foreground="{StaticResource BrandAccentBrush}"/>
+                                                        </StackPanel>
+                                                    </Grid>
+                                                </Grid>
+                                            </Border>
+                                        </Button>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </Grid>
+                    </ScrollViewer>
+                </Border>
+
+                <!-- C. RIGHT RACK CONFIGURATION PANEL -->
+                <Border Grid.Column="2" Background="{DynamicResource Theme.Surface.Primary}" BorderBrush="{DynamicResource Theme.Border}" BorderThickness="1" CornerRadius="8" Padding="16">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <StackPanel>
+                            <!-- Panel Header -->
+                            <Grid Margin="0,0,0,14">
+                                <StackPanel>
+                                    <TextBlock Text="RACK CONFIGURATION" FontSize="13" FontWeight="Bold" Foreground="{StaticResource BrandAccentBrush}"/>
+                                    <TextBlock Text="Inspect and customize layout properties" FontSize="10.5" Foreground="{DynamicResource Theme.Text.Muted}"/>
+                                </StackPanel>
+                                <Button Style="{StaticResource IconButton}" HorizontalAlignment="Right" Command="{Binding CloseConfigCommand}" Width="24" Height="24">
+                                    <TextBlock Text="✕" FontSize="11"/>
+                                </Button>
+                            </Grid>
+
+                            <!-- When no item selected -->
+                            <Border Background="{DynamicResource Theme.Surface.Secondary}" CornerRadius="6" Padding="14" Margin="0,0,0,14"
+                                    Visibility="{Binding HasSelectedItem, Converter={StaticResource InverseBoolToVisibilityConverter}}">
+                                <TextBlock Text="Select a rack or tool on the canvas to configure its properties." FontSize="11.5" Foreground="{DynamicResource Theme.Text.Muted}" TextAlignment="Center" TextWrapping="Wrap"/>
+                            </Border>
+
+                            <!-- Configuration Form (When item selected) -->
+                            <StackPanel Visibility="{Binding HasSelectedItem, Converter={StaticResource BoolToVisibilityConverter}}">
+                                <!-- Element Code -->
+                                <TextBlock Text="Rack Code *" Style="{StaticResource SectionHeader}" Margin="0,0,0,4"/>
+                                <TextBox Text="{Binding SelectedItem.Code, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FormTextBox}" FontFamily="Consolas" FontWeight="Bold" Margin="0,0,0,10"/>
+
+                                <!-- Element Name -->
+                                <TextBlock Text="Display Name *" Style="{StaticResource SectionHeader}" Margin="0,0,0,4"/>
+                                <TextBox Text="{Binding SelectedItem.Name, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FormTextBox}" Margin="0,0,0,10"/>
+
+                                <!-- Zone / Aisle Identifier -->
+                                <TextBlock Text="Zone / Aisle Identifier" Style="{StaticResource SectionHeader}" Margin="0,0,0,4"/>
+                                <TextBox Text="{Binding SelectedItem.Zone, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FormTextBox}" Margin="0,0,0,10"/>
+
+                                <!-- Rack Specific Config -->
+                                <StackPanel Visibility="{Binding IsRackSelected, Converter={StaticResource BoolToVisibilityConverter}}">
+                                    <Border Height="1" Background="{DynamicResource Theme.Border}" Margin="0,8,0,12"/>
+                                    <TextBlock Text="SHELF MATRIX SETUP" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource Theme.Text.Primary}" Margin="0,0,0,8"/>
+
+                                    <!-- Rows Toggle -->
+                                    <CheckBox IsChecked="{Binding SelectedItem.HasRows}" Margin="0,0,0,10">
+                                        <TextBlock Text="Multi-Tier Rows Enabled" FontWeight="SemiBold" FontSize="11.5" Foreground="{DynamicResource Theme.Text.Primary}"/>
+                                    </CheckBox>
+
+                                    <!-- Rows & Shelves Inputs -->
+                                    <Grid Margin="0,0,0,10">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="10"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel Grid.Column="0">
+                                            <TextBlock Text="Rows / Tiers" Style="{StaticResource SectionHeader}" Margin="0,0,0,4"/>
+                                            <TextBox Text="{Binding SelectedItem.RowsCount, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FormTextBox}"/>
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="2">
+                                            <TextBlock Text="Shelves per Row" Style="{StaticResource SectionHeader}" Margin="0,0,0,4"/>
+                                            <TextBox Text="{Binding SelectedItem.ShelvesPerRow, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FormTextBox}"/>
+                                        </StackPanel>
+                                    </Grid>
+
+                                    <!-- Simple vs Advanced Naming -->
+                                    <TextBlock Text="Shelf Naming Scheme" Style="{StaticResource SectionHeader}" Margin="0,6,0,4"/>
+                                    <ComboBox SelectedIndex="{Binding SelectedItem.IsAdvancedNaming, Converter={StaticResource BoolToVisibilityConverter}}" Style="{StaticResource FormComboBox}" Height="32" Margin="0,0,0,10">
+                                        <ComboBoxItem Content="Simple Naming (A1, A2, A3...)"/>
+                                        <ComboBoxItem Content="Advanced Naming (A-R1-S1, A-R1-S2...)"/>
+                                    </ComboBox>
+
+                                    <!-- Generated Shelves Preview Box -->
+                                    <Border Background="{DynamicResource Theme.Surface.Secondary}" BorderBrush="{DynamicResource Theme.Border}" BorderThickness="1" CornerRadius="6" Padding="10" Margin="0,0,0,14">
+                                        <StackPanel>
+                                            <TextBlock Text="AUTO-GENERATED SHELF LOCATIONS:" FontSize="9.5" FontWeight="Bold" Foreground="{DynamicResource Theme.Text.Muted}" Margin="0,0,0,4"/>
+                                            <TextBlock Text="{Binding GeneratedShelvesPreview}" FontFamily="Consolas" FontSize="11" Foreground="{StaticResource BrandAccentBrush}" TextWrapping="Wrap"/>
+                                        </StackPanel>
+                                    </Border>
+                                </StackPanel>
+
+                                <!-- Dimensions & Coordinates -->
+                                <TextBlock Text="POSITION &amp; DIMENSIONS" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource Theme.Text.Muted}" Margin="0,6,0,8"/>
+                                <Grid Margin="0,0,0,14">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="8"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel Grid.Column="0">
+                                        <TextBlock Text="Width (px)" Style="{StaticResource SectionHeader}" Margin="0,0,0,2"/>
+                                        <TextBox Text="{Binding SelectedItem.Width, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FormTextBox}"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="2">
+                                        <TextBlock Text="Height (px)" Style="{StaticResource SectionHeader}" Margin="0,0,0,2"/>
+                                        <TextBox Text="{Binding SelectedItem.Height, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FormTextBox}"/>
+                                    </StackPanel>
+                                </Grid>
+
+                                <!-- Action Buttons -->
+                                <Button Style="{StaticResource DangerButton}" Command="{Binding DeleteItemCommand}" CommandParameter="{Binding SelectedItem}" Height="32" HorizontalAlignment="Stretch">
+                                    <TextBlock Text="Delete Selected Item" FontSize="11" FontWeight="SemiBold"/>
+                                </Button>
+                            </StackPanel>
+                        </StackPanel>
+                    </ScrollViewer>
+                </Border>
+            </Grid>
+
+            <!-- 2. Bottom Ribbon -->
+            <Border Grid.Row="2" Background="{DynamicResource Theme.Surface.Primary}" BorderBrush="{DynamicResource Theme.Border}" BorderThickness="1" CornerRadius="8" Padding="16,10" Margin="0,12,0,0">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                        <TextBlock Text="{Binding FeedbackMessage}" FontWeight="SemiBold" FontSize="12" Foreground="{StaticResource BrandAccentBrush}"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="1" Orientation="Horizontal">
+                        <Button Style="{StaticResource OutlineButton}" Command="{Binding SaveLayoutCommand}" Height="34" Padding="14,0" Margin="0,0,10,0">
+                            <TextBlock Text="Save Changes" FontWeight="SemiBold" FontSize="12"/>
+                        </Button>
+                        <Button Style="{StaticResource PrimaryButton}" Command="{Binding CompleteWizardCommand}" Height="34" Padding="16,0">
+                            <TextBlock Text="Save &amp; Continue to Product Master →" FontWeight="SemiBold" FontSize="12"/>
+                        </Button>
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <!-- WELCOME TO YOUR INVENTORY SETUP WIZARD POPUP (Part 3) -->
+        <Grid Background="{DynamicResource Theme.Modal.Backdrop}" Visibility="{Binding IsWizardWelcomeVisible, Converter={StaticResource BoolToVisibilityConverter}}">
+            <Border Background="{DynamicResource Theme.Surface.Modal}" BorderBrush="{DynamicResource Theme.Border}" BorderThickness="1" CornerRadius="12" MaxWidth="600" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="28">
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="40" ShadowDepth="10" Opacity="0.75" Direction="270" Color="#000000"/>
+                </Border.Effect>
+                <StackPanel>
+                    <!-- Welcome Icon -->
+                    <Border Background="{StaticResource BrandPrimaryBrush}" CornerRadius="12" Width="54" Height="54" HorizontalAlignment="Center" Margin="0,0,0,16">
+                        <Path Data="{StaticResource Icon.Warehouse}" Fill="#FFFFFF" Width="28" Height="28" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+
+                    <TextBlock Text="WELCOME TO YOUR INVENTORY SETUP" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource Theme.Text.Primary}" HorizontalAlignment="Center" TextAlignment="Center"/>
+                    <TextBlock Text="Let's organize your warehouse, shop or storage area." FontSize="13" Foreground="{DynamicResource Theme.Text.Secondary}" HorizontalAlignment="Center" Margin="0,6,0,20" TextAlignment="Center"/>
+
+                    <!-- Setup Overview Steps -->
+                    <Border Background="{DynamicResource Theme.Surface.Secondary}" BorderBrush="{DynamicResource Theme.Border}" BorderThickness="1" CornerRadius="8" Padding="16" Margin="0,0,0,24">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                                <Border Background="{StaticResource BrandAccentBrush}" CornerRadius="10" Width="20" Height="20" Margin="0,0,10,0">
+                                    <TextBlock Text="1" FontWeight="Bold" FontSize="10.5" Foreground="#FFFFFF" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+                                <TextBlock Text="Step 1: Visual Rack &amp; Shelf Layout (Position racks &amp; staff desk)" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource Theme.Text.Primary}"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                                <Border Background="{DynamicResource Theme.Surface.Primary}" CornerRadius="10" Width="20" Height="20" Margin="0,0,10,0">
+                                    <TextBlock Text="2" FontWeight="Bold" FontSize="10.5" Foreground="{DynamicResource Theme.Text.Muted}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+                                <TextBlock Text="Step 2: Product Master &amp; Barcode Configuration" FontSize="12" Foreground="{DynamicResource Theme.Text.Muted}"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <Border Background="{DynamicResource Theme.Surface.Primary}" CornerRadius="10" Width="20" Height="20" Margin="0,0,10,0">
+                                    <TextBlock Text="3" FontWeight="Bold" FontSize="10.5" Foreground="{DynamicResource Theme.Text.Muted}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+                                <TextBlock Text="Step 3: Barcode Inward &amp; Automated FEFO Sales" FontSize="12" Foreground="{DynamicResource Theme.Text.Muted}"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Start Button -->
+                    <Button Style="{StaticResource PrimaryButton}" Command="{Binding StartDesignerFromWelcomeCommand}" Height="40" HorizontalAlignment="Stretch">
+                        <TextBlock Text="Start Visual Designer Now →" FontWeight="Bold" FontSize="13"/>
+                    </Button>
+                </StackPanel>
+            </Border>
+        </Grid>
+    </Grid>
+</UserControl>

@@ -2,45 +2,50 @@
 ## Module: Step 1 — Home Dashboard & Telemetry Hub
 **Author:** Hardik Jariwala (*Core Engineering & Module Architecture*)  
 **Branch:** `hardik/step-1-home-dashboard`  
-**Date:** 2026-10-29  
+**Date:** 2026-10-30  
 **Status:** Feature Complete & Verified (8/8 Unit Tests Passing)
 
 ---
 
-### 1. Summary of Work Delivered Today (Aaj Ka Kaam)
+### 1. UI/UX Complete Redesign Milestone (Aaj Ka Kaam)
 
-Today's milestone establishes the entire architectural foundation and the user experience for the **STOMS Business Operating System — Inventory Management Engine (BOS-IME)**.
+Today's milestone completely refines the **Home Dashboard** UI/UX into a world-class, clean, modern, and uncluttered industrial ERP workstation:
 
-#### A. Architecture & Foundation
-1. **MVVM Foundation (`Common/`):**
-   - Engineered lightweight `ObservableObject`, `RelayCommand`, and `AsyncRelayCommand` eliminating unnecessary 3rd party bloat.
-2. **Centralized Theme Engine (`Resources/` & `Services/ThemeService.cs`):**
-   - Implemented dynamic runtime switching between **Industrial Dark Mode** (slate/charcoal) and **High-Contrast Light Mode** without restarting the application.
-   - Built a comprehensive resolution-independent vector path icon repository (`Icons.xaml`).
-3. **Shell & Navigation (`MainWindow.xaml` & `ViewModels/MainWindowViewModel.cs`):**
-   - Created a responsive master shell with a **collapsible left sidebar** (240px $\leftrightarrow$ 64px icon-only mode).
-   - Designed top header with breadcrumbs, real-time SignalR connection pill, user identity (`Saumya Chaudhari — System Administrator`), and global search.
-   - Built **honest placeholder pages** for future modules (`Product Management`, `Stock Movements`, `Approvals`, `Reports`, `Users`, `Settings`) showing upcoming architectural deliverables rather than fake functionality.
+#### A. Header & Telemetry Refinements
+- **Simple Page Title & Subtitle:** Clear, uncluttered title `Dashboard` with subtitle `Warehouse overview`.
+- **Streamlined Global Search:** Sleek, integrated search field with quick shortcut tooltips.
+- **Dynamic Theme Switcher Icon:** Accurately toggles between Moon (in Light mode) and Sun (in Dark mode) for seamless runtime switching.
+- **Compact Telemetry Status Bar:** Clean 1-line connection bar replacing the previous oversized banner, preserving vertical screen real estate.
 
-#### B. Dashboard Operational Capabilities
-1. **6 Key Inventory Summary Cards:**
-   - **Total Products:** Counts distinct active SKU records.
-   - **Total Stock Quantity:** Unit-aware aggregate with click-to-view breakdown (Pcs, Drums, Bars, Kits) preventing erroneous unit combining.
-   - **Low Stock Items:** Triggered by configured reorder thresholds.
-   - **Near Expiry:** Batches expiring within the 30-day window.
-   - **Expired Stock:** Batches past their expiry date requiring quarantine.
-   - **Pending Approvals:** Inter-warehouse transfers and adjustments awaiting sign-off.
-2. **Warehouse Rack Topology & Bin Visualizer:**
-   - Visualized vertical storage structures with tier levels, capacity bars, and occupancy percentages.
-   - Implemented strict occupancy rules: displays exact percentage when capacity is configured; displays `"Capacity not configured"` when unconfigured.
-   - Interactive Shelf Tier Inspector: clicking any tier displays assigned SKUs, batch numbers, category, native units, expiry dates, and quarantine tags. Empty tiers display an explicit *"Available for allocation"* state.
-   - Live filtering by warehouse facility, SKU keyword, and status.
-3. **Recent Stock Movements Ledger:**
-   - Auditable transaction ledger showing Transaction ID, Timestamp, Product Name, SKU, Type badge (`Stock In`, `Stock Out`, `Transfer`, `Damage`, `Adjustment`), Signed Quantity, Source/Destination, Initiator, and Status.
-4. **Active Alerts Panel:**
-   - Exception handling panel with severity ratings (`Info`, `Warning`, `Critical`) and individual dismiss/acknowledge actions.
-5. **Non-Destructive Quick Actions:**
-   - Action buttons for Inward, Outward, Transfer, Add SKU, Topology, and Approvals that guide users through validated workflows without direct, dangerous stock mutations.
+#### B. The 6 Essential Summary Metric Cards
+- **Fixed Dimensions & Grid:** Engineered a 6-column balanced grid with zero text clipping (`TextTrimming="CharacterEllipsis"`).
+- **Typography & Visual Hierarchy:**
+  - `Total Products` (`9` active catalog SKUs)
+  - `Total Stock` (`2,046` native units tracked)
+  - `Low Stock` (`1` below reorder point)
+  - `Near Expiry` (`1` expiring in $\le$ 30 days)
+  - `Expired Stock` (`1` requiring quarantine)
+  - `Pending Approvals` (`2` awaiting sign-off)
+- **Subtle Pastel Badges:** Soft tinted status backgrounds (`#ECFDF5`, `#FFFBEB`, `#FEF2F2`, `#EFF6FF`) with high-contrast text in Light mode, and rich translucent darks in Dark mode.
+- **Tactile States:** Hover elevation and focus border without exaggerated gradients or animations.
+
+#### C. Interactive Warehouse Layout Canvas (Core Workspace)
+- **Real 2D Floorplan Canvas:** Racks mapped to spatial `(CanvasX, CanvasY)` coordinates on a clean grid.
+- **Drag-and-Drop Repositioning:** Activating **`Edit Layout`** unlocks interactive mouse dragging with automatic 20px grid snapping and boundary protection.
+- **Smooth Zoom & Pan:** Viewport controls (`[-]`, `[ 100% ]`, `[+]`) with dynamic scale transformation.
+- **Visual Rack Structures:** Steel frame bays with occupancy bars, tier status dots, and live SKU indicators.
+- **Docked Shelf Tier Inspector:** Click any rack on the canvas to inspect tier loads, SKU details, batch numbers, and native units with zero visual clutter.
+
+#### D. Recent Stock Movements Table
+- Compact, high-readability data table with dedicated columns: `Date`, `Product & SKU`, `Type`, `Quantity`, `Location`, and `Status`.
+- Clean badge styling with aligned numerical values and subtle row borders.
+
+#### E. Restrained Alerts & Notifications Panel
+- Soft accent stripes with severity ratings (`Critical`, `Warning`, `Info`) instead of loud, jarring backgrounds.
+- Quick dismiss/acknowledge actions with relative timestamps (`1h ago`, `Just now`).
+
+#### F. Unified Quick Actions Toolbar
+- 4 prominent, consistently sized action buttons: **Receive Stock**, **Issue Stock**, **Transfer Stock**, and **Add Product**.
 
 ---
 
@@ -50,10 +55,10 @@ The test suite in [`STOMS-SBV1-BOS-IME.Tests`](file:///D:/IMS-V1/STOMS-SBV1-BOS-
 
 ```
 Test run for D:\IMS-V1\STOMS-SBV1-BOS-IME.Tests\bin\Debug\net8.0-windows\STOMS-SBV1-BOS-IME.Tests.dll (.NETCoreApp,Version=v8.0)
-Passed! - Failed: 0, Passed: 8, Skipped: 0, Total: 8, Duration: 74 ms
+Passed! - Failed: 0, Passed: 8, Skipped: 0, Total: 8, Duration: 95 ms
 ```
 
-All 8 tests passed covering summary math, rack occupancy, status bubbling, search filters, and routing logic.
+All 8 tests pass with 0 warnings and 0 errors.
 
 ---
 
@@ -67,4 +72,3 @@ All 8 tests passed covering summary math, rack occupancy, status bubbling, searc
    - Connect `ApiDashboardService` to the central ASP.NET Core Web API.
    - Implement Goods Receipt Note (GRN) inward workflow with supplier PO verification.
    - Wire SignalR hub for live multi-computer workstation updates.
-

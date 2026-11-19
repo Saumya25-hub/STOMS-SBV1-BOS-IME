@@ -14,7 +14,9 @@ namespace STOMS_SBV1_BOS_IME.Views
     /// Interaction logic for LoginWindow.xaml
     /// Features:
     /// - Continuously animated ambient blue gradient environment.
-    /// - Real interactive mouse-following light bloom with smooth interpolation.
+    /// - Zero-lag real-time hardware-synchronized mouse-following light sheen.
+    /// - Seamless diffuse specular lighting with zero dark circular rings.
+    /// - Modern electric blue custom ComboBox & ListBox controls.
     /// - Unified professionally rounded outer window corners on all 4 sides.
     /// - Production-ready operator authentication workflow.
     /// </summary>
@@ -22,8 +24,13 @@ namespace STOMS_SBV1_BOS_IME.Views
     {
         private readonly LoginViewModel _viewModel;
         private Storyboard? _ambientStoryboard;
-        private readonly CubicEase _motionEasing = new() { EasingMode = EasingMode.EaseOut };
-        private readonly TimeSpan _lightMoveDuration = TimeSpan.FromMilliseconds(220);
+
+        // High-performance pointer tracking variables (Zero allocations on render loop)
+        private double _targetX;
+        private double _targetY;
+        private double _currentX;
+        private double _currentY;
+        private bool _isRenderingSubscribed = false;
 
         public event Action<OperatorSession>? LoginSuccessful;
 
@@ -55,20 +62,33 @@ namespace STOMS_SBV1_BOS_IME.Views
 
         private void OnWindowLoaded(object sender, RoutedEventArgs e)
         {
+            UpdateClipping();
+
             // Start continuous ambient gradient animation
             _ambientStoryboard = TryFindResource("AmbientGradientStoryboard") as Storyboard;
             _ambientStoryboard?.Begin(this, isControllable: true);
 
-            // Initialize default resting position for mouse light bloom
-            double centerX = (LeftGradientHost.ActualWidth > 0 ? LeftGradientHost.ActualWidth : 430) / 2.0 - 170;
-            double centerY = (LeftGradientHost.ActualHeight > 0 ? LeftGradientHost.ActualHeight : 650) / 2.0 - 170;
-            MouseLightTransform.X = centerX;
-            MouseLightTransform.Y = centerY;
+            // Initialize default resting position for light sheen (centered)
+            double panelW = LeftGradientHost.ActualWidth > 0 ? LeftGradientHost.ActualWidth : 430;
+            double panelH = LeftGradientHost.ActualHeight > 0 ? LeftGradientHost.ActualHeight : 650;
+            _currentX = (panelW / 2.0) - 280;
+            _currentY = (panelH / 2.0) - 280;
+            _targetX = _currentX;
+            _targetY = _currentY;
+            MouseLightTransform.X = _currentX;
+            MouseLightTransform.Y = _currentY;
         }
 
         private void OnWindowUnloaded(object sender, RoutedEventArgs e)
         {
             _ambientStoryboard?.Stop(this);
+
+            if (_isRenderingSubscribed)
+            {
+                CompositionTarget.Rendering -= OnRenderFrame;
+                _isRenderingSubscribed = false;
+            }
+
             Loaded -= OnWindowLoaded;
             Unloaded -= OnWindowUnloaded;
             StateChanged -= OnWindowStateChanged;
@@ -87,70 +107,88 @@ namespace STOMS_SBV1_BOS_IME.Views
             }
         }
 
-        #region Interactive Mouse-Following Light Engine
+        #region Zero-Lag Hardware-Synchronized Mouse-Following Light Sheen
+
+        private void OnLeftPanelMouseEnter(object sender, MouseEventArgs e)
+        {
+            Point pos = e.GetPosition(LeftGradientHost);
+            double clampedX = Math.Clamp(pos.X, 0, LeftGradientHost.ActualWidth);
+            double clampedY = Math.Clamp(pos.Y, 0, LeftGradientHost.ActualHeight);
+
+            _targetX = clampedX - 280;
+            _targetY = clampedY - 280;
+            _currentX = _targetX;
+            _currentY = _targetY;
+            MouseLightTransform.X = _currentX;
+            MouseLightTransform.Y = _currentY;
+
+            if (!_isRenderingSubscribed)
+            {
+                CompositionTarget.Rendering += OnRenderFrame;
+                _isRenderingSubscribed = true;
+            }
+
+            // Smoothly fade in specular light sheen
+            var fadeIn = new DoubleAnimation(1.0, TimeSpan.FromMilliseconds(220))
+            {
+                EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+            };
+            MouseLightBloom.BeginAnimation(UIElement.OpacityProperty, fadeIn);
+        }
 
         private void OnLeftPanelMouseMove(object sender, MouseEventArgs e)
         {
             Point mousePos = e.GetPosition(LeftGradientHost);
 
-            // Clamp coordinates to panel bounds
+            // Direct clamp to panel boundaries
             double clampedX = Math.Clamp(mousePos.X, 0, LeftGradientHost.ActualWidth);
             double clampedY = Math.Clamp(mousePos.Y, 0, LeftGradientHost.ActualHeight);
 
-            // Center the 340x340 radial light bloom around pointer
-            double targetX = clampedX - 170;
-            double targetY = clampedY - 170;
+            // Center 560x560 soft specular sheen around cursor
+            _targetX = clampedX - 280;
+            _targetY = clampedY - 280;
 
-            // Smoothly animate the bloom position (fluid damping without jumping)
-            var animX = new DoubleAnimation
+            if (!_isRenderingSubscribed)
             {
-                To = targetX,
-                Duration = _lightMoveDuration,
-                EasingFunction = _motionEasing
-            };
-
-            var animY = new DoubleAnimation
-            {
-                To = targetY,
-                Duration = _lightMoveDuration,
-                EasingFunction = _motionEasing
-            };
-
-            MouseLightTransform.BeginAnimation(TranslateTransform.XProperty, animX);
-            MouseLightTransform.BeginAnimation(TranslateTransform.YProperty, animY);
-        }
-
-        private void OnLeftPanelMouseEnter(object sender, MouseEventArgs e)
-        {
-            // Fade in interactive light bloom
-            var fadeAnim = new DoubleAnimation
-            {
-                To = 0.72,
-                Duration = TimeSpan.FromMilliseconds(240),
-                EasingFunction = _motionEasing
-            };
-            MouseLightBloom.BeginAnimation(UIElement.OpacityProperty, fadeAnim);
+                CompositionTarget.Rendering += OnRenderFrame;
+                _isRenderingSubscribed = true;
+            }
         }
 
         private void OnLeftPanelMouseLeave(object sender, MouseEventArgs e)
         {
-            // Fade out interactive light bloom gracefully
-            var fadeAnim = new DoubleAnimation
+            // Fade out light sheen
+            var fadeOut = new DoubleAnimation(0.0, TimeSpan.FromMilliseconds(350))
             {
-                To = 0.0,
-                Duration = TimeSpan.FromMilliseconds(380),
-                EasingFunction = _motionEasing
+                EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
             };
-            MouseLightBloom.BeginAnimation(UIElement.OpacityProperty, fadeAnim);
+            MouseLightBloom.BeginAnimation(UIElement.OpacityProperty, fadeOut);
 
-            // Gently glide light toward panel center
-            double centerX = (LeftGradientHost.ActualWidth > 0 ? LeftGradientHost.ActualWidth : 430) / 2.0 - 170;
-            double centerY = (LeftGradientHost.ActualHeight > 0 ? LeftGradientHost.ActualHeight : 650) / 2.0 - 170;
+            // Smoothly glide target back to center
+            double panelW = LeftGradientHost.ActualWidth > 0 ? LeftGradientHost.ActualWidth : 430;
+            double panelH = LeftGradientHost.ActualHeight > 0 ? LeftGradientHost.ActualHeight : 650;
+            _targetX = (panelW / 2.0) - 280;
+            _targetY = (panelH / 2.0) - 280;
+        }
 
-            var returnX = new DoubleAnimation(centerX, TimeSpan.FromMilliseconds(450)) { EasingFunction = _motionEasing };
-            var returnY = new DoubleAnimation(centerY, TimeSpan.FromMilliseconds(450)) { EasingFunction = _motionEasing };
-            MouseLightTransform.BeginAnimation(TranslateTransform.XProperty, returnX);
-            MouseLightTransform.BeginAnimation(TranslateTransform.YProperty, returnY);
+        private void OnRenderFrame(object? sender, EventArgs e)
+        {
+            // Smooth velocity lerp calculation (Damping factor 0.18 for natural fluid motion)
+            double dx = _targetX - _currentX;
+            double dy = _targetY - _currentY;
+
+            _currentX += dx * 0.18;
+            _currentY += dy * 0.18;
+
+            MouseLightTransform.X = _currentX;
+            MouseLightTransform.Y = _currentY;
+
+            // When light has settled within sub-pixel threshold and opacity is 0, unsubscribe to conserve CPU
+            if (Math.Abs(dx) < 0.05 && Math.Abs(dy) < 0.05 && MouseLightBloom.Opacity <= 0.001)
+            {
+                CompositionTarget.Rendering -= OnRenderFrame;
+                _isRenderingSubscribed = false;
+            }
         }
 
         private void OnLeftPanelMouseDown(object sender, MouseButtonEventArgs e)
@@ -192,6 +230,123 @@ namespace STOMS_SBV1_BOS_IME.Views
         }
 
         #endregion
+
+        #region Strict Rounded Corner Clipping Engine
+
+        private void OnWindowRootContentSizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            UpdateRootClipping();
+        }
+
+        private void OnLeftGradientHostSizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            UpdateLeftPanelClipping();
+        }
+
+        private void OnRightPanelHostSizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            UpdateRightPanelClipping();
+        }
+
+        public void UpdateClipping()
+        {
+            UpdateRootClipping();
+            UpdateLeftPanelClipping();
+            UpdateRightPanelClipping();
+        }
+
+        private void UpdateRootClipping()
+        {
+            if (WindowRootContent != null && WindowRootContent.ActualWidth > 0 && WindowRootContent.ActualHeight > 0)
+            {
+                WindowRootContent.Clip = new RectangleGeometry(
+                    new Rect(0, 0, WindowRootContent.ActualWidth, WindowRootContent.ActualHeight),
+                    20, 20);
+            }
+        }
+
+        private void UpdateLeftPanelClipping()
+        {
+            if (LeftGradientHost != null && LeftGradientHost.ActualWidth > 0 && LeftGradientHost.ActualHeight > 0)
+            {
+                LeftGradientHost.Clip = CreateLeftRoundedGeometry(LeftGradientHost.ActualWidth, LeftGradientHost.ActualHeight, 20);
+            }
+        }
+
+        private void UpdateRightPanelClipping()
+        {
+            if (RightPanelHost != null && RightPanelHost.ActualWidth > 0 && RightPanelHost.ActualHeight > 0)
+            {
+                RightPanelHost.Clip = CreateRightRoundedGeometry(RightPanelHost.ActualWidth, RightPanelHost.ActualHeight, 20);
+            }
+        }
+
+        private static Geometry CreateLeftRoundedGeometry(double width, double height, double radius)
+        {
+            if (width <= 0 || height <= 0)
+                return Geometry.Empty;
+
+            double r = Math.Min(radius, Math.Min(width / 2.0, height / 2.0));
+
+            var figure = new PathFigure
+            {
+                StartPoint = new Point(r, 0),
+                IsClosed = true,
+                IsFilled = true
+            };
+
+            // Top edge to top-right corner (flat/flush seam)
+            figure.Segments.Add(new LineSegment(new Point(width, 0), true));
+            // Right edge down to bottom-right corner (flat/flush seam)
+            figure.Segments.Add(new LineSegment(new Point(width, height), true));
+            // Bottom edge to start of bottom-left arc
+            figure.Segments.Add(new LineSegment(new Point(r, height), true));
+            // Bottom-left rounded arc
+            figure.Segments.Add(new ArcSegment(new Point(0, height - r), new Size(r, r), 0, false, SweepDirection.Clockwise, true));
+            // Left edge up to start of top-left arc
+            figure.Segments.Add(new LineSegment(new Point(0, r), true));
+            // Top-left rounded arc back to start
+            figure.Segments.Add(new ArcSegment(new Point(r, 0), new Size(r, r), 0, false, SweepDirection.Clockwise, true));
+
+            var geometry = new PathGeometry();
+            geometry.Figures.Add(figure);
+            geometry.Freeze();
+            return geometry;
+        }
+
+        private static Geometry CreateRightRoundedGeometry(double width, double height, double radius)
+        {
+            if (width <= 0 || height <= 0)
+                return Geometry.Empty;
+
+            double r = Math.Min(radius, Math.Min(width / 2.0, height / 2.0));
+
+            var figure = new PathFigure
+            {
+                StartPoint = new Point(0, 0),
+                IsClosed = true,
+                IsFilled = true
+            };
+
+            // Top edge to start of top-right arc
+            figure.Segments.Add(new LineSegment(new Point(width - r, 0), true));
+            // Top-right rounded arc
+            figure.Segments.Add(new ArcSegment(new Point(width, r), new Size(r, r), 0, false, SweepDirection.Clockwise, true));
+            // Right edge down to start of bottom-right arc
+            figure.Segments.Add(new LineSegment(new Point(width, height - r), true));
+            // Bottom-right rounded arc
+            figure.Segments.Add(new ArcSegment(new Point(width - r, height), new Size(r, r), 0, false, SweepDirection.Clockwise, true));
+            // Bottom edge to bottom-left corner (flat/flush seam)
+            figure.Segments.Add(new LineSegment(new Point(0, height), true));
+            // Left edge up to start point (flat/flush seam)
+            figure.Segments.Add(new LineSegment(new Point(0, 0), true));
+
+            var geometry = new PathGeometry();
+            geometry.Figures.Add(figure);
+            geometry.Freeze();
+            return geometry;
+        }
+
+        #endregion
     }
 }
-

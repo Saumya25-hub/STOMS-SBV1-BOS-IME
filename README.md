@@ -25,13 +25,38 @@ A high-performance, enterprise-grade inventory and stock management desktop suit
 
 ---
 
-## 📦 Planned Core Capabilities
+## 📦 Core Capabilities Implemented
 
-- **Real-Time Stock Engine:** Multi-warehouse inventory inward, outward, and transfer ledger.
-- **SKU & Barcode Integration:** Rapid barcode scanning, custom SKU generation, and batch/lot allocation.
-- **Expiry & Re-order Alerts:** Automated threshold triggers for low stock levels and expiring batches.
-- **Relational Data Safety:** Air-gapped offline relational database storage with instant verification.
-- **STOMS ERP Sync:** Native synchronization with **Signatures Light Bill ERP** and **STOMS Ecosystem**.
+- **Smart Visual Inventory & 2D Warehouse Canvas:** Interactive 2D drag-and-drop rack designer with dynamic shelf coding (`A1..A8`, `A-R1-S1`) and real-time occupancy heatmaps.
+- **Multi-Level Unit Conversion Engine:** Base (`PCS`), Packaging (`BOX`), and Bulk (`CARTON`) unit hierarchy with exact decimal calculations and packaging breakdowns (`79 BOX + 14 PCS`).
+- **High-Speed Barcode & EAN-13 System:** Keyboard-wedge POS scanner support, EAN-13 check digit calculator, and multi-barcode aliases per SKU.
+- **Automated Goods Inward & Batching:** Automatic batch identifier generation (`{PREFIX}-{YYYY}-{AUTO_INCREMENT}`), future expiry validation, and dynamic rack/shelf mapping.
+- **POS Billing & Automated FEFO Engine:** Barcode-driven point of sale with automated earliest-expiry-first (FEFO) allocation, multi-batch splitting, expired lot quarantine locks, and thread-safe deduction.
+- **Dual-Authorization & Approval Ledger:** Supervisor sign-offs on high-value issues, stock reservations, and complete movement audit history.
+- **Enterprise Dark & Light Themes:** Dynamic runtime theme toggle with persistent configuration, bilingual support, and solid non-transparent dialogs.
+
+---
+
+## 📚 Technical Documentation & Architecture Guides
+
+Detailed engineering specifications, operational workflows, and changelogs:
+
+- [Smart Visual Inventory Workflow & Guide](file:///d:/IMS-V1/docs/HARDIK_WORKFLOW_AND_NEW_CHANGES.md)
+- [Step 2 Product & Stock Management Changelog](file:///d:/IMS-V1/docs/HARDIK_CHANGELOG_STEP2.md)
+- [Step 2 Architecture Specification](file:///d:/IMS-V1/docs/STEP_2_PRODUCT_AND_STOCK_MANAGEMENT_ARCHITECTURE.md)
+- [Step 1 Home Dashboard Architecture](file:///d:/IMS-V1/docs/STEP_1_HOME_DASHBOARD_ARCHITECTURE.md)
+- [Step 1 Dashboard Changelog](file:///d:/IMS-V1/docs/HARDIK_CHANGELOG_STEP1.md)
+
+---
+
+## 🧪 Testing & Verification
+
+The suite includes 32 automated unit and integration tests covering SKU generation, barcode uniqueness, multi-unit arithmetic, FEFO batch splitting, and overselling protection:
+
+```bash
+dotnet test STOMS-SBV1-BOS-IME.Tests/STOMS-SBV1-BOS-IME.Tests.csproj
+```
+*Current Status: 32 Passed, 0 Failed, 0 Skipped (100% Pass Rate).*
 
 ---
 

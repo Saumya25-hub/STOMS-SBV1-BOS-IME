@@ -9,7 +9,15 @@ namespace STOMS_SBV1_BOS_IME.Models
         Transfer,
         Return,
         Damage,
-        Adjustment
+        Adjustment,
+        OpeningStock,
+        Sale,
+        SalesReturn,
+        PurchaseReturn,
+        RackTransfer,
+        ShelfTransfer,
+        ExpiredStock,
+        Wastage
     }
 
     public enum MovementStatus
@@ -27,8 +35,14 @@ namespace STOMS_SBV1_BOS_IME.Models
         public string ProductId { get; set; } = string.Empty;
         public string ProductName { get; set; } = string.Empty;
         public string Sku { get; set; } = string.Empty;
+        public string BatchId { get; set; } = string.Empty;
+        public string BatchNumber { get; set; } = string.Empty;
         public MovementType Type { get; set; }
         public decimal Quantity { get; set; }
+        public decimal BaseQuantity { get; set; }
+        public decimal PreviousBalance { get; set; }
+        public decimal NewBalance { get; set; }
+        public string ReferenceDocument { get; set; } = string.Empty;
         public string Unit { get; set; } = "Pcs";
         public string SourceLocation { get; set; } = string.Empty;
         public string DestinationLocation { get; set; } = string.Empty;
@@ -42,8 +56,10 @@ namespace STOMS_SBV1_BOS_IME.Models
         {
             MovementType.StockIn => $"+{Quantity:N0} {Unit}",
             MovementType.StockOut => $"-{Quantity:N0} {Unit}",
-            MovementType.Return => $"+{Quantity:N0} {Unit}",
-            MovementType.Damage => $"-{Quantity:N0} {Unit}",
+            MovementType.Sale => $"-{Quantity:N0} {Unit}",
+            MovementType.Return or MovementType.SalesReturn => $"+{Quantity:N0} {Unit}",
+            MovementType.PurchaseReturn => $"-{Quantity:N0} {Unit}",
+            MovementType.Damage or MovementType.ExpiredStock or MovementType.Wastage => $"-{Quantity:N0} {Unit}",
             _ => $"{Quantity:N0} {Unit}"
         };
 
@@ -51,10 +67,18 @@ namespace STOMS_SBV1_BOS_IME.Models
         {
             MovementType.StockIn => "Stock In / Receipt",
             MovementType.StockOut => "Stock Out / Issue",
+            MovementType.Sale => "POS / Sales Invoice",
+            MovementType.SalesReturn => "Sales Return",
+            MovementType.PurchaseReturn => "Purchase Return",
             MovementType.Transfer => "Warehouse Transfer",
+            MovementType.RackTransfer => "Rack Transfer",
+            MovementType.ShelfTransfer => "Shelf Transfer",
             MovementType.Return => "Customer Return",
             MovementType.Damage => "Damage / Scrap",
+            MovementType.ExpiredStock => "Expired Quarantine",
+            MovementType.Wastage => "Wastage / Loss",
             MovementType.Adjustment => "Stock Adjustment",
+            MovementType.OpeningStock => "Opening Stock Balance",
             _ => Type.ToString()
         };
 

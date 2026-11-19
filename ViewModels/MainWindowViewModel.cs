@@ -13,11 +13,13 @@ namespace STOMS_SBV1_BOS_IME.ViewModels
         private readonly IThemeService _themeService;
         private readonly IAuthService _authService;
         private readonly IRealtimeUpdateService _realtimeService;
+        private readonly ILocalizationService _localizationService;
 
         private object _currentViewModel;
         private string _activeNavKey = "Dashboard";
         private string _pageTitle = "Home Dashboard";
-        private string _breadcrumb = "STOMS ERP / Operations / Home Dashboard";
+        private string _pageSubtitle = "Warehouse overview";
+        private string _breadcrumb = "Dashboard";
         private bool _isSidebarCollapsed;
         private bool _isDarkMode = true;
         private bool _isUserMenuOpen;
@@ -25,6 +27,11 @@ namespace STOMS_SBV1_BOS_IME.ViewModels
         private string _globalSearchText = string.Empty;
 
         private readonly DashboardViewModel _dashboardViewModel;
+        private readonly ProductManagementViewModel _productManagementViewModel;
+        private readonly WarehouseRackViewModel _warehouseRackViewModel;
+        private readonly SettingsViewModel _settingsViewModel;
+        private readonly SalesInvoiceViewModel _salesInvoiceViewModel;
+        private readonly RackDesignerViewModel _rackDesignerViewModel;
 
         public object CurrentViewModel
         {
@@ -41,7 +48,21 @@ namespace STOMS_SBV1_BOS_IME.ViewModels
         public string PageTitle
         {
             get => _pageTitle;
-            private set => SetProperty(ref _pageTitle, value);
+            private set
+            {
+                if (SetProperty(ref _pageTitle, value))
+                {
+                    OnPropertyChanged(nameof(HeaderDisplayTitle));
+                }
+            }
+        }
+
+        public string HeaderDisplayTitle => _pageTitle == "Home Dashboard" ? "Dashboard" : _pageTitle;
+
+        public string PageSubtitle
+        {
+            get => _pageSubtitle;
+            private set => SetProperty(ref _pageSubtitle, value);
         }
 
         public string Breadcrumb
@@ -80,14 +101,23 @@ namespace STOMS_SBV1_BOS_IME.ViewModels
             set => SetProperty(ref _globalSearchText, value);
         }
 
-        public UserProfile CurrentUser => _authService.CurrentUser;
+        public string LanguageDisplay => _localizationService.CurrentLanguage switch
+        {
+            AppLanguage.English => "EN",
+            AppLanguage.Hindi => "HI",
+            AppLanguage.Hinglish => "HIN",
+            _ => "EN"
+        };
 
+        public UserProfile CurrentUser => _authService.CurrentUser;
         public string RealtimeStatusDescription => _realtimeService.ConnectionStateDescription;
 
         // Navigation Commands
         public ICommand NavigateCommand { get; }
         public ICommand ToggleSidebarCommand { get; }
         public ICommand ToggleThemeCommand { get; }
+        public ICommand ToggleLanguageCommand { get; }
+        public ICommand BarcodeScanShortcutCommand { get; }
         public ICommand ToggleUserMenuCommand { get; }
         public ICommand ToggleNotificationsCommand { get; }
         public ICommand GlobalSearchCommand { get; }
@@ -97,15 +127,23 @@ namespace STOMS_SBV1_BOS_IME.ViewModels
             INavigationService? navigationService = null,
             IThemeService? themeService = null,
             IAuthService? authService = null,
-            IRealtimeUpdateService? realtimeService = null)
+            IRealtimeUpdateService? realtimeService = null,
+            ILocalizationService? localizationService = null)
         {
             _navigationService = navigationService ?? NavigationService.Instance;
             _themeService = themeService ?? ThemeService.Instance;
             _authService = authService ?? AuthService.Instance;
             _realtimeService = realtimeService ?? RealtimeUpdateService.Instance;
+            _localizationService = localizationService ?? LocalizationService.Instance;
 
             _isDarkMode = _themeService.IsDarkMode;
             _dashboardViewModel = new DashboardViewModel(dashboardService: null, _navigationService, _realtimeService);
+            _productManagementViewModel = new ProductManagementViewModel(MockInventoryService.Instance, _navigationService);
+            _warehouseRackViewModel = new WarehouseRackViewModel(null, MockInventoryService.Instance, _navigationService);
+            _settingsViewModel = new SettingsViewModel(_themeService, _localizationService);
+            _salesInvoiceViewModel = new SalesInvoiceViewModel(SalesService.Instance, MockInventoryService.Instance, BarcodeService.Instance, _navigationService);
+            _rackDesignerViewModel = new RackDesignerViewModel(RackLayoutService.Instance, MockInventoryService.Instance, _navigationService);
+
             _currentViewModel = _dashboardViewModel;
 
             NavigateCommand = new RelayCommand<string>(NavigateToModule);
@@ -115,6 +153,11 @@ namespace STOMS_SBV1_BOS_IME.ViewModels
                 _themeService.ToggleTheme();
                 IsDarkMode = _themeService.IsDarkMode;
             });
+            ToggleLanguageCommand = new RelayCommand(CycleLanguage);
+            BarcodeScanShortcutCommand = new RelayCommand(() =>
+            {
+                NavigateToModule("Products");
+            });
             ToggleUserMenuCommand = new RelayCommand(() => IsUserMenuOpen = !IsUserMenuOpen);
             ToggleNotificationsCommand = new RelayCommand(() => IsNotificationsOpen = !IsNotificationsOpen);
             GlobalSearchCommand = new RelayCommand(ExecuteGlobalSearch);
@@ -123,6 +166,19 @@ namespace STOMS_SBV1_BOS_IME.ViewModels
             _navigationService.NavigationChanged += (s, key) => NavigateToModule(key);
             _themeService.ThemeChanged += (s, isDark) => IsDarkMode = isDark;
             _authService.AuthStateChanged += (s, user) => OnPropertyChanged(nameof(CurrentUser));
+            _localizationService.LanguageChanged += (s, lang) => OnPropertyChanged(nameof(LanguageDisplay));
+        }
+
+        private void CycleLanguage()
+        {
+            var next = _localizationService.CurrentLanguage switch
+            {
+                AppLanguage.English => AppLanguage.Hindi,
+                AppLanguage.Hindi => AppLanguage.Hinglish,
+                AppLanguage.Hinglish => AppLanguage.English,
+                _ => AppLanguage.English
+            };
+            _localizationService.SetLanguage(next);
         }
 
         private void ExecuteGlobalSearch()
@@ -145,80 +201,91 @@ namespace STOMS_SBV1_BOS_IME.ViewModels
             {
                 case "Dashboard":
                     PageTitle = "Home Dashboard";
-                    Breadcrumb = "STOMS ERP / Operations / Home Dashboard";
+                    PageSubtitle = "Warehouse overview & executive telemetry";
+                    Breadcrumb = "Dashboard";
                     CurrentViewModel = _dashboardViewModel;
                     break;
 
                 case "Products":
-                    PageTitle = "Product Management";
+                    PageTitle = "Product Master";
+                    PageSubtitle = "Central catalog, SKU definitions & specifications";
                     Breadcrumb = "STOMS ERP / Master Data / Products & SKUs";
-                    CurrentViewModel = new PlaceholderViewModel(
-                        "Product Management & Master SKU Catalog",
-                        "MOD-PRD-02",
-                        "Step 2 Engineering Milestone",
-                        "Centralized SKU catalog, Bill of Materials (BOM), unit definition, supplier mapping, and barcodes.",
-                        new List<string>
-                        {
-                            "Multi-tier category & brand classification",
-                            "Dynamic reorder point & safety stock calculation",
-                            "EAN-13, QR Code & custom barcode generation",
-                            "Batch & serial number tracking definitions"
-                        });
+                    _productManagementViewModel.ActiveSection = "Catalog";
+                    CurrentViewModel = _productManagementViewModel;
+                    break;
+
+                case "Products_Add":
+                    ActiveNavKey = "Products";
+                    PageTitle = "Product Master";
+                    PageSubtitle = "Configure master SKU & inventory tracking";
+                    Breadcrumb = "STOMS ERP / Master Data / Add New SKU";
+                    _productManagementViewModel.ActiveSection = "Catalog";
+                    _productManagementViewModel.OpenAddProduct();
+                    CurrentViewModel = _productManagementViewModel;
                     break;
 
                 case "Stock":
                     PageTitle = "Stock Management";
-                    Breadcrumb = "STOMS ERP / Operations / Real-Time Stock Ledger";
-                    CurrentViewModel = new PlaceholderViewModel(
-                        "Stock Management & Multi-Warehouse Ledger",
-                        "MOD-STK-03",
-                        "Step 2 Engineering Milestone",
-                        "Comprehensive inventory valuations, FIFO/LIFO batch tracking, and real-time ledger synchronization.",
-                        new List<string>
-                        {
-                            "Air-gapped transaction verification",
-                            "Unit-of-measurement cross-ledger protection",
-                            "Cycle counts and variance reconciliations",
-                            "Real-time SignalR distributed stock updates"
-                        });
+                    PageSubtitle = "Multi-warehouse real-time balance ledger";
+                    Breadcrumb = "STOMS ERP / Operations / Stock Balances";
+                    _productManagementViewModel.ActiveSection = "Balances";
+                    CurrentViewModel = _productManagementViewModel;
+                    break;
+
+                case "Stock_Receive":
+                    ActiveNavKey = "Stock";
+                    PageTitle = "Stock Management";
+                    PageSubtitle = "Goods Inward Receipt (GRN) & Inspection";
+                    Breadcrumb = "STOMS ERP / Operations / Stock Receive";
+                    _productManagementViewModel.ActiveSection = "Catalog";
+                    _productManagementViewModel.OpenReceiveStock();
+                    CurrentViewModel = _productManagementViewModel;
+                    break;
+
+                case "Stock_Issue":
+                    ActiveNavKey = "Stock";
+                    PageTitle = "Stock Management";
+                    PageSubtitle = "Goods Outward Requisition & Dispatch";
+                    Breadcrumb = "STOMS ERP / Operations / Stock Issue";
+                    _productManagementViewModel.ActiveSection = "Catalog";
+                    _productManagementViewModel.OpenIssueStock();
+                    CurrentViewModel = _productManagementViewModel;
                     break;
 
                 case "Warehouse":
-                    PageTitle = "Warehouse & Rack Management";
+                    PageTitle = "Warehouse & Rack Topology";
+                    PageSubtitle = "Interactive 2D visual layout studio & storage bays";
                     Breadcrumb = "STOMS ERP / Logistics / Warehouse & Rack Layout";
-                    CurrentViewModel = new PlaceholderViewModel(
-                        "Warehouse & Advanced Rack Topology",
-                        "MOD-WH-04",
-                        "Step 3 Engineering Milestone",
-                        "Interactive 2D/3D bay visualizer, rack layout builder, capacity modeling, and bin slotting.",
-                        new List<string>
-                        {
-                            "Drag-and-drop rack shelf & compartment builder",
-                            "Weight load and volumetric distribution calculation",
-                            "Dynamic bin-level QR tagging & forklift routing",
-                            "Zone temperature and environmental condition logging"
-                        });
+                    CurrentViewModel = _warehouseRackViewModel;
+                    break;
+
+                case "RackDesigner":
+                    ActiveNavKey = "Warehouse";
+                    PageTitle = "Visual Rack Designer";
+                    PageSubtitle = "Layout canvas & visual storage topology builder";
+                    Breadcrumb = "STOMS ERP / Logistics / Visual Rack Designer";
+                    CurrentViewModel = _rackDesignerViewModel;
+                    break;
+
+                case "Sales":
+                case "POS":
+                    PageTitle = "Sales & POS Invoicing";
+                    PageSubtitle = "Point of sale billing with automated FEFO batch allocation";
+                    Breadcrumb = "STOMS ERP / Operations / Sales & POS";
+                    CurrentViewModel = _salesInvoiceViewModel;
                     break;
 
                 case "Movements":
-                    PageTitle = "Stock Movements & Inward/Outward";
+                    PageTitle = "Stock Movements & Audit History";
+                    PageSubtitle = "Material transfers, transactions & batch traceability";
                     Breadcrumb = "STOMS ERP / Operations / Movement History";
-                    CurrentViewModel = new PlaceholderViewModel(
-                        "Stock Movements & Material Transfers",
-                        "MOD-MOV-05",
-                        "Step 3 Engineering Milestone",
-                        "Complete inward receipt (GRN), dispatch work orders, inter-warehouse transit, and scrap records.",
-                        new List<string>
-                        {
-                            "Dual-custody digital sign-off on transfers",
-                            "Supplier Goods Receipt Note (GRN) verification",
-                            "Automated pick-list & pack-slip generation",
-                            "Defect and quarantine scrap isolation ledger"
-                        });
+                    _productManagementViewModel.ActiveSection = "Batches";
+                    CurrentViewModel = _productManagementViewModel;
                     break;
 
                 case "Approvals":
                     PageTitle = "Approvals & Sign-Offs";
+                    PageSubtitle = "Role-gated dual authorization for high-value issues";
                     Breadcrumb = "STOMS ERP / Governance / Pending Approvals";
                     CurrentViewModel = new PlaceholderViewModel(
                         "Dual-Authorization & Approval Workflows",
@@ -236,11 +303,12 @@ namespace STOMS_SBV1_BOS_IME.ViewModels
 
                 case "Reports":
                     PageTitle = "Reports & Analytics";
+                    PageSubtitle = "Inventory valuation, velocity & stock analytics";
                     Breadcrumb = "STOMS ERP / Executive / Reports & Analytics";
                     CurrentViewModel = new PlaceholderViewModel(
                         "Warehouse Analytics & Executive Reporting",
                         "MOD-REP-07",
-                        "Step 4 Engineering Milestone",
+                        "Enterprise Reporting Suite",
                         "Inventory turnover, dead-stock analysis, SKU velocity, lead times, and financial valuations.",
                         new List<string>
                         {
@@ -252,12 +320,13 @@ namespace STOMS_SBV1_BOS_IME.ViewModels
                     break;
 
                 case "Users":
-                    PageTitle = "User Management & Access Control";
+                    PageTitle = "User Management & RBAC";
+                    PageSubtitle = "Role-based access controls and workstation security";
                     Breadcrumb = "STOMS ERP / Administration / Users & Roles";
                     CurrentViewModel = new PlaceholderViewModel(
                         "User Management & RBAC Permissions",
                         "MOD-USR-08",
-                        "Step 5 Engineering Milestone",
+                        "Role & Access Management",
                         "Role-based access controls (RBAC), multi-workstation logins, and activity audit logging.",
                         new List<string>
                         {
@@ -269,20 +338,10 @@ namespace STOMS_SBV1_BOS_IME.ViewModels
                     break;
 
                 case "Settings":
-                    PageTitle = "System Settings";
+                    PageTitle = "System Settings & Configuration";
+                    PageSubtitle = "Central appearance, language localization & network profile";
                     Breadcrumb = "STOMS ERP / Administration / Configuration";
-                    CurrentViewModel = new PlaceholderViewModel(
-                        "System & Network Configuration",
-                        "MOD-SET-09",
-                        "Step 5 Engineering Milestone",
-                        "Central API endpoint configuration, SignalR telemetry options, local cache policy, and printer setup.",
-                        new List<string>
-                        {
-                            "Central ASP.NET Core API server URL & SSL certificates",
-                            "Thermal barcode printer & zebra scanner integration",
-                            "Local offline SQLite synchronization parameters",
-                            "Theme and regional display formatting options"
-                        });
+                    CurrentViewModel = _settingsViewModel;
                     break;
             }
         }

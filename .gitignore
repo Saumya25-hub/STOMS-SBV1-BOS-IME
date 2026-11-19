@@ -48,3 +48,5 @@ bld/
 *.db-shm
 *.db-wal
 *.local.db
+
+*.slnx

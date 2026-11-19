@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="clr-namespace:STOMS_SBV1_BOS_IME.ViewModels"
         mc:Ignorable="d"
-        Title="IMS ΓÇö Inventor Management System | Operator Login"
+        Title="IMS — Inventor Management System | Operator Login"
         Height="650"
         Width="1030"
         WindowStartupLocation="CenterScreen"
@@ -106,7 +106,7 @@
             </Style.Triggers>
         </Style>
 
-        <!-- Input Box Style -->
+        <!-- Modern Text Input Style -->
         <Style x:Key="ModernTextBox" TargetType="TextBox">
             <Setter Property="Height" Value="40" />
             <Setter Property="Background" Value="#F8FAFC" />
@@ -137,6 +137,7 @@
             </Setter>
         </Style>
 
+        <!-- Modern Password Input Style -->
         <Style x:Key="ModernPasswordBox" TargetType="PasswordBox">
             <Setter Property="Height" Value="40" />
             <Setter Property="Background" Value="#F8FAFC" />
@@ -160,6 +161,202 @@
                             <Trigger Property="IsFocused" Value="True">
                                 <Setter TargetName="border" Property="BorderBrush" Value="#0066FF" />
                                 <Setter TargetName="border" Property="Background" Value="#FFFFFF" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Modern Electric Blue ComboBoxItem Style -->
+        <Style x:Key="ModernComboBoxItem" TargetType="ComboBoxItem">
+            <Setter Property="SnapsToDevicePixels" Value="True" />
+            <Setter Property="Padding" Value="14,10" />
+            <Setter Property="Margin" Value="2,2" />
+            <Setter Property="FontSize" Value="12.5" />
+            <Setter Property="FontWeight" Value="Medium" />
+            <Setter Property="Foreground" Value="#334155" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ComboBoxItem">
+                        <Border x:Name="itemBorder"
+                                Background="Transparent"
+                                CornerRadius="6"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Left" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="itemBorder" Property="Background" Value="#EFF6FF" />
+                                <Setter Property="Foreground" Value="#0066FF" />
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="itemBorder" Property="Background" Value="#0066FF" />
+                                <Setter Property="Foreground" Value="#FFFFFF" />
+                                <Setter Property="FontWeight" Value="SemiBold" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Modern ComboBox ToggleButton Template -->
+        <ControlTemplate x:Key="ComboBoxToggleButtonTemplate" TargetType="ToggleButton">
+            <Border x:Name="border"
+                    Background="{TemplateBinding Background}"
+                    BorderBrush="{TemplateBinding BorderBrush}"
+                    BorderThickness="{TemplateBinding BorderThickness}"
+                    CornerRadius="8">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="38" />
+                    </Grid.ColumnDefinitions>
+                    <!-- Modern Vector Chevron Arrow -->
+                    <Path x:Name="Arrow"
+                          Grid.Column="1"
+                          HorizontalAlignment="Center"
+                          VerticalAlignment="Center"
+                          Data="M 0 0 L 4.5 4.5 L 9 0"
+                          Stroke="#64748B"
+                          StrokeThickness="1.8"
+                          StrokeStartLineCap="Round"
+                          StrokeEndLineCap="Round"
+                          StrokeLineJoin="Round" />
+                </Grid>
+            </Border>
+            <ControlTemplate.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter TargetName="border" Property="BorderBrush" Value="#0066FF" />
+                    <Setter TargetName="border" Property="Background" Value="#FFFFFF" />
+                    <Setter TargetName="Arrow" Property="Stroke" Value="#0066FF" />
+                </Trigger>
+                <Trigger Property="IsChecked" Value="True">
+                    <Setter TargetName="border" Property="BorderBrush" Value="#0066FF" />
+                    <Setter TargetName="border" Property="Background" Value="#FFFFFF" />
+                    <Setter TargetName="Arrow" Property="Stroke" Value="#0066FF" />
+                </Trigger>
+            </ControlTemplate.Triggers>
+        </ControlTemplate>
+
+        <!-- Modern Electric Blue ComboBox Style -->
+        <Style x:Key="ModernComboBox" TargetType="ComboBox">
+            <Setter Property="Height" Value="40" />
+            <Setter Property="Background" Value="#F8FAFC" />
+            <Setter Property="BorderBrush" Value="#CBD5E1" />
+            <Setter Property="BorderThickness" Value="1.2" />
+            <Setter Property="Foreground" Value="#0F172A" />
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="FontWeight" Value="Normal" />
+            <Setter Property="ItemContainerStyle" Value="{StaticResource ModernComboBoxItem}" />
+            <Setter Property="SnapsToDevicePixels" Value="True" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ComboBox">
+                        <Grid x:Name="MainGrid">
+                            <ToggleButton x:Name="ToggleButton"
+                                          Template="{StaticResource ComboBoxToggleButtonTemplate}"
+                                          Background="{TemplateBinding Background}"
+                                          BorderBrush="{TemplateBinding BorderBrush}"
+                                          BorderThickness="{TemplateBinding BorderThickness}"
+                                          Focusable="False"
+                                          IsChecked="{Binding Path=IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
+                                          ClickMode="Press" />
+
+                            <ContentPresenter x:Name="ContentSite"
+                                              IsHitTestVisible="False"
+                                              Content="{TemplateBinding SelectionBoxItem}"
+                                              ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                                              ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}"
+                                              Margin="12,0,38,0"
+                                              VerticalAlignment="Center"
+                                              HorizontalAlignment="Left" />
+
+                            <Popup x:Name="PART_Popup"
+                                   AllowsTransparency="True"
+                                   IsOpen="{TemplateBinding IsDropDownOpen}"
+                                   Placement="Bottom"
+                                   PopupAnimation="Fade"
+                                   Focusable="False">
+                                <Border x:Name="DropDownBorder"
+                                        MinWidth="{Binding ActualWidth, ElementName=MainGrid}"
+                                        MaxHeight="{TemplateBinding MaxDropDownHeight}"
+                                        Background="#FFFFFF"
+                                        BorderBrush="#CBD5E1"
+                                        BorderThickness="1"
+                                        CornerRadius="10"
+                                        Margin="0,4,0,0"
+                                        Padding="4">
+                                    <Border.Effect>
+                                        <DropShadowEffect Color="#0F172A" BlurRadius="22" ShadowDepth="4" Opacity="0.14" />
+                                    </Border.Effect>
+                                    <ScrollViewer x:Name="DropDownScrollViewer" CanContentScroll="True" VerticalScrollBarVisibility="Auto">
+                                        <ItemsPresenter x:Name="ItemsPresenter" KeyboardNavigation.DirectionalNavigation="Contained" />
+                                    </ScrollViewer>
+                                </Border>
+                            </Popup>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsDropDownOpen" Value="True">
+                                <Setter TargetName="ToggleButton" Property="BorderBrush" Value="#0066FF" />
+                                <Setter TargetName="ToggleButton" Property="Background" Value="#FFFFFF" />
+                            </Trigger>
+                            <Trigger Property="IsFocused" Value="True">
+                                <Setter TargetName="ToggleButton" Property="BorderBrush" Value="#0066FF" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Modern Universal ListBox & ListBoxItem Styles -->
+        <Style TargetType="ListBox">
+            <Setter Property="Background" Value="#FFFFFF" />
+            <Setter Property="BorderBrush" Value="#CBD5E1" />
+            <Setter Property="BorderThickness" Value="1.2" />
+            <Setter Property="Padding" Value="4" />
+            <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
+            <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ListBox">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="8">
+                            <ScrollViewer Focusable="False" Padding="{TemplateBinding Padding}">
+                                <ItemsPresenter SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                            </ScrollViewer>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style TargetType="ListBoxItem">
+            <Setter Property="Padding" Value="12,8" />
+            <Setter Property="Margin" Value="2" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ListBoxItem">
+                        <Border x:Name="itemBorder"
+                                Background="Transparent"
+                                CornerRadius="6"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="itemBorder" Property="Background" Value="#EFF6FF" />
+                                <Setter Property="Foreground" Value="#0066FF" />
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="itemBorder" Property="Background" Value="#0066FF" />
+                                <Setter Property="Foreground" Value="#FFFFFF" />
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -236,7 +433,7 @@
                 Background="#FFFFFF"
                 BorderBrush="#CBD5E1"
                 BorderThickness="1"
-                ClipToBounds="True">
+                ClipToBounds="False">
             
             <Border.Effect>
                 <DropShadowEffect Color="#0F172A"
@@ -245,7 +442,7 @@
                                   Opacity="0.18" />
             </Border.Effect>
 
-            <Grid>
+            <Grid x:Name="WindowRootContent" SizeChanged="OnWindowRootContentSizeChanged">
                 <Grid.ColumnDefinitions>
                     <!-- Left: Interactive Animated Gradient Showcase (43%) -->
                     <ColumnDefinition Width="430" />
@@ -256,9 +453,10 @@
                 <!-- ================= LEFT INTERACTIVE ANIMATED GRADIENT PANEL ================= -->
                 <Border x:Name="LeftGradientHost"
                         Grid.Column="0"
-                        CornerRadius="19,0,0,19"
+                        CornerRadius="20,0,0,20"
                         ClipToBounds="True"
                         Background="#07132B"
+                        SizeChanged="OnLeftGradientHostSizeChanged"
                         MouseMove="OnLeftPanelMouseMove"
                         MouseEnter="OnLeftPanelMouseEnter"
                         MouseLeave="OnLeftPanelMouseLeave"
@@ -278,20 +476,20 @@
                             </Rectangle.Fill>
                         </Rectangle>
 
-                        <!-- Layer 2: Slow-Moving Secondary Ambient Light Bloom -->
+                        <!-- Layer 2: Slow-Moving Secondary Ambient Light Sheen (Zero Harsh Rings) -->
                         <Canvas IsHitTestVisible="False">
-                            <Ellipse Width="380" Height="380" Margin="-80,80,0,0" Opacity="0.38">
-                                <Ellipse.RenderTransform>
+                            <Rectangle Width="500" Height="500" Margin="-60,40,0,0" Opacity="0.22">
+                                <Rectangle.RenderTransform>
                                     <TranslateTransform x:Name="AmbientBloomTransform" X="0" Y="0" />
-                                </Ellipse.RenderTransform>
-                                <Ellipse.Fill>
+                                </Rectangle.RenderTransform>
+                                <Rectangle.Fill>
                                     <RadialGradientBrush Center="0.5,0.5" GradientOrigin="0.5,0.5" RadiusX="0.5" RadiusY="0.5">
-                                        <GradientStop Color="#0066FF" Offset="0.0" />
-                                        <GradientStop Color="#00D2FF" Offset="0.45" />
+                                        <GradientStop Color="#3000D2FF" Offset="0.0" />
+                                        <GradientStop Color="#150066FF" Offset="0.45" />
                                         <GradientStop Color="#00000000" Offset="1.0" />
                                     </RadialGradientBrush>
-                                </Ellipse.Fill>
-                            </Ellipse>
+                                </Rectangle.Fill>
+                            </Rectangle>
                         </Canvas>
 
                         <!-- Layer 3: Flowing Translucent Light Wave Ribbon -->
@@ -311,29 +509,28 @@
                             </Path>
                         </Canvas>
 
-                        <!-- Layer 4: REAL INTERACTIVE MOUSE-FOLLOWING LIGHT BLOOM -->
+                        <!-- Layer 4: REAL INTERACTIVE MOUSE-FOLLOWING LIGHT SHEEN (Zero Dark Rings, Pure Diffuse Glow) -->
                         <Canvas IsHitTestVisible="False">
                             <Border x:Name="MouseLightBloom"
-                                    Width="340"
-                                    Height="340"
+                                    Width="560"
+                                    Height="560"
                                     Opacity="0"
                                     IsHitTestVisible="False">
                                 <Border.RenderTransform>
-                                    <TranslateTransform x:Name="MouseLightTransform" X="45" Y="150" />
+                                    <TranslateTransform x:Name="MouseLightTransform" X="-65" Y="45" />
                                 </Border.RenderTransform>
 
-                                <Ellipse Width="340" Height="340">
-                                    <Ellipse.Fill>
+                                <Rectangle Width="560" Height="560">
+                                    <Rectangle.Fill>
                                         <RadialGradientBrush Center="0.5,0.5" GradientOrigin="0.5,0.5" RadiusX="0.5" RadiusY="0.5">
-                                            <!-- Soft luminous cyan highlight at core -->
-                                            <GradientStop Color="#60A5FA" Offset="0.0" />
-                                            <GradientStop Color="#38BDF8" Offset="0.22" />
-                                            <GradientStop Color="#0066FF" Offset="0.52" />
-                                            <GradientStop Color="#0A2463" Offset="0.78" />
-                                            <GradientStop Color="#00000000" Offset="1.0" />
+                                            <!-- Pure luminous specular sheen - completely seamless & zero dark rings -->
+                                            <GradientStop Color="#4067E8F9" Offset="0.0" />
+                                            <GradientStop Color="#2838BDF8" Offset="0.25" />
+                                            <GradientStop Color="#120066FF" Offset="0.55" />
+                                            <GradientStop Color="#000066FF" Offset="1.0" />
                                         </RadialGradientBrush>
-                                    </Ellipse.Fill>
-                                </Ellipse>
+                                    </Rectangle.Fill>
+                                </Rectangle>
                             </Border>
                         </Canvas>
 
@@ -417,7 +614,7 @@
                                         CornerRadius="10"
                                         Padding="14,11">
                                     <StackPanel Orientation="Horizontal">
-                                        <TextBlock Text="≡ƒôè" FontSize="16" Margin="0,0,12,0" VerticalAlignment="Center" />
+                                        <TextBlock Text="📊" FontSize="16" Margin="0,0,12,0" VerticalAlignment="Center" />
                                         <StackPanel>
                                             <TextBlock Text="Real-Time Stock Engine" Foreground="#FFFFFF" FontWeight="SemiBold" FontSize="12.5" />
                                             <TextBlock Text="Multi-warehouse inward, outward &amp; ledger" Foreground="#94A3B8" FontSize="11" />
@@ -433,7 +630,7 @@
                                         CornerRadius="10"
                                         Padding="14,11">
                                     <StackPanel Orientation="Horizontal">
-                                        <TextBlock Text="ΓÜí" FontSize="16" Margin="0,0,12,0" VerticalAlignment="Center" />
+                                        <TextBlock Text="⚡" FontSize="16" Margin="0,0,12,0" VerticalAlignment="Center" />
                                         <StackPanel>
                                             <TextBlock Text="Rapid SKU &amp; Barcode Integration" Foreground="#FFFFFF" FontWeight="SemiBold" FontSize="12.5" />
                                             <TextBlock Text="Fast batch tracking &amp; barcode allocation" Foreground="#94A3B8" FontSize="11" />
@@ -448,7 +645,7 @@
                                         CornerRadius="10"
                                         Padding="14,11">
                                     <StackPanel Orientation="Horizontal">
-                                        <TextBlock Text="≡ƒ¢í" FontSize="16" Margin="0,0,12,0" VerticalAlignment="Center" />
+                                        <TextBlock Text="🛡" FontSize="16" Margin="0,0,12,0" VerticalAlignment="Center" />
                                         <StackPanel>
                                             <TextBlock Text="Air-Gapped Offline Data Safety" Foreground="#FFFFFF" FontWeight="SemiBold" FontSize="12.5" />
                                             <TextBlock Text="Relational data safety with instant verification" Foreground="#94A3B8" FontSize="11" />
@@ -461,17 +658,19 @@
                             <StackPanel Grid.Row="2">
                                 <Border Height="1" Background="#26FFFFFF" Margin="0,0,0,12" />
                                 <TextBlock Text="STOMS Engineering Architecture" Foreground="#94A3B8" FontSize="10" FontWeight="SemiBold" />
-                                <TextBlock Text="Saumya Chaudhari ΓÇó Jenil ΓÇó Hardik" Foreground="#E2E8F0" FontSize="11" Margin="0,2,0,0" />
+                                <TextBlock Text="Saumya Chaudhari • Jenil • Hardik" Foreground="#E2E8F0" FontSize="11" Margin="0,2,0,0" />
                             </StackPanel>
                         </Grid>
                     </Grid>
                 </Border>
 
                 <!-- ================= RIGHT LOGIN / WORKSPACE PANEL ================= -->
-                <Border Grid.Column="1"
-                        CornerRadius="0,19,19,0"
+                <Border x:Name="RightPanelHost"
+                        Grid.Column="1"
+                        CornerRadius="0,20,20,0"
                         Background="#FFFFFF"
-                        ClipToBounds="True">
+                        ClipToBounds="True"
+                        SizeChanged="OnRightPanelHostSizeChanged">
                     <Grid>
                         <Grid.RowDefinitions>
                             <!-- Top Window Navigation Bar -->
@@ -488,13 +687,13 @@
                                         BorderThickness="1"
                                         CornerRadius="6"
                                         Padding="10,3.5">
-                                    <TextBlock Text="BOS Suite ΓÇó v1.0.0" Foreground="#0066FF" FontSize="10.5" FontWeight="SemiBold" />
+                                    <TextBlock Text="BOS Suite • v1.0.0" Foreground="#0066FF" FontSize="10.5" FontWeight="SemiBold" />
                                 </Border>
                             </StackPanel>
 
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                                <Button Content="ΓÇö" Style="{StaticResource WindowCtrlBtn}" Click="OnMinimizeClick" />
-                                <Button Content="Γ£ò" Style="{StaticResource WindowCloseBtn}" Click="OnCloseClick" />
+                                <Button Content="—" Style="{StaticResource WindowCtrlBtn}" Click="OnMinimizeClick" />
+                                <Button Content="✕" Style="{StaticResource WindowCloseBtn}" Click="OnCloseClick" />
                             </StackPanel>
                         </Grid>
 
@@ -528,7 +727,7 @@
                                             <ColumnDefinition Width="Auto" />
                                             <ColumnDefinition Width="*" />
                                         </Grid.ColumnDefinitions>
-                                        <TextBlock Text="Γä╣" Foreground="#0066FF" FontSize="14" Margin="0,0,8,0" VerticalAlignment="Center" />
+                                        <TextBlock Text="ℹ" Foreground="#0066FF" FontSize="14" Margin="0,0,8,0" VerticalAlignment="Center" />
                                         <TextBlock Grid.Column="1"
                                                    Text="{Binding StatusMessage}"
                                                    Foreground="#1E40AF"
@@ -559,7 +758,7 @@
                                              PasswordChanged="OnPasswordChanged"
                                              Margin="0,0,0,16" />
 
-                                <!-- Field 3: Warehouse Location -->
+                                <!-- Field 3: Warehouse Location (Custom Modern ComboBox) -->
                                 <TextBlock Text="Warehouse Facility Assignment"
                                            FontSize="12"
                                            FontWeight="SemiBold"
@@ -567,9 +766,7 @@
                                            Margin="0,0,0,6" />
                                 <ComboBox ItemsSource="{Binding Warehouses}"
                                           SelectedItem="{Binding SelectedWarehouse}"
-                                          Height="38"
-                                          FontSize="12.5"
-                                          Padding="8,4"
+                                          Style="{StaticResource ModernComboBox}"
                                           Margin="0,0,0,16" />
 
                                 <!-- Remember Me Checkbox -->
@@ -648,7 +845,7 @@
                                         Visibility="{Binding IsSuccess, Converter={StaticResource BoolToVis}}">
                                     <StackPanel>
                                         <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
-                                            <TextBlock Text="Γ£ô" Foreground="#16A34A" FontWeight="Bold" FontSize="14" Margin="0,0,8,0" />
+                                            <TextBlock Text="✓" Foreground="#16A34A" FontWeight="Bold" FontSize="14" Margin="0,0,8,0" />
                                             <TextBlock Text="Session Verified &amp; Active" Foreground="#15803D" FontWeight="Bold" FontSize="13" />
                                         </StackPanel>
                                         <TextBlock Text="{Binding Session.FullName, StringFormat='Operator: {0}'}" Foreground="#166534" FontSize="12" />

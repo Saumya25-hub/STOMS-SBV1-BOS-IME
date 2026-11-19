@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using STOMS_SBV1_BOS_IME.Common;
 
 namespace STOMS_SBV1_BOS_IME.Models
 {
@@ -13,9 +14,19 @@ namespace STOMS_SBV1_BOS_IME.Models
         public List<StoredProductItem> Items { get; set; } = new();
     }
 
-    public class RackSection
+    public class RackSection : ObservableObject
     {
+        private bool _isSelected;
+
+        public bool IsSelected
+        {
+            get => _isSelected;
+            set => SetProperty(ref _isSelected, value);
+        }
+
         public string Id { get; set; } = string.Empty;
+        public string RackId { get; set; } = string.Empty;
+        public string RackCode { get; set; } = string.Empty;
         public string SectionCode { get; set; } = string.Empty;
         public string Name { get; set; } = string.Empty;
         public int TierLevel { get; set; } = 1;
