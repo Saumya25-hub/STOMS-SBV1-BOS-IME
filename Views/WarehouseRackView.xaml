@@ -159,7 +159,7 @@
                                                                         <TextBlock Text="{Binding OccupancyDisplay}" FontSize="10" FontWeight="Bold" HorizontalAlignment="Right" Foreground="{Binding OverallStatus, Converter={StaticResource StockStatusToColorConverter}}"/>
                                                                     </Grid>
                                                                     <Border Height="6" Background="{DynamicResource Theme.Border.Subtle}" CornerRadius="3" ClipToBounds="True">
-                                                                        <ProgressBar Value="{Binding OccupancyPercentage}" Maximum="100" Height="6" BorderThickness="0" Background="Transparent" Foreground="{Binding OverallStatus, Converter={StaticResource StockStatusToColorConverter}}"/>
+                                                                        <ProgressBar Value="{Binding OccupancyPercentage, Mode=OneWay}" Maximum="100" Height="6" BorderThickness="0" Background="Transparent" Foreground="{Binding OverallStatus, Converter={StaticResource StockStatusToColorConverter}}"/>
                                                                     </Border>
                                                                 </StackPanel>
                                                             </Border>

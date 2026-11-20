@@ -97,9 +97,13 @@ namespace STOMS_SBV1_BOS_IME.Models
             set => SetProperty(ref _isSelected, value);
         }
 
-        public double OccupancyPercentage => MaxCapacity > 0
-            ? Math.Min(100.0, (double)(OccupiedCapacity / MaxCapacity) * 100.0)
-            : 0.0;
+        public double OccupancyPercentage
+        {
+            get => MaxCapacity > 0
+                ? Math.Min(100.0, (double)(OccupiedCapacity / MaxCapacity) * 100.0)
+                : 0.0;
+            set { }
+        }
 
         public bool IsAvailable => OccupiedCapacity < MaxCapacity;
 

@@ -81,9 +81,13 @@ namespace STOMS_SBV1_BOS_IME.Models
 
         public bool HasCapacityConfigured => MaxCapacity.HasValue && MaxCapacity.Value > 0;
 
-        public double OccupancyPercentage => HasCapacityConfigured
-            ? Math.Min(100.0, (double)(OccupiedCapacity / MaxCapacity!.Value) * 100.0)
-            : 0;
+        public double OccupancyPercentage
+        {
+            get => HasCapacityConfigured
+                ? Math.Min(100.0, (double)(OccupiedCapacity / MaxCapacity!.Value) * 100.0)
+                : 0;
+            set { }
+        }
 
         public string OccupancyDisplay => HasCapacityConfigured
             ? $"{OccupancyPercentage:F1}%"
