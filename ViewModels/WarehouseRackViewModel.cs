@@ -82,8 +82,22 @@ namespace STOMS_SBV1_BOS_IME.ViewModels
         public string ActiveStudioTab
         {
             get => _activeStudioTab;
-            set => SetProperty(ref _activeStudioTab, value);
+            set
+            {
+                if (SetProperty(ref _activeStudioTab, value))
+                {
+                    OnPropertyChanged(nameof(IsFloorPlanActive));
+                    OnPropertyChanged(nameof(IsWarehousesActive));
+                    OnPropertyChanged(nameof(IsHierarchyActive));
+                    OnPropertyChanged(nameof(IsStockInspectorActive));
+                }
+            }
         }
+
+        public bool IsFloorPlanActive => ActiveStudioTab == "FloorPlan";
+        public bool IsWarehousesActive => ActiveStudioTab == "Warehouses";
+        public bool IsHierarchyActive => ActiveStudioTab == "Hierarchy";
+        public bool IsStockInspectorActive => ActiveStudioTab == "StockInspector";
 
         public bool IsEditLayoutMode
         {

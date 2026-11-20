@@ -73,38 +73,31 @@
 
                     <!-- Studio Tabs -->
                     <StackPanel Grid.Column="0" Orientation="Horizontal">
-                        <RadioButton Content="📐 Visual Floor Plan" 
-                                     IsChecked="{Binding ActiveStudioTab, Converter={x:Null}, Mode=OneWay}"
-                                     Command="{Binding SetStudioTabCommand}" CommandParameter="FloorPlan"
-                                     Style="{StaticResource TabButton}" Margin="0,0,6,0">
-                            <RadioButton.Triggers>
-                                <EventTrigger RoutedEvent="RadioButton.Checked">
-                                    <!-- Handled via Command -->
-                                </EventTrigger>
-                            </RadioButton.Triggers>
-                        </RadioButton>
+                        <Button Content="📐 Visual Floor Plan" 
+                                Command="{Binding SetStudioTabCommand}" CommandParameter="FloorPlan"
+                                Style="{StaticResource TabButton}" Tag="{Binding IsFloorPlanActive}" Margin="0,0,6,0"/>
 
-                        <RadioButton Content="🏭 Warehouse Facilities" 
-                                     Command="{Binding SetStudioTabCommand}" CommandParameter="Warehouses"
-                                     Style="{StaticResource TabButton}" Margin="0,0,6,0"/>
+                        <Button Content="🏭 Warehouse Facilities" 
+                                Command="{Binding SetStudioTabCommand}" CommandParameter="Warehouses"
+                                Style="{StaticResource TabButton}" Tag="{Binding IsWarehousesActive}" Margin="0,0,6,0"/>
 
-                        <RadioButton Content="🗂️ Slotting &amp; Hierarchy Tree" 
-                                     Command="{Binding SetStudioTabCommand}" CommandParameter="Hierarchy"
-                                     Style="{StaticResource TabButton}" Margin="0,0,6,0"/>
+                        <Button Content="🗂️ Slotting &amp; Hierarchy Tree" 
+                                Command="{Binding SetStudioTabCommand}" CommandParameter="Hierarchy"
+                                Style="{StaticResource TabButton}" Tag="{Binding IsHierarchyActive}" Margin="0,0,6,0"/>
 
-                        <RadioButton Content="📦 Location Stock Inspector" 
-                                     Command="{Binding SetStudioTabCommand}" CommandParameter="StockInspector"
-                                     Style="{StaticResource TabButton}"/>
+                        <Button Content="📦 Location Stock Inspector" 
+                                Command="{Binding SetStudioTabCommand}" CommandParameter="StockInspector"
+                                Style="{StaticResource TabButton}" Tag="{Binding IsStockInspectorActive}"/>
                     </StackPanel>
 
                     <!-- Studio Action Buttons (Right) -->
                     <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
                         <!-- Mode Toggle -->
-                        <ToggleButton IsChecked="{Binding IsEditLayoutMode}" Style="{StaticResource OutlineButton}" Height="32" Margin="0,0,8,0" Padding="10,0" ToolTip="Toggle between View Mode and Edit Layout Mode">
+                        <Button Style="{StaticResource OutlineButton}" Command="{Binding ToggleEditModeCommand}" Height="32" Margin="0,0,8,0" Padding="10,0" ToolTip="Toggle between View Mode and Edit Layout Mode">
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock Text="{Binding EditModeBadgeText}" FontWeight="Bold" FontSize="11"/>
                             </StackPanel>
-                        </ToggleButton>
+                        </Button>
 
                         <!-- Save Layout (Visible in edit mode) -->
                         <Button Style="{StaticResource PrimaryButton}" Command="{Binding SaveLayoutCommand}" Height="32" Margin="0,0,8,0" Padding="12,0" ToolTip="Save visual coordinates to database">
