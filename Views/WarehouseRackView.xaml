@@ -700,8 +700,7 @@
                         <DataGrid ItemsSource="{Binding LocationInventory}" 
                                   SelectedItem="{Binding SelectedStoredItem}"
                                   AutoGenerateColumns="False" 
-                                  IsReadOnly="True" 
-                                  Style="{StaticResource FormCardDataGrid}">
+                                  IsReadOnly="True">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="Product Name" Binding="{Binding Name}" Width="2*"/>
                                 <DataGridTextColumn Header="SKU" Binding="{Binding Sku}" Width="1.2*"/>
