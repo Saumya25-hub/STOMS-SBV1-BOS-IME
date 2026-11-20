@@ -14,6 +14,8 @@ namespace STOMS_SBV1_BOS_IME.Models
         private double _canvasY = 40;
         private double _width = 250;
         private double _height = 150;
+        private double _rotation = 0;
+        private bool _isActive = true;
 
         public string Id { get; set; } = string.Empty;
         public string WarehouseId { get; set; } = string.Empty;
@@ -21,6 +23,29 @@ namespace STOMS_SBV1_BOS_IME.Models
         public string RackCode { get; set; } = string.Empty;
         public string Name { get; set; } = string.Empty;
         public string Zone { get; set; } = "Aisle A";
+        public string RackType { get; set; } = "Selective Pallet Rack";
+        public string Description { get; set; } = string.Empty;
+        public string Orientation { get; set; } = "Horizontal";
+        public int NumberOfLevels { get; set; } = 4;
+
+        // Physical Dimensions (meters)
+        public double RackWidth { get; set; } = 2.5;
+        public double RackHeight { get; set; } = 4.0;
+        public double RackDepth { get; set; } = 1.0;
+
+        public double Rotation
+        {
+            get => _rotation;
+            set => SetProperty(ref _rotation, value);
+        }
+
+        public bool IsActive
+        {
+            get => _isActive;
+            set => SetProperty(ref _isActive, value);
+        }
+
+        public CapacityType CapacityType { get; set; } = CapacityType.Weight;
 
         public bool IsSelected
         {

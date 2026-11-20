@@ -16,6 +16,7 @@ namespace STOMS_SBV1_BOS_IME.Models
         PurchaseReturn,
         RackTransfer,
         ShelfTransfer,
+        LocationRelocation,
         ExpiredStock,
         Wastage
     }

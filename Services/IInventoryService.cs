@@ -59,12 +59,33 @@ namespace STOMS_SBV1_BOS_IME.Services
             string destinationShelfCode,
             string destinationWarehouseId = "WH-01");
 
-        // Topology Lookups
+        // Topology Lookups & Step 3 Warehouse Master
         Task<List<string>> GetCategoriesAsync();
         Task<List<Warehouse>> GetWarehousesAsync();
+        Task<Warehouse?> GetWarehouseByIdAsync(string id);
+        Task<Warehouse> CreateWarehouseAsync(Warehouse warehouse);
+        Task<Warehouse> UpdateWarehouseAsync(Warehouse warehouse);
+        Task<bool> DeleteWarehouseAsync(string warehouseId);
+        Task<bool> ToggleWarehouseStatusAsync(string warehouseId, bool isActive);
+
         Task<List<Rack>> GetRacksByWarehouseAsync(string warehouseId);
+        Task<List<Rack>> GetRacksAsync(string? warehouseId = null, string? searchQuery = null);
+        Task<Rack?> GetRackByIdAsync(string rackId);
+        Task<Rack> CreateRackAsync(Rack rack);
+        Task<Rack> UpdateRackAsync(Rack rack);
+        Task<bool> DeleteRackAsync(string rackId);
+        Task<Rack> DuplicateRackAsync(string rackId, string newRackCode);
+        Task<bool> SaveRackLayoutCoordinatesAsync(string warehouseId, List<Rack> racks);
+
         Task<List<RackSection>> GetSectionsByRackAsync(string rackId);
         Task<List<RackShelf>> GetShelvesByRackAsync(string rackIdOrCode);
+        Task<RackSection> CreateSectionAsync(RackSection section);
+        Task<RackSection> UpdateSectionAsync(RackSection section);
+        Task<bool> DeleteSectionAsync(string rackId, string sectionId);
+
+        Task<List<StoredProductItem>> GetInventoryByLocationAsync(string warehouseId, string? rackCode = null, string? sectionCode = null);
+        Task<List<LocationSuggestion>> SuggestStorageLocationsAsync(LocationSuggestionRequest request);
+        Task<StockRelocationResult> RelocateStockAsync(StockRelocationDto dto);
     }
 }
 

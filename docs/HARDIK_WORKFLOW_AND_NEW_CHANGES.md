@@ -1,11 +1,11 @@
 # Complete Engineering Documentation & Workflow Guide
-## Smart Visual Inventory + Rack Topology + Barcode + Automatic Batch + Automated FEFO Sales & POS System
+## Smart Visual Inventory + Rack Topology + Barcode + Automatic Batch + Automated FEFO Sales & POS System + Warehouse & Rack Management Studio
 
 **Lead Engineer:** Hardik Jariwala  
 **Branch:** `hardik/step-2-product-stock-management`  
-**Milestone:** Phase 2.5 — Production Smart Visual Inventory Ecosystem & Automated FEFO POS Billing  
-**Release Tag:** `v0.3.0-smart-visual-inventory-pos`  
-**Test Suite:** 32 Tests Passing (100% Pass Rate)
+**Milestone:** Phase 3 — Production Warehouse & Rack Management Studio, Multi-Level Hierarchy, Spatial Canvas, and Stock Relocation  
+**Release Tag:** `v0.4.0-warehouse-rack-management`  
+**Test Suite:** 52 Tests Passing (100% Pass Rate: 32 Step 2 + 20 Step 3)
 
 ---
 
@@ -55,6 +55,14 @@ Today's engineering sprint delivered a comprehensive, end-to-end industrial inve
    - Solid, opaque modal containers (`Theme.Surface.Modal`: `#151E2E` Dark, `#FFFFFF` Light).
    - Dark/Light theme engine harmonization with persistent state and bilingual support.
    - Added missing vector geometry (`Icon.Cart`) for POS navigation.
+
+8. **Warehouse & Rack Management Studio (Step 3)**:
+   - Multi-warehouse facility management with safe-deletion protection (blocks deletion when active stock exists).
+   - Flexible non-uniform physical hierarchy: `Warehouse -> Rack -> Section -> Sub-section -> Compartment -> Bin -> Products`.
+   - Interactive 2D floor-plan canvas editor with free positioning, zoom compensation, $20\text{px}$ grid snapping, $90^\circ$ rotation, and undo/redo history.
+   - Spatial independence: Visual rack movement updates coordinates only, never modifying product quantities or inventory ledger records.
+   - Rule-based Storage Location Suggestion Engine (`ILocationSuggestionEngine`) with scoring for default bays, capacity, SKU consolidation, and quarantine locks.
+   - Location Stock Inspector and Stock Relocation workflow with double-entry ledger logging (`MovementType.LocationRelocation`).
 
 ---
 

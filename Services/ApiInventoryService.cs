@@ -281,6 +281,121 @@ namespace STOMS_SBV1_BOS_IME.Services
             return response.IsSuccessStatusCode;
         }
 
+        public async Task<Warehouse?> GetWarehouseByIdAsync(string id)
+        {
+            try { return await _httpClient.GetFromJsonAsync<Warehouse>($"warehouses/{id}"); }
+            catch { return null; }
+        }
+
+        public async Task<Warehouse> CreateWarehouseAsync(Warehouse warehouse)
+        {
+            var res = await _httpClient.PostAsJsonAsync("warehouses", warehouse);
+            res.EnsureSuccessStatusCode();
+            return await res.Content.ReadFromJsonAsync<Warehouse>() ?? warehouse;
+        }
+
+        public async Task<Warehouse> UpdateWarehouseAsync(Warehouse warehouse)
+        {
+            var res = await _httpClient.PutAsJsonAsync($"warehouses/{warehouse.Id}", warehouse);
+            res.EnsureSuccessStatusCode();
+            return await res.Content.ReadFromJsonAsync<Warehouse>() ?? warehouse;
+        }
+
+        public async Task<bool> DeleteWarehouseAsync(string warehouseId)
+        {
+            var res = await _httpClient.DeleteAsync($"warehouses/{warehouseId}");
+            return res.IsSuccessStatusCode;
+        }
+
+        public async Task<bool> ToggleWarehouseStatusAsync(string warehouseId, bool isActive)
+        {
+            var res = await _httpClient.PutAsJsonAsync($"warehouses/{warehouseId}/status", new { isActive });
+            return res.IsSuccessStatusCode;
+        }
+
+        public async Task<List<Rack>> GetRacksAsync(string? warehouseId = null, string? searchQuery = null)
+        {
+            var url = string.IsNullOrWhiteSpace(warehouseId) ? "racks" : $"warehouses/{warehouseId}/racks";
+            if (!string.IsNullOrWhiteSpace(searchQuery)) url += $"?q={Uri.EscapeDataString(searchQuery)}";
+            return await _httpClient.GetFromJsonAsync<List<Rack>>(url) ?? new List<Rack>();
+        }
+
+        public async Task<Rack?> GetRackByIdAsync(string rackId)
+        {
+            try { return await _httpClient.GetFromJsonAsync<Rack>($"racks/{rackId}"); }
+            catch { return null; }
+        }
+
+        public async Task<Rack> CreateRackAsync(Rack rack)
+        {
+            var res = await _httpClient.PostAsJsonAsync("racks", rack);
+            res.EnsureSuccessStatusCode();
+            return await res.Content.ReadFromJsonAsync<Rack>() ?? rack;
+        }
+
+        public async Task<Rack> UpdateRackAsync(Rack rack)
+        {
+            var res = await _httpClient.PutAsJsonAsync($"racks/{rack.Id}", rack);
+            res.EnsureSuccessStatusCode();
+            return await res.Content.ReadFromJsonAsync<Rack>() ?? rack;
+        }
+
+        public async Task<bool> DeleteRackAsync(string rackId)
+        {
+            var res = await _httpClient.DeleteAsync($"racks/{rackId}");
+            return res.IsSuccessStatusCode;
+        }
+
+        public async Task<Rack> DuplicateRackAsync(string rackId, string newRackCode)
+        {
+            var res = await _httpClient.PostAsJsonAsync($"racks/{rackId}/duplicate", new { newRackCode });
+            res.EnsureSuccessStatusCode();
+            return await res.Content.ReadFromJsonAsync<Rack>() ?? new Rack { RackCode = newRackCode };
+        }
+
+        public async Task<bool> SaveRackLayoutCoordinatesAsync(string warehouseId, List<Rack> racks)
+        {
+            var res = await _httpClient.PutAsJsonAsync($"warehouses/{warehouseId}/layout", racks);
+            return res.IsSuccessStatusCode;
+        }
+
+        public async Task<RackSection> CreateSectionAsync(RackSection section)
+        {
+            var res = await _httpClient.PostAsJsonAsync($"racks/{section.RackId}/sections", section);
+            res.EnsureSuccessStatusCode();
+            return await res.Content.ReadFromJsonAsync<RackSection>() ?? section;
+        }
+
+        public async Task<RackSection> UpdateSectionAsync(RackSection section)
+        {
+            var res = await _httpClient.PutAsJsonAsync($"racks/{section.RackId}/sections/{section.Id}", section);
+            res.EnsureSuccessStatusCode();
+            return await res.Content.ReadFromJsonAsync<RackSection>() ?? section;
+        }
+
+        public async Task<bool> DeleteSectionAsync(string rackId, string sectionId)
+        {
+            var res = await _httpClient.DeleteAsync($"racks/{rackId}/sections/{sectionId}");
+            return res.IsSuccessStatusCode;
+        }
+
+        public async Task<List<StoredProductItem>> GetInventoryByLocationAsync(string warehouseId, string? rackCode = null, string? sectionCode = null)
+        {
+            var url = $"inventory/location?warehouseId={warehouseId}&rackCode={rackCode}&sectionCode={sectionCode}";
+            return await _httpClient.GetFromJsonAsync<List<StoredProductItem>>(url) ?? new List<StoredProductItem>();
+        }
+
+        public async Task<List<LocationSuggestion>> SuggestStorageLocationsAsync(LocationSuggestionRequest request)
+        {
+            var res = await _httpClient.PostAsJsonAsync("inventory/suggest-locations", request);
+            return await res.Content.ReadFromJsonAsync<List<LocationSuggestion>>() ?? new List<LocationSuggestion>();
+        }
+
+        public async Task<StockRelocationResult> RelocateStockAsync(StockRelocationDto dto)
+        {
+            var res = await _httpClient.PostAsJsonAsync("inventory/relocate", dto);
+            return await res.Content.ReadFromJsonAsync<StockRelocationResult>() ?? new StockRelocationResult { Success = false, Message = "API error" };
+        }
         public async Task<List<RackShelf>> GetShelvesByRackAsync(string rackIdOrCode)
         {
             var result = await _httpClient.GetFromJsonAsync<List<RackShelf>>($"racks/{rackIdOrCode}/shelves");

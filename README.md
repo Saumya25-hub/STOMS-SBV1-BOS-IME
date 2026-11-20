@@ -33,6 +33,7 @@ A high-performance, enterprise-grade inventory and stock management desktop suit
 - **Automated Goods Inward & Batching:** Automatic batch identifier generation (`{PREFIX}-{YYYY}-{AUTO_INCREMENT}`), future expiry validation, and dynamic rack/shelf mapping.
 - **POS Billing & Automated FEFO Engine:** Barcode-driven point of sale with automated earliest-expiry-first (FEFO) allocation, multi-batch splitting, expired lot quarantine locks, and thread-safe deduction.
 - **Dual-Authorization & Approval Ledger:** Supervisor sign-offs on high-value issues, stock reservations, and complete movement audit history.
+- **Warehouse & Rack Management Studio:** Multi-facility directory, non-uniform spatial hierarchy (`Warehouse -> Rack -> Section -> Compartment -> Bin`), 2D interactive floor-plan canvas with free movement, zoom compensation, $20\text{px}$ grid snap, undo/redo history, intelligent storage suggestions, and atomic stock relocation ledger.
 - **Enterprise Dark & Light Themes:** Dynamic runtime theme toggle with persistent configuration, bilingual support, and solid non-transparent dialogs.
 
 ---
@@ -41,6 +42,8 @@ A high-performance, enterprise-grade inventory and stock management desktop suit
 
 Detailed engineering specifications, operational workflows, and changelogs:
 
+- [Step 3 Warehouse & Rack Management Architecture](file:///d:/IMS-V1/docs/STEP_3_WAREHOUSE_AND_RACK_MANAGEMENT_ARCHITECTURE.md)
+- [Step 3 Warehouse & Rack Management Changelog](file:///d:/IMS-V1/docs/HARDIK_CHANGELOG_STEP3.md)
 - [Smart Visual Inventory Workflow & Guide](file:///d:/IMS-V1/docs/HARDIK_WORKFLOW_AND_NEW_CHANGES.md)
 - [Step 2 Product & Stock Management Changelog](file:///d:/IMS-V1/docs/HARDIK_CHANGELOG_STEP2.md)
 - [Step 2 Architecture Specification](file:///d:/IMS-V1/docs/STEP_2_PRODUCT_AND_STOCK_MANAGEMENT_ARCHITECTURE.md)
@@ -51,12 +54,12 @@ Detailed engineering specifications, operational workflows, and changelogs:
 
 ## 🧪 Testing & Verification
 
-The suite includes 32 automated unit and integration tests covering SKU generation, barcode uniqueness, multi-unit arithmetic, FEFO batch splitting, and overselling protection:
+The suite includes 52 automated unit and integration tests covering SKU generation, barcode uniqueness, multi-unit arithmetic, FEFO batch splitting, overselling protection, warehouse/rack CRUD, spatial layout independence, storage suggestions, and atomic relocation:
 
 ```bash
 dotnet test STOMS-SBV1-BOS-IME.Tests/STOMS-SBV1-BOS-IME.Tests.csproj
 ```
-*Current Status: 32 Passed, 0 Failed, 0 Skipped (100% Pass Rate).*
+*Current Status: 52 Passed, 0 Failed, 0 Skipped (100% Pass Rate).*
 
 ---
 

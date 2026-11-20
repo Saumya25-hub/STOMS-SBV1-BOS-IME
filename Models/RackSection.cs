@@ -7,11 +7,16 @@ namespace STOMS_SBV1_BOS_IME.Models
 {
     public class CompartmentBin
     {
+        public string Id { get; set; } = string.Empty;
         public string BinCode { get; set; } = string.Empty;
         public string Name { get; set; } = string.Empty;
         public decimal? Capacity { get; set; }
         public decimal Occupied { get; set; }
+        public string CapacityUnit { get; set; } = "kg";
+        public bool IsActive { get; set; } = true;
+        public string Description { get; set; } = string.Empty;
         public List<StoredProductItem> Items { get; set; } = new();
+        public List<CompartmentBin> NestedBins { get; set; } = new();
     }
 
     public class RackSection : ObservableObject
@@ -30,6 +35,14 @@ namespace STOMS_SBV1_BOS_IME.Models
         public string SectionCode { get; set; } = string.Empty;
         public string Name { get; set; } = string.Empty;
         public int TierLevel { get; set; } = 1;
+        public string Description { get; set; } = string.Empty;
+        public bool IsActive { get; set; } = true;
+        public StorageLocationType LocationType { get; set; } = StorageLocationType.Section;
+
+        // Dimensions
+        public double? Width { get; set; }
+        public double? Height { get; set; }
+        public double? Depth { get; set; }
         
         /// <summary>
         /// Configured section weight or volumetric capacity (null if unconfigured).
@@ -40,6 +53,7 @@ namespace STOMS_SBV1_BOS_IME.Models
 
         public List<StoredProductItem> Products { get; set; } = new();
         public List<CompartmentBin> Compartments { get; set; } = new();
+        public List<RackSection> SubSections { get; set; } = new();
 
         public bool HasCapacityConfigured => MaxCapacity.HasValue && MaxCapacity.Value > 0;
 

@@ -100,9 +100,98 @@ namespace STOMS_SBV1_BOS_IME.Services
                 CapacityUnit = "kg",
                 Sections = new List<RackSection>
                 {
-                    new RackSection { Id = "SEC-01", SectionCode = "A1-T1", Name = "Tier 1: Ground Pallet Load", TierLevel = 1, MaxCapacity = 500, OccupiedCapacity = 420 },
-                    new RackSection { Id = "SEC-02", SectionCode = "A1-T2", Name = "Tier 2: Hydraulic Lubricants & Solvents", TierLevel = 2, MaxCapacity = 400, OccupiedCapacity = 380 },
-                    new RackSection { Id = "SEC-03", SectionCode = "A1-T3", Name = "Tier 3: Structural High-Tensile Fasteners", TierLevel = 3, MaxCapacity = 300, OccupiedCapacity = 120 },
+                    new RackSection
+                    {
+                        Id = "SEC-01",
+                        SectionCode = "A1-T1",
+                        Name = "Tier 1: Ground Pallet Load",
+                        TierLevel = 1,
+                        MaxCapacity = 500,
+                        OccupiedCapacity = 420,
+                        Products = new List<StoredProductItem>
+                        {
+                            new StoredProductItem
+                            {
+                                ProductId = "PRD-101",
+                                Sku = "SKU-BRG-6205",
+                                Name = "Heavy Industrial Ball Bearings (Deep Groove 6205)",
+                                Category = "Mechanical Power Transmission",
+                                BatchNumber = "BAT-2026-088",
+                                Quantity = 450,
+                                Unit = "Pcs",
+                                ExpiryDate = null,
+                                ReorderThreshold = 100,
+                                Status = StockStatus.Normal,
+                                CompartmentCode = "BIN-01"
+                            },
+                            new StoredProductItem
+                            {
+                                ProductId = "PRD-102",
+                                Sku = "SKU-VAL-DN50",
+                                Name = "Stainless Steel Butterfly Valves DN50 PN16",
+                                Category = "Fluid & Flow Control",
+                                BatchNumber = "BAT-2026-092",
+                                Quantity = 42,
+                                Unit = "Pcs",
+                                ExpiryDate = null,
+                                ReorderThreshold = 50,
+                                Status = StockStatus.LowStock,
+                                CompartmentCode = "BIN-02"
+                            }
+                        }
+                    },
+                    new RackSection
+                    {
+                        Id = "SEC-02",
+                        SectionCode = "A1-T2",
+                        Name = "Tier 2: Hydraulic Lubricants & Solvents",
+                        TierLevel = 2,
+                        MaxCapacity = 400,
+                        OccupiedCapacity = 380,
+                        Products = new List<StoredProductItem>
+                        {
+                            new StoredProductItem
+                            {
+                                ProductId = "PRD-103",
+                                Sku = "SKU-LUB-ISO68",
+                                Name = "Industrial Hydraulic ISO VG 68 Lubricant Drums",
+                                Category = "Chemicals & Lubricants",
+                                BatchNumber = "BAT-2026-CHEM-12",
+                                Quantity = 8,
+                                Unit = "Drums",
+                                ExpiryDate = now.AddDays(18),
+                                ReorderThreshold = 4,
+                                Status = StockStatus.NearExpiry,
+                                CompartmentCode = "PAL-02"
+                            }
+                        }
+                    },
+                    new RackSection
+                    {
+                        Id = "SEC-03",
+                        SectionCode = "A1-T3",
+                        Name = "Tier 3: Structural High-Tensile Fasteners",
+                        TierLevel = 3,
+                        MaxCapacity = 300,
+                        OccupiedCapacity = 120,
+                        Products = new List<StoredProductItem>
+                        {
+                            new StoredProductItem
+                            {
+                                ProductId = "PRD-104",
+                                Sku = "SKU-BOLT-M16",
+                                Name = "M16 Grade 8.8 Hex Bolts & Washer Kits",
+                                Category = "Fasteners & Hardware",
+                                BatchNumber = "BAT-2025-FST-99",
+                                Quantity = 1200,
+                                Unit = "Pcs",
+                                ExpiryDate = null,
+                                ReorderThreshold = 300,
+                                Status = StockStatus.Normal,
+                                CompartmentCode = "BIN-03"
+                            }
+                        }
+                    },
                     new RackSection { Id = "SEC-04", SectionCode = "A1-T4", Name = "Tier 4: Top Level Reserve Buffer", TierLevel = 4, MaxCapacity = 200, OccupiedCapacity = 0 }
                 }
             });
@@ -120,9 +209,84 @@ namespace STOMS_SBV1_BOS_IME.Services
                 CapacityUnit = "kg",
                 Sections = new List<RackSection>
                 {
-                    new RackSection { Id = "SEC-05", SectionCode = "B4-T1", Name = "Tier 1: High-Precision Transducers", TierLevel = 1, MaxCapacity = 250, OccupiedCapacity = 180 },
-                    new RackSection { Id = "SEC-06", SectionCode = "B4-T2", Name = "Tier 2: Expired Adhesives & Sealants", TierLevel = 2, MaxCapacity = 250, OccupiedCapacity = 210 },
-                    new RackSection { Id = "SEC-07", SectionCode = "B4-T3", Name = "Tier 3: Damaged Stock Quarantine", TierLevel = 3, MaxCapacity = 300, OccupiedCapacity = 250 }
+                    new RackSection
+                    {
+                        Id = "SEC-05",
+                        SectionCode = "B4-T1",
+                        Name = "Tier 1: High-Precision Transducers",
+                        TierLevel = 1,
+                        MaxCapacity = 250,
+                        OccupiedCapacity = 180,
+                        Products = new List<StoredProductItem>
+                        {
+                            new StoredProductItem
+                            {
+                                ProductId = "PRD-105",
+                                Sku = "SKU-SNS-420MA",
+                                Name = "Pressure Transmitters (4-20mA Industrial 0-10 Bar)",
+                                Category = "Sensors & Automation",
+                                BatchNumber = "BAT-2026-SNS-01",
+                                Quantity = 85,
+                                Unit = "Pcs",
+                                ExpiryDate = null,
+                                ReorderThreshold = 20,
+                                Status = StockStatus.Normal,
+                                CompartmentCode = "CAB-A1"
+                            }
+                        }
+                    },
+                    new RackSection
+                    {
+                        Id = "SEC-06",
+                        SectionCode = "B4-T2",
+                        Name = "Tier 2: Expired Adhesives & Sealants",
+                        TierLevel = 2,
+                        MaxCapacity = 250,
+                        OccupiedCapacity = 210,
+                        Products = new List<StoredProductItem>
+                        {
+                            new StoredProductItem
+                            {
+                                ProductId = "PRD-106",
+                                Sku = "SKU-ADH-EPOXY",
+                                Name = "Industrial Structural Epoxy Resin Adhesive Cartridges",
+                                Category = "Chemical Adhesives",
+                                BatchNumber = "BAT-2025-ADH-04",
+                                Quantity = 35,
+                                Unit = "Pcs",
+                                ExpiryDate = now.AddDays(-14),
+                                ReorderThreshold = 15,
+                                Status = StockStatus.Expired,
+                                CompartmentCode = "CAB-A2"
+                            }
+                        }
+                    },
+                    new RackSection
+                    {
+                        Id = "SEC-07",
+                        SectionCode = "B4-T3",
+                        Name = "Tier 3: Damaged Stock Quarantine",
+                        TierLevel = 3,
+                        MaxCapacity = 300,
+                        OccupiedCapacity = 250,
+                        Products = new List<StoredProductItem>
+                        {
+                            new StoredProductItem
+                            {
+                                ProductId = "PRD-107",
+                                Sku = "SKU-CYL-PNEU",
+                                Name = "Double-Acting ISO Pneumatic Cylinders (Damaged Seals)",
+                                Category = "Pneumatics",
+                                BatchNumber = "BAT-2026-CYL-19",
+                                Quantity = 14,
+                                Unit = "Pcs",
+                                ExpiryDate = null,
+                                ReorderThreshold = 10,
+                                Status = StockStatus.Damaged,
+                                CompartmentCode = "QR-01"
+                            }
+                        }
+                    }
                 }
             });
 
@@ -136,7 +300,32 @@ namespace STOMS_SBV1_BOS_IME.Services
                 Zone = "Heavy Yard Yard-3",
                 Sections = new List<RackSection>
                 {
-                    new RackSection { Id = "SEC-08", SectionCode = "R9-T1", Name = "Yard Tier 1: Heavy Ingot Slabs", TierLevel = 1, MaxCapacity = 5000, OccupiedCapacity = 3500 }
+                    new RackSection
+                    {
+                        Id = "SEC-08",
+                        SectionCode = "R9-T1",
+                        Name = "Yard Tier 1: Heavy Ingot Slabs",
+                        TierLevel = 1,
+                        MaxCapacity = 5000,
+                        OccupiedCapacity = 3500,
+                        Products = new List<StoredProductItem>
+                        {
+                            new StoredProductItem
+                            {
+                                ProductId = "PRD-108",
+                                Sku = "SKU-RAW-CI-BED",
+                                Name = "Cast Iron Continuous Cast Machine Bar Stock",
+                                Category = "Raw Metals & Alloys",
+                                BatchNumber = "BAT-2026-RAW-88",
+                                Quantity = 210,
+                                Unit = "Bars",
+                                ExpiryDate = null,
+                                ReorderThreshold = 50,
+                                Status = StockStatus.Normal,
+                                CompartmentCode = "BIN-RAW-01"
+                            }
+                        }
+                    }
                 }
             });
 
@@ -1794,6 +1983,606 @@ namespace STOMS_SBV1_BOS_IME.Services
             lock (_lock)
             {
                 return Task.FromResult(_warehouses.ToList());
+            }
+        }
+
+        public Task<Warehouse?> GetWarehouseByIdAsync(string id)
+        {
+            lock (_lock)
+            {
+                var wh = _warehouses.FirstOrDefault(w => w.Id == id || w.Code.Equals(id, StringComparison.OrdinalIgnoreCase));
+                return Task.FromResult(wh);
+            }
+        }
+
+        public Task<Warehouse> CreateWarehouseAsync(Warehouse warehouse)
+        {
+            lock (_lock)
+            {
+                if (string.IsNullOrWhiteSpace(warehouse.Code))
+                    throw new ArgumentException("Warehouse Code is required.");
+
+                if (_warehouses.Any(w => w.Code.Equals(warehouse.Code.Trim(), StringComparison.OrdinalIgnoreCase)))
+                    throw new InvalidOperationException($"Warehouse with Code '{warehouse.Code}' already exists.");
+
+                if (string.IsNullOrWhiteSpace(warehouse.Id))
+                    warehouse.Id = $"WH-{_warehouses.Count + 1:D2}";
+
+                warehouse.UpdatedAt = DateTime.Now;
+                _warehouses.Add(warehouse);
+                InventoryChanged?.Invoke(this, EventArgs.Empty);
+                return Task.FromResult(warehouse);
+            }
+        }
+
+        public Task<Warehouse> UpdateWarehouseAsync(Warehouse warehouse)
+        {
+            lock (_lock)
+            {
+                var existing = _warehouses.FirstOrDefault(w => w.Id == warehouse.Id);
+                if (existing == null) throw new InvalidOperationException($"Warehouse with ID '{warehouse.Id}' not found.");
+
+                if (_warehouses.Any(w => w.Id != warehouse.Id && w.Code.Equals(warehouse.Code.Trim(), StringComparison.OrdinalIgnoreCase)))
+                    throw new InvalidOperationException($"Another warehouse already uses Code '{warehouse.Code}'.");
+
+                existing.Code = warehouse.Code;
+                existing.Name = warehouse.Name;
+                existing.Description = warehouse.Description;
+                existing.Address = warehouse.Address;
+                existing.CityLocation = warehouse.CityLocation;
+                existing.WarehouseType = warehouse.WarehouseType;
+                existing.TotalFloorArea = warehouse.TotalFloorArea;
+                existing.LayoutWidth = warehouse.LayoutWidth;
+                existing.LayoutHeight = warehouse.LayoutHeight;
+                existing.TotalCapacity = warehouse.TotalCapacity;
+                existing.Unit = warehouse.Unit;
+                existing.IsActive = warehouse.IsActive;
+                existing.Notes = warehouse.Notes;
+                existing.UpdatedAt = DateTime.Now;
+                existing.UpdatedBy = warehouse.UpdatedBy;
+
+                InventoryChanged?.Invoke(this, EventArgs.Empty);
+                return Task.FromResult(existing);
+            }
+        }
+
+        public Task<bool> DeleteWarehouseAsync(string warehouseId)
+        {
+            lock (_lock)
+            {
+                var wh = _warehouses.FirstOrDefault(w => w.Id == warehouseId || w.Code.Equals(warehouseId, StringComparison.OrdinalIgnoreCase));
+                if (wh == null) return Task.FromResult(false);
+
+                // Check dependency: cannot delete warehouse containing stock
+                bool hasStock = _batches.Any(b => b.WarehouseId == wh.Id && b.RemainingQuantity > 0) ||
+                                _locationBalances.Any(l => l.WarehouseId == wh.Id && l.PhysicalQuantity > 0) ||
+                                _racks.Where(r => r.WarehouseId == wh.Id).Any(r => r.TotalStockQuantity > 0);
+
+                if (hasStock)
+                {
+                    throw new InvalidOperationException($"Cannot delete warehouse '{wh.Name}' because it currently stores active physical stock. Please transfer stock first.");
+                }
+
+                _racks.RemoveAll(r => r.WarehouseId == wh.Id);
+                _warehouses.Remove(wh);
+                InventoryChanged?.Invoke(this, EventArgs.Empty);
+                return Task.FromResult(true);
+            }
+        }
+
+        public Task<bool> ToggleWarehouseStatusAsync(string warehouseId, bool isActive)
+        {
+            lock (_lock)
+            {
+                var wh = _warehouses.FirstOrDefault(w => w.Id == warehouseId || w.Code.Equals(warehouseId, StringComparison.OrdinalIgnoreCase));
+                if (wh == null) return Task.FromResult(false);
+                wh.IsActive = isActive;
+                wh.UpdatedAt = DateTime.Now;
+                InventoryChanged?.Invoke(this, EventArgs.Empty);
+                return Task.FromResult(true);
+            }
+        }
+
+        public Task<List<Rack>> GetRacksAsync(string? warehouseId = null, string? searchQuery = null)
+        {
+            lock (_lock)
+            {
+                var query = _racks.AsEnumerable();
+                if (!string.IsNullOrWhiteSpace(warehouseId))
+                {
+                    query = query.Where(r => r.WarehouseId == warehouseId);
+                }
+                if (!string.IsNullOrWhiteSpace(searchQuery))
+                {
+                    var q = searchQuery.Trim();
+                    query = query.Where(r => r.RackCode.Contains(q, StringComparison.OrdinalIgnoreCase) ||
+                                             r.Name.Contains(q, StringComparison.OrdinalIgnoreCase) ||
+                                             r.Zone.Contains(q, StringComparison.OrdinalIgnoreCase));
+                }
+                return Task.FromResult(query.ToList());
+            }
+        }
+
+        public Task<Rack?> GetRackByIdAsync(string rackId)
+        {
+            lock (_lock)
+            {
+                var rack = _racks.FirstOrDefault(r => r.Id == rackId || r.RackCode.Equals(rackId, StringComparison.OrdinalIgnoreCase));
+                return Task.FromResult(rack);
+            }
+        }
+
+        public Task<Rack> CreateRackAsync(Rack rack)
+        {
+            lock (_lock)
+            {
+                if (string.IsNullOrWhiteSpace(rack.RackCode))
+                    throw new ArgumentException("Rack code is required.");
+
+                if (_racks.Any(r => r.WarehouseId == rack.WarehouseId && r.RackCode.Equals(rack.RackCode.Trim(), StringComparison.OrdinalIgnoreCase)))
+                    throw new InvalidOperationException($"Rack code '{rack.RackCode}' already exists in warehouse '{rack.WarehouseId}'.");
+
+                if (string.IsNullOrWhiteSpace(rack.Id))
+                    rack.Id = $"RCK-{Guid.NewGuid():N}"[..8].ToUpperInvariant();
+
+                _racks.Add(rack);
+                var wh = _warehouses.FirstOrDefault(w => w.Id == rack.WarehouseId);
+                if (wh != null) wh.TotalRacksCount = _racks.Count(r => r.WarehouseId == wh.Id);
+
+                InventoryChanged?.Invoke(this, EventArgs.Empty);
+                return Task.FromResult(rack);
+            }
+        }
+
+        public Task<Rack> UpdateRackAsync(Rack rack)
+        {
+            lock (_lock)
+            {
+                var existing = _racks.FirstOrDefault(r => r.Id == rack.Id);
+                if (existing == null) throw new InvalidOperationException($"Rack with ID '{rack.Id}' not found.");
+
+                if (_racks.Any(r => r.Id != rack.Id && r.WarehouseId == rack.WarehouseId && r.RackCode.Equals(rack.RackCode.Trim(), StringComparison.OrdinalIgnoreCase)))
+                    throw new InvalidOperationException($"Another rack in warehouse '{rack.WarehouseId}' already uses code '{rack.RackCode}'.");
+
+                existing.RackCode = rack.RackCode;
+                existing.Name = rack.Name;
+                existing.Zone = rack.Zone;
+                existing.RackType = rack.RackType;
+                existing.Description = rack.Description;
+                existing.Orientation = rack.Orientation;
+                existing.NumberOfLevels = rack.NumberOfLevels;
+                existing.RackWidth = rack.RackWidth;
+                existing.RackHeight = rack.RackHeight;
+                existing.RackDepth = rack.RackDepth;
+                existing.CanvasX = rack.CanvasX;
+                existing.CanvasY = rack.CanvasY;
+                existing.Width = rack.Width;
+                existing.Height = rack.Height;
+                existing.Rotation = rack.Rotation;
+                existing.MaxCapacity = rack.MaxCapacity;
+                existing.CapacityUnit = rack.CapacityUnit;
+                existing.CapacityType = rack.CapacityType;
+                existing.IsActive = rack.IsActive;
+
+                InventoryChanged?.Invoke(this, EventArgs.Empty);
+                return Task.FromResult(existing);
+            }
+        }
+
+        public Task<bool> DeleteRackAsync(string rackId)
+        {
+            lock (_lock)
+            {
+                var rack = _racks.FirstOrDefault(r => r.Id == rackId || r.RackCode.Equals(rackId, StringComparison.OrdinalIgnoreCase));
+                if (rack == null) return Task.FromResult(false);
+
+                // Dependency check: Cannot delete rack containing stock
+                bool hasStock = rack.TotalStockQuantity > 0 ||
+                                _batches.Any(b => (b.RackId == rack.Id || b.RackCode.Equals(rack.RackCode, StringComparison.OrdinalIgnoreCase)) && b.RemainingQuantity > 0);
+
+                if (hasStock)
+                {
+                    throw new InvalidOperationException($"Cannot delete rack '{rack.RackCode}' because it contains active stock ({rack.TotalStockQuantity:N0} items). Relocate stock first.");
+                }
+
+                _racks.Remove(rack);
+                var wh = _warehouses.FirstOrDefault(w => w.Id == rack.WarehouseId);
+                if (wh != null) wh.TotalRacksCount = _racks.Count(r => r.WarehouseId == wh.Id);
+
+                InventoryChanged?.Invoke(this, EventArgs.Empty);
+                return Task.FromResult(true);
+            }
+        }
+
+        public Task<Rack> DuplicateRackAsync(string rackId, string newRackCode)
+        {
+            lock (_lock)
+            {
+                var src = _racks.FirstOrDefault(r => r.Id == rackId || r.RackCode.Equals(rackId, StringComparison.OrdinalIgnoreCase));
+                if (src == null) throw new InvalidOperationException($"Source rack '{rackId}' not found.");
+
+                if (_racks.Any(r => r.WarehouseId == src.WarehouseId && r.RackCode.Equals(newRackCode.Trim(), StringComparison.OrdinalIgnoreCase)))
+                    throw new InvalidOperationException($"Rack code '{newRackCode}' already exists in this warehouse.");
+
+                var newRack = new Rack
+                {
+                    Id = $"RCK-{Guid.NewGuid():N}"[..8].ToUpperInvariant(),
+                    WarehouseId = src.WarehouseId,
+                    WarehouseName = src.WarehouseName,
+                    RackCode = newRackCode.Trim().ToUpperInvariant(),
+                    Name = $"{src.Name} (Copy)",
+                    Zone = src.Zone,
+                    RackType = src.RackType,
+                    Description = src.Description,
+                    Orientation = src.Orientation,
+                    NumberOfLevels = src.NumberOfLevels,
+                    RackWidth = src.RackWidth,
+                    RackHeight = src.RackHeight,
+                    RackDepth = src.RackDepth,
+                    CanvasX = src.CanvasX + 30,
+                    CanvasY = src.CanvasY + 30,
+                    Width = src.Width,
+                    Height = src.Height,
+                    Rotation = src.Rotation,
+                    MaxCapacity = src.MaxCapacity,
+                    OccupiedCapacity = 0,
+                    CapacityUnit = src.CapacityUnit,
+                    CapacityType = src.CapacityType,
+                    IsActive = true
+                };
+
+                // Duplicate section structure without stock
+                foreach (var s in src.Sections)
+                {
+                    newRack.Sections.Add(new RackSection
+                    {
+                        Id = $"SEC-{Guid.NewGuid():N}"[..8],
+                        RackId = newRack.Id,
+                        RackCode = newRack.RackCode,
+                        SectionCode = s.SectionCode.Replace(src.RackCode, newRack.RackCode),
+                        Name = s.Name,
+                        TierLevel = s.TierLevel,
+                        MaxCapacity = s.MaxCapacity,
+                        OccupiedCapacity = 0,
+                        CapacityUnit = s.CapacityUnit,
+                        IsActive = true
+                    });
+                }
+
+                _racks.Add(newRack);
+                var wh = _warehouses.FirstOrDefault(w => w.Id == newRack.WarehouseId);
+                if (wh != null) wh.TotalRacksCount = _racks.Count(r => r.WarehouseId == wh.Id);
+
+                InventoryChanged?.Invoke(this, EventArgs.Empty);
+                return Task.FromResult(newRack);
+            }
+        }
+
+        public Task<bool> SaveRackLayoutCoordinatesAsync(string warehouseId, List<Rack> racks)
+        {
+            lock (_lock)
+            {
+                foreach (var r in racks)
+                {
+                    var target = _racks.FirstOrDefault(existing => existing.Id == r.Id || existing.RackCode == r.RackCode);
+                    if (target != null)
+                    {
+                        target.CanvasX = r.CanvasX;
+                        target.CanvasY = r.CanvasY;
+                        target.Width = r.Width;
+                        target.Height = r.Height;
+                        target.Rotation = r.Rotation;
+                    }
+                }
+
+                var wh = _warehouses.FirstOrDefault(w => w.Id == warehouseId);
+                if (wh != null)
+                {
+                    wh.LayoutRevision++;
+                    wh.UpdatedAt = DateTime.Now;
+                }
+
+                InventoryChanged?.Invoke(this, EventArgs.Empty);
+                return Task.FromResult(true);
+            }
+        }
+
+        public Task<RackSection> CreateSectionAsync(RackSection section)
+        {
+            lock (_lock)
+            {
+                var rack = _racks.FirstOrDefault(r => r.Id == section.RackId || r.RackCode.Equals(section.RackCode, StringComparison.OrdinalIgnoreCase));
+                if (rack == null) throw new InvalidOperationException($"Rack '{section.RackId}' not found.");
+
+                if (rack.Sections.Any(s => s.SectionCode.Equals(section.SectionCode.Trim(), StringComparison.OrdinalIgnoreCase)))
+                    throw new InvalidOperationException($"Section code '{section.SectionCode}' already exists on rack '{rack.RackCode}'.");
+
+                if (string.IsNullOrWhiteSpace(section.Id))
+                    section.Id = $"SEC-{Guid.NewGuid():N}"[..8];
+
+                rack.Sections.Add(section);
+                InventoryChanged?.Invoke(this, EventArgs.Empty);
+                return Task.FromResult(section);
+            }
+        }
+
+        public Task<RackSection> UpdateSectionAsync(RackSection section)
+        {
+            lock (_lock)
+            {
+                var rack = _racks.FirstOrDefault(r => r.Id == section.RackId || r.RackCode.Equals(section.RackCode, StringComparison.OrdinalIgnoreCase));
+                if (rack == null) throw new InvalidOperationException($"Rack '{section.RackId}' not found.");
+
+                var existing = rack.Sections.FirstOrDefault(s => s.Id == section.Id || s.SectionCode == section.SectionCode);
+                if (existing == null) throw new InvalidOperationException($"Section '{section.SectionCode}' not found.");
+
+                existing.Name = section.Name;
+                existing.TierLevel = section.TierLevel;
+                existing.MaxCapacity = section.MaxCapacity;
+                existing.CapacityUnit = section.CapacityUnit;
+                existing.IsActive = section.IsActive;
+                existing.Description = section.Description;
+
+                InventoryChanged?.Invoke(this, EventArgs.Empty);
+                return Task.FromResult(existing);
+            }
+        }
+
+        public Task<bool> DeleteSectionAsync(string rackId, string sectionId)
+        {
+            lock (_lock)
+            {
+                var rack = _racks.FirstOrDefault(r => r.Id == rackId || r.RackCode.Equals(rackId, StringComparison.OrdinalIgnoreCase));
+                if (rack == null) return Task.FromResult(false);
+
+                var section = rack.Sections.FirstOrDefault(s => s.Id == sectionId || s.SectionCode.Equals(sectionId, StringComparison.OrdinalIgnoreCase));
+                if (section == null) return Task.FromResult(false);
+
+                if (section.TotalStockQuantity > 0)
+                {
+                    throw new InvalidOperationException($"Cannot delete section '{section.SectionCode}' because it contains active stock ({section.TotalStockQuantity:N0} units).");
+                }
+
+                rack.Sections.Remove(section);
+                InventoryChanged?.Invoke(this, EventArgs.Empty);
+                return Task.FromResult(true);
+            }
+        }
+
+        public Task<List<StoredProductItem>> GetInventoryByLocationAsync(string warehouseId, string? rackCode = null, string? sectionCode = null)
+        {
+            lock (_lock)
+            {
+                var items = new List<StoredProductItem>();
+                var targetRacks = _racks.Where(r => r.WarehouseId == warehouseId);
+                if (!string.IsNullOrWhiteSpace(rackCode))
+                {
+                    targetRacks = targetRacks.Where(r => r.RackCode.Equals(rackCode, StringComparison.OrdinalIgnoreCase));
+                }
+
+                foreach (var rack in targetRacks)
+                {
+                    var sections = rack.Sections.AsEnumerable();
+                    if (!string.IsNullOrWhiteSpace(sectionCode))
+                    {
+                        sections = sections.Where(s => s.SectionCode.Equals(sectionCode, StringComparison.OrdinalIgnoreCase));
+                    }
+                    foreach (var sec in sections)
+                    {
+                        items.AddRange(sec.Products);
+                    }
+                }
+                return Task.FromResult(items);
+            }
+        }
+
+        public Task<List<LocationSuggestion>> SuggestStorageLocationsAsync(LocationSuggestionRequest request)
+        {
+            return LocationSuggestionEngine.Instance.SuggestLocationsAsync(request, _warehouses, _racks, _products);
+        }
+
+        public Task<StockRelocationResult> RelocateStockAsync(StockRelocationDto dto)
+        {
+            lock (_lock)
+            {
+                if (dto.Quantity <= 0)
+                {
+                    return Task.FromResult(new StockRelocationResult { Success = false, Message = "Relocation quantity must be greater than zero." });
+                }
+
+                var product = _products.FirstOrDefault(p => p.Id.Equals(dto.ProductId, StringComparison.OrdinalIgnoreCase) || p.Sku.Equals(dto.ProductId, StringComparison.OrdinalIgnoreCase));
+                if (product == null)
+                {
+                    return Task.FromResult(new StockRelocationResult { Success = false, Message = $"Product '{dto.ProductId}' not found." });
+                }
+
+                var srcWarehouse = _warehouses.FirstOrDefault(w => w.Id == dto.SourceWarehouseId || w.Code == dto.SourceWarehouseId);
+                var destWarehouse = _warehouses.FirstOrDefault(w => w.Id == dto.DestinationWarehouseId || w.Code == dto.DestinationWarehouseId);
+
+                if (srcWarehouse == null || destWarehouse == null)
+                {
+                    return Task.FromResult(new StockRelocationResult { Success = false, Message = "Source or destination warehouse not found." });
+                }
+
+                if (!destWarehouse.IsActive)
+                {
+                    return Task.FromResult(new StockRelocationResult { Success = false, Message = $"Destination warehouse '{destWarehouse.Name}' is deactivated." });
+                }
+
+                // Check source rack and section
+                var srcRack = _racks.FirstOrDefault(r => (r.WarehouseId == srcWarehouse.Id) && (r.RackCode.Equals(dto.SourceRackCode, StringComparison.OrdinalIgnoreCase) || r.Id == dto.SourceRackCode));
+                var srcSection = srcRack?.Sections.FirstOrDefault(s => s.SectionCode.Equals(dto.SourceLocationCode, StringComparison.OrdinalIgnoreCase) || s.Id == dto.SourceLocationCode);
+
+                // Find batch if batch tracked
+                StockBatch? batch = null;
+                if (!string.IsNullOrWhiteSpace(dto.BatchId) || !string.IsNullOrWhiteSpace(dto.BatchNumber))
+                {
+                    batch = _batches.FirstOrDefault(b => b.ProductId == product.Id && (b.BatchId == dto.BatchId || b.BatchNumber == dto.BatchNumber));
+                    if (batch == null)
+                    {
+                        return Task.FromResult(new StockRelocationResult { Success = false, Message = "Selected batch does not exist." });
+                    }
+                    if (batch.RemainingQuantity < dto.Quantity)
+                    {
+                        return Task.FromResult(new StockRelocationResult { Success = false, Message = $"Insufficient batch balance. Available in batch: {batch.RemainingQuantity} {batch.Unit}." });
+                    }
+                }
+
+                // Check destination rack and section
+                var destRack = _racks.FirstOrDefault(r => (r.WarehouseId == destWarehouse.Id) && (r.RackCode.Equals(dto.DestinationRackCode, StringComparison.OrdinalIgnoreCase) || r.Id == dto.DestinationRackCode));
+                if (destRack == null)
+                {
+                    // Auto-provision if needed
+                    destRack = new Rack
+                    {
+                        Id = $"RCK-{Guid.NewGuid():N}"[..8],
+                        WarehouseId = destWarehouse.Id,
+                        WarehouseName = destWarehouse.Name,
+                        RackCode = dto.DestinationRackCode,
+                        Name = $"Rack {dto.DestinationRackCode}",
+                        MaxCapacity = 1000m
+                    };
+                    _racks.Add(destRack);
+                }
+
+                var destSection = destRack.Sections.FirstOrDefault(s => s.SectionCode.Equals(dto.DestinationLocationCode, StringComparison.OrdinalIgnoreCase) || s.Id == dto.DestinationLocationCode);
+                if (destSection == null)
+                {
+                    destSection = new RackSection
+                    {
+                        Id = $"SEC-{Guid.NewGuid():N}"[..8],
+                        RackId = destRack.Id,
+                        RackCode = destRack.RackCode,
+                        SectionCode = dto.DestinationLocationCode,
+                        Name = $"Section {dto.DestinationLocationCode}",
+                        MaxCapacity = 500m
+                    };
+                    destRack.Sections.Add(destSection);
+                }
+
+                // Capacity check: warn / guard
+                if (destSection.HasCapacityConfigured && (destSection.OccupiedCapacity + dto.Quantity > destSection.MaxCapacity!.Value * 1.5m))
+                {
+                    return Task.FromResult(new StockRelocationResult
+                    {
+                        Success = false,
+                        Message = $"Destination section '{destSection.SectionCode}' would exceed hard safety capacity limit ({destSection.OccupiedCapacity + dto.Quantity} / {destSection.MaxCapacity} {destSection.CapacityUnit})."
+                    });
+                }
+
+                // Update batch location if moving entire batch or adjusting location
+                if (batch != null)
+                {
+                    batch.WarehouseId = destWarehouse.Id;
+                    batch.WarehouseName = destWarehouse.Name;
+                    batch.RackCode = destRack.RackCode;
+                    batch.ShelfCode = destSection.SectionCode;
+                }
+
+                // Update stored item in section
+                if (srcSection != null)
+                {
+                    var item = srcSection.Products.FirstOrDefault(p => p.ProductId == product.Id);
+                    if (item != null)
+                    {
+                        item.Quantity = Math.Max(0m, item.Quantity - dto.Quantity);
+                        if (item.Quantity == 0) srcSection.Products.Remove(item);
+                    }
+                    srcSection.OccupiedCapacity = Math.Max(0m, srcSection.OccupiedCapacity - (dto.Quantity * 0.5m));
+                }
+
+                var destItem = destSection.Products.FirstOrDefault(p => p.ProductId == product.Id);
+                if (destItem == null)
+                {
+                    destItem = new StoredProductItem
+                    {
+                        ProductId = product.Id,
+                        Sku = product.Sku,
+                        Name = product.Name,
+                        Category = product.Category,
+                        BatchNumber = batch?.BatchNumber ?? string.Empty,
+                        Quantity = dto.Quantity,
+                        Unit = product.Unit,
+                        ExpiryDate = batch?.ExpiryDate
+                    };
+                    destSection.Products.Add(destItem);
+                }
+                else
+                {
+                    destItem.Quantity += dto.Quantity;
+                }
+                destSection.OccupiedCapacity += (dto.Quantity * 0.5m);
+
+                // Update location balance
+                var srcBal = _locationBalances.FirstOrDefault(l => l.ProductId == product.Id && l.WarehouseId == srcWarehouse.Id && l.SectionCode == dto.SourceLocationCode);
+                if (srcBal != null)
+                {
+                    srcBal.PhysicalQuantity = Math.Max(0m, srcBal.PhysicalQuantity - dto.Quantity);
+                    srcBal.AvailableQuantity = Math.Max(0m, srcBal.AvailableQuantity - dto.Quantity);
+                }
+
+                var destBal = _locationBalances.FirstOrDefault(l => l.ProductId == product.Id && l.WarehouseId == destWarehouse.Id && l.SectionCode == destSection.SectionCode);
+                if (destBal == null)
+                {
+                    destBal = new StockLocationBalance
+                    {
+                        ProductId = product.Id,
+                        ProductName = product.Name,
+                        Sku = product.Sku,
+                        WarehouseId = destWarehouse.Id,
+                        WarehouseName = destWarehouse.Name,
+                        RackId = destRack.Id,
+                        RackCode = destRack.RackCode,
+                        SectionId = destSection.Id,
+                        SectionCode = destSection.SectionCode,
+                        PhysicalQuantity = dto.Quantity,
+                        AvailableQuantity = dto.Quantity,
+                        Unit = product.Unit
+                    };
+                    _locationBalances.Add(destBal);
+                }
+                else
+                {
+                    destBal.PhysicalQuantity += dto.Quantity;
+                    destBal.AvailableQuantity += dto.Quantity;
+                }
+
+                // If moving between different warehouses, update total warehouse holdings
+                bool isInterWarehouse = srcWarehouse.Id != destWarehouse.Id;
+                var txId = $"REL-{DateTime.Now:yyyyMMdd}-{Guid.NewGuid():N}"[..16].ToUpperInvariant();
+
+                _movements.Insert(0, new StockMovement
+                {
+                    TransactionId = txId,
+                    Timestamp = DateTime.Now,
+                    ProductId = product.Id,
+                    ProductName = product.Name,
+                    Sku = product.Sku,
+                    BatchId = batch?.BatchId ?? string.Empty,
+                    BatchNumber = batch?.BatchNumber ?? string.Empty,
+                    Type = isInterWarehouse ? MovementType.Transfer : MovementType.LocationRelocation,
+                    Quantity = dto.Quantity,
+                    BaseQuantity = dto.Quantity,
+                    PreviousBalance = product.PhysicalStock,
+                    NewBalance = product.PhysicalStock,
+                    SourceLocation = $"{srcWarehouse.Code} → {dto.SourceRackCode} → {dto.SourceLocationCode}",
+                    DestinationLocation = $"{destWarehouse.Code} → {destRack.RackCode} → {destSection.SectionCode}",
+                    ReferenceDocument = !string.IsNullOrWhiteSpace(dto.Reference) ? dto.Reference : txId,
+                    InitiatedBy = dto.PerformedBy,
+                    Status = MovementStatus.Completed,
+                    Remarks = $"Relocated {dto.Quantity} {dto.Unit}: {dto.Reason}. {dto.Notes}"
+                });
+
+                InventoryChanged?.Invoke(this, EventArgs.Empty);
+
+                return Task.FromResult(new StockRelocationResult
+                {
+                    Success = true,
+                    TransactionId = txId,
+                    Message = $"Successfully relocated {dto.Quantity} {dto.Unit} of '{product.Name}' to {destWarehouse.Code} / {destRack.RackCode} / {destSection.SectionCode}.",
+                    RemainingSourceQuantity = srcBal?.PhysicalQuantity ?? 0m,
+                    NewDestinationQuantity = destBal.PhysicalQuantity
+                });
             }
         }
 
