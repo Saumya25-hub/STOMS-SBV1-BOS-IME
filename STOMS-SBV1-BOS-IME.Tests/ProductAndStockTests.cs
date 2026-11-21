@@ -508,5 +508,45 @@ namespace STOMS_SBV1_BOS_IME.Tests
                 Assert.Fail($"ProductManagementView failed to initialize: {caughtException}");
             }
         }
+
+        [TestMethod]
+        public async Task Persistence_SavesAndReloadsDataSuccessfully()
+        {
+            var service1 = new MockInventoryService(seedData: false, enablePersistence: true);
+            var prod = new Product
+            {
+                Id = "PRD-TEST-PERSIST",
+                Name = "Test Persistence Ball Bearing",
+                Sku = "SKU-TEST-PERSIST-01",
+                Category = "General Spares",
+                Unit = "Pcs",
+                PhysicalStock = 100,
+                AvailableStock = 100,
+                DefaultRackCode = "RCK-A-01",
+                DefaultSectionCode = "A1-T1"
+            };
+
+            await service1.CreateProductAsync(prod);
+
+            // Re-instantiate service simulating application restart
+            var service2 = new MockInventoryService(seedData: false, enablePersistence: true);
+            var loadedProd = await service2.GetProductByIdAsync("PRD-TEST-PERSIST");
+
+            Assert.IsNotNull(loadedProd);
+            Assert.AreEqual("Test Persistence Ball Bearing", loadedProd.Name);
+            Assert.AreEqual("SKU-TEST-PERSIST-01", loadedProd.Sku);
+            Assert.AreEqual(100m, loadedProd.PhysicalStock);
+
+            // Verify rack synchronization after reload
+            var rack = await service2.GetRackByIdAsync("RCK-01");
+            Assert.IsNotNull(rack);
+            var section = rack.Sections.First(s => s.SectionCode == "A1-T1");
+            var item = section.Products.FirstOrDefault(p => p.ProductId == "PRD-TEST-PERSIST");
+            Assert.IsNotNull(item);
+            Assert.AreEqual(100m, item.Quantity);
+
+            // Clean up
+            service2.ClearAllData();
+        }
     }
 }

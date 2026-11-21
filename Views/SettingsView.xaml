@@ -140,6 +140,25 @@
                     </StackPanel>
                 </Border>
 
+                <!-- SECTION 4: DATABASE & MASTER LEDGER RESET -->
+                <Border Background="{DynamicResource Theme.Surface.Primary}" BorderBrush="#EF4444" BorderThickness="1" CornerRadius="8" Padding="20" Margin="0,0,0,16">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                            <TextBlock Text="DATABASE MANAGEMENT &amp; CLEAN SLATE" FontSize="11" FontWeight="Bold" Foreground="#EF4444"/>
+                            <Border Background="#FEE2E2" CornerRadius="4" Padding="6,1" Margin="8,0,0,0" VerticalAlignment="Center">
+                                <TextBlock Text="DATA WIPEOUT" FontSize="10" FontWeight="Bold" Foreground="#B91C1C"/>
+                            </Border>
+                        </StackPanel>
+                        <TextBlock Text="Wipe out all existing products, batches, stock balances, movements, and POS invoices to zero so you can manually test fresh entries from scratch." FontSize="12" Foreground="{DynamicResource Theme.Text.Secondary}" Margin="0,0,0,14" TextWrapping="Wrap"/>
+
+                        <Button Style="{StaticResource DangerButton}" Command="{Binding WipeDatabaseCommand}" Height="38" Padding="20,8" HorizontalAlignment="Left">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="Wipe Database &amp; Start Clean" FontWeight="Bold" FontSize="12" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+                </Border>
+
                 <!-- Save Action Button -->
                 <Button Style="{StaticResource PrimaryButton}" Command="{Binding SaveSettingsCommand}" Width="160" Height="36" HorizontalAlignment="Left">
                     <StackPanel Orientation="Horizontal">

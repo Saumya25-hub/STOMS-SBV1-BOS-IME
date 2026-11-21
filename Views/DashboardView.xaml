@@ -448,7 +448,6 @@
                                                     <Border x:Name="RackCardBorder" 
                                                             Width="{Binding Width}" 
                                                             Height="{Binding Height}" 
-                                                            Background="{DynamicResource Theme.Surface.Card}" 
                                                             CornerRadius="6" 
                                                             Padding="10" 
                                                             Cursor="Hand"
@@ -456,12 +455,26 @@
                                                             PreviewMouseMove="RackCard_PreviewMouseMove"
                                                             PreviewMouseLeftButtonUp="RackCard_PreviewMouseLeftButtonUp">
 
+                                                        <Border.InputBindings>
+                                                            <MouseBinding Gesture="LeftClick" 
+                                                                          Command="{Binding DataContext.SelectRackCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" 
+                                                                          CommandParameter="{Binding}"/>
+                                                        </Border.InputBindings>
+
+                                                        <Border.Effect>
+                                                            <DropShadowEffect BlurRadius="8" ShadowDepth="2" Opacity="0.08" Direction="270"/>
+                                                        </Border.Effect>
+
                                                         <!-- Selection & Steel Border Styling -->
                                                         <Border.Style>
                                                             <Style TargetType="Border">
+                                                                <Setter Property="Background" Value="{DynamicResource Theme.Surface.Card}"/>
                                                                 <Setter Property="BorderBrush" Value="{DynamicResource Theme.Border}"/>
                                                                 <Setter Property="BorderThickness" Value="1"/>
                                                                 <Style.Triggers>
+                                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                                        <Setter Property="BorderBrush" Value="{StaticResource BrandAccentBrush}"/>
+                                                                    </Trigger>
                                                                     <DataTrigger Binding="{Binding IsSelected}" Value="True">
                                                                         <Setter Property="BorderBrush" Value="{StaticResource BrandPrimaryBrush}"/>
                                                                         <Setter Property="BorderThickness" Value="2"/>
@@ -553,12 +566,6 @@
                                                                     </DataTemplate>
                                                                 </ItemsControl.ItemTemplate>
                                                             </ItemsControl>
-
-                                                            <!-- Transparent Button Overlay to Select Rack when not dragging -->
-                                                            <Button Grid.RowSpan="3" Background="Transparent" BorderThickness="0" Cursor="Hand"
-                                                                    Command="{Binding DataContext.SelectRackCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                                                    CommandParameter="{Binding}"
-                                                                    Visibility="{Binding DataContext.IsEditingLayout, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
                                                         </Grid>
                                                     </Border>
                                                 </DataTemplate>

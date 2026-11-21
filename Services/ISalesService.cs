@@ -1,6 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 using STOMS_SBV1_BOS_IME.Models;
@@ -28,6 +31,7 @@ namespace STOMS_SBV1_BOS_IME.Services
         Task<bool> CancelInvoiceAsync(string invoiceId, string reason = "Customer Cancellation");
         Task<List<SaleInvoice>> GetInvoicesAsync();
         Task<SaleInvoice?> GetInvoiceByIdAsync(string invoiceId);
+        void ClearInvoices();
     }
 
     public class SalesService : ISalesService
@@ -36,25 +40,103 @@ namespace STOMS_SBV1_BOS_IME.Services
         public static SalesService Instance => _instance ??= new SalesService(
             MockInventoryService.Instance,
             FefoAllocationEngine.Instance,
-            UnitConversionEngine.Instance);
+            UnitConversionEngine.Instance,
+            enablePersistence: true);
 
         private readonly IInventoryService _inventoryService;
         private readonly IFefoAllocationEngine _fefoEngine;
         private readonly IUnitConversionEngine _conversionEngine;
         private readonly List<SaleInvoice> _invoices = new();
         private readonly SemaphoreSlim _saleLock = new(1, 1);
+        private readonly bool _enablePersistence;
+        private readonly string _invoicesFilePath;
+        private readonly object _saveLock = new();
+        private static readonly JsonSerializerOptions _jsonOptions = new()
+        {
+            WriteIndented = true,
+            PropertyNameCaseInsensitive = true,
+            ReferenceHandler = ReferenceHandler.IgnoreCycles
+        };
 
         public event EventHandler<SaleInvoice>? SaleFinalized;
         public event EventHandler<SaleInvoice>? SaleCancelled;
 
+        public void ClearInvoices()
+        {
+            lock (_saveLock)
+            {
+                _invoices.Clear();
+                SaveInvoicesToDisk();
+            }
+        }
+
         public SalesService(
             IInventoryService inventoryService,
             IFefoAllocationEngine fefoEngine,
-            IUnitConversionEngine conversionEngine)
+            IUnitConversionEngine conversionEngine,
+            bool enablePersistence = false)
         {
             _inventoryService = inventoryService;
             _fefoEngine = fefoEngine;
             _conversionEngine = conversionEngine;
+            _enablePersistence = enablePersistence;
+
+            var appData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+            var dir = Path.Combine(appData, "STOMS-BOS");
+            _invoicesFilePath = Path.Combine(dir, "sales_invoices.json");
+
+            if (_enablePersistence)
+            {
+                LoadInvoicesFromDisk();
+            }
+        }
+
+        private void LoadInvoicesFromDisk()
+        {
+            try
+            {
+                lock (_saveLock)
+                {
+                    if (!File.Exists(_invoicesFilePath)) return;
+                    var json = File.ReadAllText(_invoicesFilePath);
+                    if (string.IsNullOrWhiteSpace(json)) return;
+
+                    var loaded = JsonSerializer.Deserialize<List<SaleInvoice>>(json, _jsonOptions);
+                    if (loaded != null)
+                    {
+                        _invoices.Clear();
+                        _invoices.AddRange(loaded);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"[SalesService] LoadInvoices error: {ex.Message}");
+            }
+        }
+
+        private void SaveInvoicesToDisk()
+        {
+            if (!_enablePersistence) return;
+
+            try
+            {
+                lock (_saveLock)
+                {
+                    var dir = Path.GetDirectoryName(_invoicesFilePath);
+                    if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir))
+                    {
+                        Directory.CreateDirectory(dir);
+                    }
+
+                    var json = JsonSerializer.Serialize(_invoices, _jsonOptions);
+                    File.WriteAllText(_invoicesFilePath, json);
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"[SalesService] SaveInvoices error: {ex.Message}");
+            }
         }
 
         public SaleInvoice CreateDraftInvoice()
@@ -230,6 +312,8 @@ namespace STOMS_SBV1_BOS_IME.Services
                     _invoices.Add(invoice);
                 }
 
+                SaveInvoicesToDisk();
+
                 result.Success = true;
                 SaleFinalized?.Invoke(this, invoice);
                 return result;
@@ -300,6 +384,7 @@ namespace STOMS_SBV1_BOS_IME.Services
                 }
 
                 invoice.Status = InvoiceStatus.Cancelled;
+                SaveInvoicesToDisk();
                 SaleCancelled?.Invoke(this, invoice);
                 return true;
             }

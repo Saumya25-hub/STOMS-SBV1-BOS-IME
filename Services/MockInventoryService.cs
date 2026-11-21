@@ -1,6 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 using STOMS_SBV1_BOS_IME.Models;
@@ -20,7 +23,7 @@ namespace STOMS_SBV1_BOS_IME.Services
                 {
                     lock (_lock)
                     {
-                        _instance ??= new MockInventoryService();
+                        _instance ??= new MockInventoryService(seedData: false, enablePersistence: true);
                     }
                 }
                 return _instance;
@@ -37,14 +40,269 @@ namespace STOMS_SBV1_BOS_IME.Services
         private readonly List<Rack> _racks = new();
         private int _autoBatchSequence = 1;
 
+        private readonly bool _enablePersistence;
+        private readonly string _databaseFilePath;
+        private readonly object _saveLock = new();
+        private static readonly JsonSerializerOptions _jsonOptions = new()
+        {
+            WriteIndented = true,
+            PropertyNameCaseInsensitive = true,
+            ReferenceHandler = ReferenceHandler.IgnoreCycles
+        };
+
         public bool IsConnectedToRemoteApi => false;
         public string ApiEndpointUrl => "https://api.stoms.internal/v1 (In-Memory Master Ledger)";
 
         public event EventHandler? InventoryChanged;
 
-        public MockInventoryService()
+        public MockInventoryService(bool seedData = true, bool enablePersistence = false)
         {
-            InitializeData();
+            _enablePersistence = enablePersistence;
+
+            var appData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+            var dir = Path.Combine(appData, "STOMS-BOS");
+            _databaseFilePath = Path.Combine(dir, "inventory_database.json");
+
+            if (_enablePersistence)
+            {
+                bool loaded = LoadFromDisk();
+                if (!loaded)
+                {
+                    if (seedData)
+                    {
+                        InitializeData();
+                    }
+                    else
+                    {
+                        InitializeCleanData();
+                    }
+                    SaveToDisk();
+                }
+
+                InventoryChanged += (s, e) => SaveToDisk();
+            }
+            else
+            {
+                if (seedData)
+                {
+                    InitializeData();
+                }
+                else
+                {
+                    InitializeCleanData();
+                }
+            }
+        }
+
+        public void SaveToDisk()
+        {
+            if (!_enablePersistence) return;
+
+            try
+            {
+                InventoryStorageState state;
+                lock (_lock)
+                {
+                    state = new InventoryStorageState
+                    {
+                        Products = _products.ToList(),
+                        Batches = _batches.ToList(),
+                        SerialNumbers = _serialNumbers.ToList(),
+                        LocationBalances = _locationBalances.ToList(),
+                        Movements = _movements.ToList(),
+                        ApprovalRequests = _approvalRequests.ToList(),
+                        Warehouses = _warehouses.ToList(),
+                        Racks = _racks.ToList(),
+                        AutoBatchSequence = _autoBatchSequence
+                    };
+                }
+
+                lock (_saveLock)
+                {
+                    var dir = Path.GetDirectoryName(_databaseFilePath);
+                    if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir))
+                    {
+                        Directory.CreateDirectory(dir);
+                    }
+
+                    var json = JsonSerializer.Serialize(state, _jsonOptions);
+                    File.WriteAllText(_databaseFilePath, json);
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"[MockInventoryService] SaveToDisk error: {ex.Message}");
+            }
+        }
+
+        private bool LoadFromDisk()
+        {
+            if (!_enablePersistence) return false;
+
+            try
+            {
+                lock (_saveLock)
+                {
+                    if (!File.Exists(_databaseFilePath)) return false;
+
+                    var json = File.ReadAllText(_databaseFilePath);
+                    if (string.IsNullOrWhiteSpace(json)) return false;
+
+                    var state = JsonSerializer.Deserialize<InventoryStorageState>(json, _jsonOptions);
+                    if (state == null) return false;
+
+                    lock (_lock)
+                    {
+                        _products.Clear();
+                        if (state.Products != null) _products.AddRange(state.Products);
+
+                        _batches.Clear();
+                        if (state.Batches != null) _batches.AddRange(state.Batches);
+
+                        _serialNumbers.Clear();
+                        if (state.SerialNumbers != null) _serialNumbers.AddRange(state.SerialNumbers);
+
+                        _locationBalances.Clear();
+                        if (state.LocationBalances != null) _locationBalances.AddRange(state.LocationBalances);
+
+                        _movements.Clear();
+                        if (state.Movements != null) _movements.AddRange(state.Movements);
+
+                        _approvalRequests.Clear();
+                        if (state.ApprovalRequests != null) _approvalRequests.AddRange(state.ApprovalRequests);
+
+                        _warehouses.Clear();
+                        if (state.Warehouses != null && state.Warehouses.Count > 0)
+                        {
+                            _warehouses.AddRange(state.Warehouses);
+                        }
+
+                        _racks.Clear();
+                        if (state.Racks != null && state.Racks.Count > 0)
+                        {
+                            _racks.AddRange(state.Racks);
+                        }
+
+                        _autoBatchSequence = state.AutoBatchSequence > 0 ? state.AutoBatchSequence : 1;
+
+                        if (_warehouses.Count == 0)
+                        {
+                            InitializeCleanData();
+                        }
+
+                        SynchronizeRackProducts();
+                    }
+
+                    return true;
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"[MockInventoryService] LoadFromDisk error: {ex.Message}");
+                return false;
+            }
+        }
+
+        public void ClearAllData()
+        {
+            lock (_lock)
+            {
+                _products.Clear();
+                _batches.Clear();
+                _serialNumbers.Clear();
+                _locationBalances.Clear();
+                _movements.Clear();
+                _approvalRequests.Clear();
+
+                foreach (var rack in _racks)
+                {
+                    rack.OccupiedCapacity = 0;
+                    foreach (var section in rack.Sections)
+                    {
+                        section.OccupiedCapacity = 0;
+                        section.Products.Clear();
+                    }
+                }
+
+                foreach (var wh in _warehouses)
+                {
+                    wh.OccupiedCapacity = 0;
+                }
+
+                if (_warehouses.Count == 0)
+                {
+                    InitializeCleanData();
+                }
+
+                InventoryChanged?.Invoke(this, EventArgs.Empty);
+            }
+        }
+
+        private void InitializeCleanData()
+        {
+            // Clean slate: 1 default active warehouse and 1 clean rack ready for user entries
+            _warehouses.Add(new Warehouse
+            {
+                Id = "WH-01",
+                Code = "WH-01",
+                Name = "Main Central Logistics Hub",
+                CityLocation = "Headquarters Logistics Depot",
+                TotalRacksCount = 1,
+                TotalCapacity = 1000,
+                OccupiedCapacity = 0,
+                Unit = "kg",
+                IsActive = true
+            });
+
+            _racks.Add(new Rack
+            {
+                Id = "RCK-01",
+                WarehouseId = "WH-01",
+                WarehouseName = "Main Central Logistics Hub",
+                RackCode = "RCK-A-01",
+                Name = "Rack A1 (General Inward Bay)",
+                Zone = "Aisle 1 - Bay Central",
+                CanvasX = 50,
+                CanvasY = 50,
+                Width = 260,
+                Height = 150,
+                MaxCapacity = 1000,
+                OccupiedCapacity = 0,
+                CapacityUnit = "kg",
+                IsActive = true,
+                Sections = new List<RackSection>
+                {
+                    new RackSection
+                    {
+                        Id = "SEC-01",
+                        SectionCode = "A1-T1",
+                        Name = "Tier 1: Ground Bay",
+                        TierLevel = 1,
+                        MaxCapacity = 500,
+                        OccupiedCapacity = 0,
+                        CapacityUnit = "kg",
+                        Products = new List<StoredProductItem>()
+                    },
+                    new RackSection
+                    {
+                        Id = "SEC-02",
+                        SectionCode = "A1-T2",
+                        Name = "Tier 2: Upper Bay",
+                        TierLevel = 2,
+                        MaxCapacity = 500,
+                        OccupiedCapacity = 0,
+                        CapacityUnit = "kg",
+                        Products = new List<StoredProductItem>()
+                    }
+                },
+                Shelves = new List<RackShelf>
+                {
+                    new RackShelf { ShelfId = "SHF-01", ShelfCode = "A1", RackId = "RCK-01", RackCode = "RCK-A-01", WarehouseId = "WH-01" },
+                    new RackShelf { ShelfId = "SHF-02", ShelfCode = "A2", RackId = "RCK-01", RackCode = "RCK-A-01", WarehouseId = "WH-01" },
+                    new RackShelf { ShelfId = "SHF-03", ShelfCode = "A3", RackId = "RCK-01", RackCode = "RCK-A-01", WarehouseId = "WH-01" },
+                    new RackShelf { ShelfId = "SHF-04", ShelfCode = "A4", RackId = "RCK-01", RackCode = "RCK-A-01", WarehouseId = "WH-01" }
+                }
+            });
         }
 
         private void InitializeData()
@@ -1032,6 +1290,64 @@ namespace STOMS_SBV1_BOS_IME.Services
             }
         }
 
+        private void SynchronizeRackProducts()
+        {
+            foreach (var prod in _products)
+            {
+                var targetRack = _racks.FirstOrDefault(r =>
+                    (!string.IsNullOrEmpty(prod.DefaultRackId) && (r.Id == prod.DefaultRackId || r.RackCode.Equals(prod.DefaultRackId, StringComparison.OrdinalIgnoreCase))) ||
+                    (!string.IsNullOrEmpty(prod.DefaultRackCode) && (r.RackCode.Equals(prod.DefaultRackCode, StringComparison.OrdinalIgnoreCase) || r.Id == prod.DefaultRackCode)));
+
+                if (targetRack == null)
+                {
+                    targetRack = _racks.FirstOrDefault(r => string.IsNullOrEmpty(prod.DefaultWarehouseId) || r.WarehouseId == prod.DefaultWarehouseId) ?? _racks.FirstOrDefault();
+                }
+
+                if (targetRack != null)
+                {
+                    if (string.IsNullOrWhiteSpace(prod.DefaultRackId)) prod.DefaultRackId = targetRack.Id;
+                    if (string.IsNullOrWhiteSpace(prod.DefaultRackCode)) prod.DefaultRackCode = targetRack.RackCode;
+
+                    var secCode = !string.IsNullOrWhiteSpace(prod.DefaultSectionCode) ? prod.DefaultSectionCode : prod.DefaultSectionId;
+                    var targetSection = targetRack.Sections.FirstOrDefault(s =>
+                        (!string.IsNullOrEmpty(prod.DefaultSectionId) && s.Id == prod.DefaultSectionId) ||
+                        (!string.IsNullOrEmpty(secCode) && s.SectionCode.Equals(secCode, StringComparison.OrdinalIgnoreCase)))
+                        ?? targetRack.Sections.FirstOrDefault();
+
+                    if (targetSection != null)
+                    {
+                        if (string.IsNullOrWhiteSpace(prod.DefaultSectionId)) prod.DefaultSectionId = targetSection.Id;
+                        if (string.IsNullOrWhiteSpace(prod.DefaultSectionCode)) prod.DefaultSectionCode = targetSection.SectionCode;
+
+                        var existingItem = targetSection.Products.FirstOrDefault(p => p.ProductId == prod.Id || p.Sku.Equals(prod.Sku, StringComparison.OrdinalIgnoreCase));
+                        if (existingItem == null)
+                        {
+                            targetSection.Products.Add(new StoredProductItem
+                            {
+                                ProductId = prod.Id,
+                                Sku = prod.Sku,
+                                Name = prod.Name,
+                                Category = prod.Category,
+                                BatchNumber = "Allocated SKU",
+                                Quantity = prod.PhysicalStock,
+                                Unit = prod.Unit,
+                                ReorderThreshold = prod.ReorderLevel,
+                                Status = StockStatus.Normal,
+                                CompartmentCode = targetSection.SectionCode
+                            });
+                        }
+                        else
+                        {
+                            existingItem.Quantity = prod.PhysicalStock;
+                            existingItem.Name = prod.Name;
+                            existingItem.Sku = prod.Sku;
+                            existingItem.Unit = prod.Unit;
+                        }
+                    }
+                }
+            }
+        }
+
         public Task<Product> CreateProductAsync(Product product)
         {
             lock (_lock)
@@ -1082,6 +1398,7 @@ namespace STOMS_SBV1_BOS_IME.Services
                     });
                 }
 
+                SynchronizeRackProducts();
                 InventoryChanged?.Invoke(this, EventArgs.Empty);
                 return Task.FromResult(product);
             }
@@ -1130,6 +1447,7 @@ namespace STOMS_SBV1_BOS_IME.Services
                 existing.IsActive = product.IsActive;
                 existing.UpdatedAt = DateTime.Now;
 
+                SynchronizeRackProducts();
                 InventoryChanged?.Invoke(this, EventArgs.Empty);
                 return Task.FromResult(existing);
             }
@@ -1438,6 +1756,40 @@ namespace STOMS_SBV1_BOS_IME.Services
                 product.PhysicalStock += baseQuantity;
                 product.AvailableStock += baseQuantity;
                 product.UpdatedAt = DateTime.Now;
+
+                // Update section and rack stored products
+                var storedProduct = section.Products.FirstOrDefault(p => p.ProductId == product.Id || p.Sku.Equals(product.Sku, StringComparison.OrdinalIgnoreCase));
+                if (storedProduct == null)
+                {
+                    storedProduct = new StoredProductItem
+                    {
+                        ProductId = product.Id,
+                        Sku = product.Sku,
+                        Name = product.Name,
+                        Category = product.Category,
+                        BatchNumber = batchNumber,
+                        Quantity = baseQuantity,
+                        Unit = product.Unit,
+                        ExpiryDate = dto.ExpiryDate,
+                        ReorderThreshold = product.ReorderLevel,
+                        Status = StockStatus.Normal,
+                        CompartmentCode = section.SectionCode
+                    };
+                    section.Products.Add(storedProduct);
+                }
+                else
+                {
+                    storedProduct.Quantity += baseQuantity;
+                    storedProduct.BatchNumber = batchNumber;
+                    storedProduct.ExpiryDate = dto.ExpiryDate;
+                    storedProduct.Status = StockStatus.Normal;
+                }
+
+                decimal estWeight = baseQuantity * 0.5m;
+                section.OccupiedCapacity = Math.Min(section.MaxCapacity ?? 1000m, section.OccupiedCapacity + estWeight);
+                rack.OccupiedCapacity = Math.Min(rack.MaxCapacity ?? 2000m, rack.OccupiedCapacity + estWeight);
+
+                SynchronizeRackProducts();
 
                 // 5. Create Movement Transaction
                 string txnId = $"TXN-{DateTime.Now:yyyyMMdd}-{_movements.Count + 1:D4}";
@@ -1849,8 +2201,12 @@ namespace STOMS_SBV1_BOS_IME.Services
         {
             lock (_lock)
             {
-                var list = _movements
-                    .Where(m => m.ProductId.Equals(productId, StringComparison.OrdinalIgnoreCase))
+                var query = _movements.AsEnumerable();
+                if (!string.IsNullOrWhiteSpace(productId))
+                {
+                    query = query.Where(m => m.ProductId.Equals(productId, StringComparison.OrdinalIgnoreCase));
+                }
+                var list = query
                     .OrderByDescending(m => m.Timestamp)
                     .Take(limit)
                     .ToList();
@@ -2087,6 +2443,7 @@ namespace STOMS_SBV1_BOS_IME.Services
         {
             lock (_lock)
             {
+                SynchronizeRackProducts();
                 var query = _racks.AsEnumerable();
                 if (!string.IsNullOrWhiteSpace(warehouseId))
                 {
@@ -2107,6 +2464,7 @@ namespace STOMS_SBV1_BOS_IME.Services
         {
             lock (_lock)
             {
+                SynchronizeRackProducts();
                 var rack = _racks.FirstOrDefault(r => r.Id == rackId || r.RackCode.Equals(rackId, StringComparison.OrdinalIgnoreCase));
                 return Task.FromResult(rack);
             }
@@ -2353,6 +2711,7 @@ namespace STOMS_SBV1_BOS_IME.Services
         {
             lock (_lock)
             {
+                SynchronizeRackProducts();
                 var items = new List<StoredProductItem>();
                 var targetRacks = _racks.Where(r => r.WarehouseId == warehouseId);
                 if (!string.IsNullOrWhiteSpace(rackCode))
@@ -2590,6 +2949,7 @@ namespace STOMS_SBV1_BOS_IME.Services
         {
             lock (_lock)
             {
+                SynchronizeRackProducts();
                 var racks = _racks.Where(r => r.WarehouseId == warehouseId).ToList();
                 return Task.FromResult(racks);
             }

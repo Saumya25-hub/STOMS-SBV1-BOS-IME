@@ -137,7 +137,10 @@ namespace STOMS_SBV1_BOS_IME.ViewModels
             _localizationService = localizationService ?? LocalizationService.Instance;
 
             _isDarkMode = _themeService.IsDarkMode;
-            _dashboardViewModel = new DashboardViewModel(dashboardService: null, _navigationService, _realtimeService);
+            _dashboardViewModel = new DashboardViewModel(
+                new MockDashboardService(seedDemoData: false, inventoryService: MockInventoryService.Instance),
+                _navigationService,
+                _realtimeService);
             _productManagementViewModel = new ProductManagementViewModel(MockInventoryService.Instance, _navigationService);
             _warehouseRackViewModel = new WarehouseRackViewModel(null, MockInventoryService.Instance, _navigationService);
             _settingsViewModel = new SettingsViewModel(_themeService, _localizationService);
@@ -256,6 +259,7 @@ namespace STOMS_SBV1_BOS_IME.ViewModels
                     PageSubtitle = "Interactive 2D visual layout studio & storage bays";
                     Breadcrumb = "STOMS ERP / Logistics / Warehouse & Rack Layout";
                     CurrentViewModel = _warehouseRackViewModel;
+                    _ = _warehouseRackViewModel.LoadWarehouseTopologyAsync();
                     break;
 
                 case "RackDesigner":

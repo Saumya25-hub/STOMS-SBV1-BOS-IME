@@ -269,6 +269,18 @@ namespace STOMS_SBV1_BOS_IME.ViewModels
                 App.Current.Dispatcher.Invoke(async () => await LoadDashboardDataAsync());
             };
 
+            MockInventoryService.Instance.InventoryChanged += (s, e) =>
+            {
+                if (App.Current != null && App.Current.Dispatcher != null)
+                {
+                    App.Current.Dispatcher.Invoke(async () => await LoadDashboardDataAsync());
+                }
+                else
+                {
+                    _ = LoadDashboardDataAsync();
+                }
+            };
+
             // Initial load
             _ = LoadDashboardDataAsync();
         }

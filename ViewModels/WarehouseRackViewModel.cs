@@ -445,6 +445,18 @@ namespace STOMS_SBV1_BOS_IME.ViewModels
                 IsSuggestionOpen = false;
             });
 
+            _inventoryService.InventoryChanged += (s, e) =>
+            {
+                if (App.Current != null && App.Current.Dispatcher != null)
+                {
+                    App.Current.Dispatcher.Invoke(async () => await LoadWarehouseTopologyAsync());
+                }
+                else
+                {
+                    _ = LoadWarehouseTopologyAsync();
+                }
+            };
+
             _ = InitializeAsync();
         }
 

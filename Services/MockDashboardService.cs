@@ -13,13 +13,24 @@ namespace STOMS_SBV1_BOS_IME.Services
         private readonly List<Rack> _racks;
         private readonly List<StockMovement> _movements;
         private readonly List<InventoryAlert> _alerts;
+        private readonly IInventoryService? _inventoryService;
 
         public bool IsConnectedToRemoteApi => false;
         public string ApiEndpointUrl => "https://api.stoms.internal/v1 (Local Mock)";
 
-        public MockDashboardService()
+        public MockDashboardService(bool seedDemoData = true, IInventoryService? inventoryService = null)
         {
+            _inventoryService = inventoryService;
             var now = DateTime.Now;
+
+            if (!seedDemoData)
+            {
+                _warehouses = new List<Warehouse>();
+                _racks = new List<Rack>();
+                _movements = new List<StockMovement>();
+                _alerts = new List<InventoryAlert>();
+                return;
+            }
 
             // 1. Warehouses
             _warehouses = new List<Warehouse>
@@ -526,13 +537,64 @@ namespace STOMS_SBV1_BOS_IME.Services
             };
         }
 
-        public Task<DashboardSummary> GetDashboardSummaryAsync(CancellationToken cancellationToken = default)
+        public async Task<DashboardSummary> GetDashboardSummaryAsync(CancellationToken cancellationToken = default)
         {
+            if (_inventoryService != null)
+            {
+                var products = await _inventoryService.GetProductsAsync();
+                var batches = await _inventoryService.GetAllBatchesAsync();
+                var pending = await _inventoryService.GetPendingApprovalsAsync();
+                var movements = await _inventoryService.GetMovementsForProductAsync(string.Empty, 100);
+                var now = DateTime.Now;
+
+                var totalProducts = products.Count;
+                var totalQuantity = products.Sum(p => p.PhysicalStock);
+                var totalValuation = products.Sum(p => p.PhysicalStock * p.SellingRate);
+                var lowStockCount = products.Count(p => p.PhysicalStock <= p.ReorderLevel && p.PhysicalStock > 0);
+                var outOfStockCount = products.Count(p => p.PhysicalStock <= 0);
+                var nearExpiryCount = batches.Count(b => b.ExpiryDate.HasValue && b.ExpiryDate.Value <= now.AddDays(30) && b.ExpiryDate.Value > now);
+                var expiredCount = batches.Count(b => b.ExpiryDate.HasValue && b.ExpiryDate.Value <= now);
+
+                var todayMovements = movements.Where(m => m.Timestamp.Date == now.Date).ToList();
+                var todayInward = todayMovements.Where(m => m.Type == MovementType.StockIn).ToList();
+                var todayOutward = todayMovements.Where(m => m.Type == MovementType.StockOut || m.Type == MovementType.Sale).ToList();
+
+                var unitGroups = products
+                    .GroupBy(p => p.Unit)
+                    .Select(g => new UnitStockBreakdown
+                    {
+                        Unit = g.Key,
+                        Quantity = g.Sum(x => x.PhysicalStock)
+                    })
+                    .OrderByDescending(u => u.Quantity)
+                    .ToList();
+
+                return new DashboardSummary
+                {
+                    TotalProducts = totalProducts,
+                    TotalStockQuantity = totalQuantity,
+                    PrimaryUnit = products.FirstOrDefault()?.Unit ?? "Pcs",
+                    TotalValuation = totalValuation,
+                    TodayInwardQuantity = todayInward.Sum(m => m.Quantity),
+                    TodayInwardCount = todayInward.Count,
+                    TodayOutwardQuantity = todayOutward.Sum(m => m.Quantity),
+                    TodayOutwardCount = todayOutward.Count,
+                    UnitBreakdowns = unitGroups,
+                    LowStockItemsCount = lowStockCount,
+                    OutOfStockItemsCount = outOfStockCount,
+                    NearExpiryBatchesCount = nearExpiryCount,
+                    ExpiredStockBatchesCount = expiredCount,
+                    PendingApprovalsCount = pending.Count,
+                    LastRefreshed = DateTime.Now,
+                    IsDemoData = false
+                };
+            }
+
             var allProducts = _racks.SelectMany(r => r.Sections).SelectMany(s => s.Products).ToList();
             var distinctProductSkus = allProducts.Select(p => p.Sku).Distinct().Count();
 
             // Total stock broken down by unit
-            var unitGroups = allProducts
+            var testUnitGroups = allProducts
                 .GroupBy(p => p.Unit)
                 .Select(g => new UnitStockBreakdown
                 {
@@ -542,10 +604,10 @@ namespace STOMS_SBV1_BOS_IME.Services
                 .OrderByDescending(u => u.Quantity)
                 .ToList();
 
-            var lowStockCount = allProducts.Count(p => p.Status == StockStatus.LowStock);
-            var nearExpiryCount = allProducts.Count(p => p.Status == StockStatus.NearExpiry);
-            var expiredCount = allProducts.Count(p => p.Status == StockStatus.Expired);
-            var pendingApprovalsCount = _movements.Count(m => m.Status == MovementStatus.PendingApproval);
+            var testLowStockCount = allProducts.Count(p => p.Status == StockStatus.LowStock);
+            var testNearExpiryCount = allProducts.Count(p => p.Status == StockStatus.NearExpiry);
+            var testExpiredCount = allProducts.Count(p => p.Status == StockStatus.Expired);
+            var testPendingApprovalsCount = _movements.Count(m => m.Status == MovementStatus.PendingApproval);
 
             var summary = new DashboardSummary
             {
@@ -557,48 +619,61 @@ namespace STOMS_SBV1_BOS_IME.Services
                 TodayInwardCount = 1,
                 TodayOutwardQuantity = 20m,
                 TodayOutwardCount = 1,
-                UnitBreakdowns = unitGroups,
-                LowStockItemsCount = lowStockCount,
+                UnitBreakdowns = testUnitGroups,
+                LowStockItemsCount = testLowStockCount,
                 OutOfStockItemsCount = allProducts.Count(p => p.Quantity <= 0),
-                NearExpiryBatchesCount = nearExpiryCount,
-                ExpiredStockBatchesCount = expiredCount,
-                PendingApprovalsCount = pendingApprovalsCount,
+                NearExpiryBatchesCount = testNearExpiryCount,
+                ExpiredStockBatchesCount = testExpiredCount,
+                PendingApprovalsCount = testPendingApprovalsCount,
                 LastRefreshed = DateTime.Now,
                 IsDemoData = true
             };
 
-            return Task.FromResult(summary);
+            return summary;
         }
 
-        public Task<IReadOnlyList<Warehouse>> GetWarehousesAsync(CancellationToken cancellationToken = default)
+        public async Task<IReadOnlyList<Warehouse>> GetWarehousesAsync(CancellationToken cancellationToken = default)
         {
-            return Task.FromResult<IReadOnlyList<Warehouse>>(_warehouses.AsReadOnly());
+            if (_inventoryService != null)
+            {
+                var whs = await _inventoryService.GetWarehousesAsync();
+                return whs.AsReadOnly();
+            }
+            return _warehouses.AsReadOnly();
         }
 
-        public Task<IReadOnlyList<Rack>> GetRacksAsync(
+        public async Task<IReadOnlyList<Rack>> GetRacksAsync(
             string? warehouseId = null,
             string? searchQuery = null,
             StockStatus? statusFilter = null,
             CancellationToken cancellationToken = default)
         {
-            var query = _racks.AsEnumerable();
-
-            if (!string.IsNullOrWhiteSpace(warehouseId))
+            IEnumerable<Rack> query;
+            if (_inventoryService != null)
             {
-                query = query.Where(r => r.WarehouseId == warehouseId);
+                query = await _inventoryService.GetRacksAsync(warehouseId, searchQuery);
             }
-
-            if (!string.IsNullOrWhiteSpace(searchQuery))
+            else
             {
-                var term = searchQuery.Trim().ToLowerInvariant();
-                query = query.Where(r =>
-                    r.RackCode.ToLowerInvariant().Contains(term) ||
-                    r.Name.ToLowerInvariant().Contains(term) ||
-                    r.WarehouseName.ToLowerInvariant().Contains(term) ||
-                    r.Sections.Any(s =>
-                        s.SectionCode.ToLowerInvariant().Contains(term) ||
-                        s.Name.ToLowerInvariant().Contains(term) ||
-                        s.Products.Any(p => p.Name.ToLowerInvariant().Contains(term) || p.Sku.ToLowerInvariant().Contains(term))));
+                query = _racks.AsEnumerable();
+
+                if (!string.IsNullOrWhiteSpace(warehouseId))
+                {
+                    query = query.Where(r => r.WarehouseId == warehouseId);
+                }
+
+                if (!string.IsNullOrWhiteSpace(searchQuery))
+                {
+                    var term = searchQuery.Trim().ToLowerInvariant();
+                    query = query.Where(r =>
+                        r.RackCode.ToLowerInvariant().Contains(term) ||
+                        r.Name.ToLowerInvariant().Contains(term) ||
+                        r.WarehouseName.ToLowerInvariant().Contains(term) ||
+                        r.Sections.Any(s =>
+                            s.SectionCode.ToLowerInvariant().Contains(term) ||
+                            s.Name.ToLowerInvariant().Contains(term) ||
+                            s.Products.Any(p => p.Name.ToLowerInvariant().Contains(term) || p.Sku.ToLowerInvariant().Contains(term))));
+                }
             }
 
             if (statusFilter.HasValue)
@@ -607,16 +682,25 @@ namespace STOMS_SBV1_BOS_IME.Services
                                          r.Sections.Any(s => s.WorstStatus == statusFilter.Value || s.Products.Any(p => p.Status == statusFilter.Value)));
             }
 
-            return Task.FromResult<IReadOnlyList<Rack>>(query.ToList().AsReadOnly());
+            return query.ToList().AsReadOnly();
         }
 
-        public Task<IReadOnlyList<StockMovement>> GetRecentMovementsAsync(
+        public async Task<IReadOnlyList<StockMovement>> GetRecentMovementsAsync(
             int limit = 10,
             MovementDateRange dateRange = MovementDateRange.AllTime,
             string? searchQuery = null,
             CancellationToken cancellationToken = default)
         {
-            var query = _movements.AsEnumerable();
+            IEnumerable<StockMovement> query;
+            if (_inventoryService != null)
+            {
+                query = await _inventoryService.GetMovementsForProductAsync(string.Empty, 100);
+            }
+            else
+            {
+                query = _movements.AsEnumerable();
+            }
+
             var now = DateTime.Now;
 
             switch (dateRange)
@@ -645,17 +729,63 @@ namespace STOMS_SBV1_BOS_IME.Services
             }
 
             var results = query.OrderByDescending(m => m.Timestamp).Take(limit).ToList();
-            return Task.FromResult<IReadOnlyList<StockMovement>>(results.AsReadOnly());
+            return results.AsReadOnly();
         }
 
-        public Task<IReadOnlyList<InventoryAlert>> GetActiveAlertsAsync(CancellationToken cancellationToken = default)
+        public async Task<IReadOnlyList<InventoryAlert>> GetActiveAlertsAsync(CancellationToken cancellationToken = default)
         {
-            return Task.FromResult<IReadOnlyList<InventoryAlert>>(_alerts.AsReadOnly());
+            if (_inventoryService != null)
+            {
+                var alerts = new List<InventoryAlert>();
+                var products = await _inventoryService.GetProductsAsync();
+                var batches = await _inventoryService.GetAllBatchesAsync();
+                var now = DateTime.Now;
+
+                foreach (var p in products.Where(p => p.PhysicalStock <= p.ReorderLevel && p.PhysicalStock > 0))
+                {
+                    alerts.Add(new InventoryAlert
+                    {
+                        Id = $"ALT-{Guid.NewGuid():N}"[..8],
+                        Category = AlertCategory.LowStock,
+                        Severity = AlertSeverity.Warning,
+                        Title = $"Low Stock: {p.Name}",
+                        Description = $"Available stock ({p.PhysicalStock:G29} {p.Unit}) is at or below the reorder threshold ({p.ReorderLevel:G29} {p.Unit}).",
+                        TargetSku = p.Sku,
+                        Location = $"{p.DefaultWarehouseName} / {p.DefaultRackCode}",
+                        Timestamp = now,
+                        TargetModule = "Product Management"
+                    });
+                }
+
+                foreach (var b in batches.Where(b => b.ExpiryDate.HasValue && b.ExpiryDate.Value <= now))
+                {
+                    alerts.Add(new InventoryAlert
+                    {
+                        Id = $"ALT-{Guid.NewGuid():N}"[..8],
+                        Category = AlertCategory.ExpiredStock,
+                        Severity = AlertSeverity.Critical,
+                        Title = $"Expired Batch: {b.BatchNumber}",
+                        Description = $"Batch expired on {b.ExpiryDate:yyyy-MM-dd} ({b.RemainingQuantity:G29} {b.Unit}). Locked under quarantine.",
+                        TargetSku = b.Sku,
+                        Location = $"{b.WarehouseName} / {b.RackCode}",
+                        Timestamp = now,
+                        TargetModule = "Stock Management"
+                    });
+                }
+
+                return alerts.AsReadOnly();
+            }
+            return _alerts.AsReadOnly();
         }
 
-        public Task<int> GetPendingApprovalsCountAsync(CancellationToken cancellationToken = default)
+        public async Task<int> GetPendingApprovalsCountAsync(CancellationToken cancellationToken = default)
         {
-            return Task.FromResult(_movements.Count(m => m.Status == MovementStatus.PendingApproval));
+            if (_inventoryService != null)
+            {
+                var pending = await _inventoryService.GetPendingApprovalsAsync();
+                return pending.Count;
+            }
+            return _movements.Count(m => m.Status == MovementStatus.PendingApproval);
         }
     }
 }

@@ -25,16 +25,21 @@ namespace STOMS_SBV1_BOS_IME.Views
 
         private void RackCard_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            if (ViewModel?.IsEditingLayout == true && sender is FrameworkElement element && element.DataContext is Rack rack)
+            if (sender is FrameworkElement element && element.DataContext is Rack rack && ViewModel != null)
             {
-                _isDragging = true;
-                _draggedElement = element;
-                _draggedRack = rack;
-                _dragStartPoint = e.GetPosition(this);
-                _rackStartCanvasX = rack.CanvasX;
-                _rackStartCanvasY = rack.CanvasY;
-                _draggedElement.CaptureMouse();
-                e.Handled = true;
+                ViewModel.SelectedRack = rack;
+
+                if (ViewModel.IsEditingLayout)
+                {
+                    _isDragging = true;
+                    _draggedElement = element;
+                    _draggedRack = rack;
+                    _dragStartPoint = e.GetPosition(this);
+                    _rackStartCanvasX = rack.CanvasX;
+                    _rackStartCanvasY = rack.CanvasY;
+                    _draggedElement.CaptureMouse();
+                    e.Handled = true;
+                }
             }
         }
 

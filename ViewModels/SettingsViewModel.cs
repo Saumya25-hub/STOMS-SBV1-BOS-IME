@@ -72,6 +72,7 @@ namespace STOMS_SBV1_BOS_IME.ViewModels
         public ICommand SetLanguageHiCommand { get; }
         public ICommand SetLanguageHinglishCommand { get; }
         public ICommand SaveSettingsCommand { get; }
+        public ICommand WipeDatabaseCommand { get; }
         public ICommand DismissFeedbackCommand { get; }
 
         public SettingsViewModel(
@@ -97,7 +98,17 @@ namespace STOMS_SBV1_BOS_IME.ViewModels
                 ShowFeedback("Settings preferences successfully saved.");
             });
 
+            WipeDatabaseCommand = new RelayCommand(ExecuteWipeDatabase);
+
             DismissFeedbackCommand = new RelayCommand(() => IsSavedNotificationVisible = false);
+        }
+
+        private void ExecuteWipeDatabase()
+        {
+            MockInventoryService.Instance.ClearAllData();
+            SalesService.Instance.ClearInvoices();
+            _ = RackLayoutService.Instance.ResetLayoutAsync();
+            ShowFeedback("Database completely wiped! All products, stock, batches, movements, and invoices are reset to zero.");
         }
 
         private void ShowFeedback(string message)

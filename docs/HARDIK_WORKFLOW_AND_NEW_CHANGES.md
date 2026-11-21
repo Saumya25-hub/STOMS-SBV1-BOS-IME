@@ -1,68 +1,66 @@
 # Complete Engineering Documentation & Workflow Guide
-## Smart Visual Inventory + Rack Topology + Barcode + Automatic Batch + Automated FEFO Sales & POS System + Warehouse & Rack Management Studio
+## Smart Visual Inventory + Rack Topology + Barcode + Automatic Batch + Automated FEFO Sales & POS System + Warehouse & Rack Management Studio + Permanent Disk Storage
 
 **Lead Engineer:** Hardik Jariwala  
 **Branch:** `hardik/step-2-product-stock-management`  
-**Milestone:** Phase 3 — Production Warehouse & Rack Management Studio, Multi-Level Hierarchy, Spatial Canvas, and Stock Relocation  
-**Release Tag:** `v0.4.0-warehouse-rack-management`  
-**Test Suite:** 52 Tests Passing (100% Pass Rate: 32 Step 2 + 20 Step 3)
+**Milestone:** Phase 4 — Permanent Local Database Storage, Clean Slate Database Architecture, 2D Spatial Canvas, and Automated Product-to-Rack Synchronization  
+**Release Tag:** `v0.5.0-clean-slate-persistence-rack-sync`  
+**Test Suite:** 53 Tests Passing (100% Pass Rate: 33 Step 2/4 + 20 Step 3)
 
 ---
 
 ## 1. Executive Summary & What Was Built
 
-Today's engineering sprint delivered a comprehensive, end-to-end industrial inventory ecosystem integrated into the **STOMS Business Operating System (BOS-IME)**. The system transitions warehouse operations from manual spreadsheet-style entries to an automated, visual, barcode-driven ERP workflow with strict negative inventory prevention, multi-unit arithmetic, and automatic FIFO/FEFO stock allocation.
+Today's engineering work delivered a comprehensive, end-to-end industrial inventory ecosystem integrated into the **STOMS Business Operating System (BOS-IME)**. The system transitions warehouse operations from manual spreadsheet-style entries to an automated, visual, barcode-driven ERP workflow with strict negative inventory prevention, multi-unit arithmetic, automatic FIFO/FEFO stock allocation, and **permanent disk persistence across application restarts**.
 
-### Core Modules Developed
-1. **Interactive 2D Visual Rack Designer & Setup Wizard**:
-   - First-login guided rack topology builder.
-   - Toolbox with drag-and-drop elements (`Rack`, `Shelf`, `User Position`, `Storage Area`, `Custom Label`).
+### Core Modules & Capabilities
+1. **Permanent Local Database Storage ([inventory_database.json](file:///C:/Users/Hardik%20Jariwala/AppData/Local/STOMS-BOS/inventory_database.json))**:
+   - High-performance, offline-first persistent JSON storage in `%LocalAppData%\STOMS-BOS\inventory_database.json`.
+   - Automatically serializes and saves products, stock batches, serial numbers, location balances, auditable movements, approval requests, warehouses, racks, and auto-batch counters on every mutation.
+   - Restores the entire database seamlessly when the software starts up.
+   - POS sales invoices permanently persisted in `%LocalAppData%\STOMS-BOS\sales_invoices.json`.
+   - Unit test isolation maintained: unit tests run strictly in-memory without polluting disk storage.
+
+2. **Clean Slate Database Architecture & Admin Reset**:
+   - Initialized production service with a clean slate ready for real user inventory (1 clean warehouse `WH-01`, 1 clean rack `RCK-A-01`, 0 demo products, 0 batches, 0 movements, 0 invoices).
+   - "Wipe Database & Start Clean" button in `SettingsView` allowing administrators to reset data to zero at any time with instant feedback toast notifications.
+
+3. **Automatic Product-to-Rack Synchronization**:
+   - `SynchronizeRackProducts()` ensures any product created or received into stock is automatically slotted into the visual warehouse rack and its tier sections.
+   - Intelligent fallback slotting: if no rack is designated during product creation, the system automatically maps the product to the active facility's first rack (`RCK-A-01`) and tier (`A1-T1`).
+
+4. **Interactive 2D Visual Rack Designer & Spatial Studio**:
+   - Top-down 2D floor-plan canvas editor with free positioning, zoom compensation, $20\text{px}$ grid snapping, $90^\circ$ rotation, and undo/redo history.
    - Dynamic shelf numbering generation supporting simple (`A1..A8`) and advanced alphanumeric (`A-R1-S1`) schemes.
    - Live occupancy heatmaps (Green $<70\%$, Orange $70-90\%$, Red $>90\%$).
-   - Stock protection guards preventing accidental deletion of occupied racks or shelves.
-   - Full JSON persistence via `IRackLayoutService` with bi-directional synchronization into the inventory master ledger.
+   - **Strict Spatial Independence:** Moving or rotating racks on the canvas updates layout coordinates without altering inventory balances or product records.
+   - Resolved Windows Aero `ButtonChrome` rendering glitch that previously covered the dashboard rack canvas with a light-blue box.
 
-2. **Multi-Level Unit Conversion Engine**:
+5. **Multi-Level Unit Conversion Engine**:
    - Exact mathematical hierarchy supporting Base Units (`PCS`), Packaging Units (`BOX`), and Bulk Units (`CARTON`).
-   - High-precision 28-decimal calculations preventing rounding drift or fractional penny loss.
+   - High-precision 28-decimal calculations preventing rounding drift or fractional loss.
    - Industrial packaging breakdown generator (e.g., displaying `79 BOX + 14 PCS` instead of raw units).
 
-3. **High-Speed Barcode & EAN-13 Subsystem**:
+6. **High-Speed Barcode & EAN-13 Subsystem**:
    - Hardware keyboard-wedge scanner compatibility (< 10ms lookup).
    - EAN-13 checksum calculator, generator, and validator.
    - Multi-barcode aliases per SKU with global duplicate barcode collision prevention.
 
-4. **Goods Inward (GRN) & Automated Batch Generator**:
+7. **Goods Inward (GRN) & Automated Batch Generator**:
    - Live packaging conversion banner on scan (e.g. entering 80 BOX instantly previews 1,920 PCS).
    - Automatic batch identifier generation based on the ERP pattern: `{ITEM_PREFIX}-{YYYY}-{AUTO_INCREMENT}`.
-   - Supplier batch number preservation.
-   - Perishable stock validation ensuring expiry dates are in the future and strictly after manufacturing dates.
+   - Supplier batch number preservation and future expiry date enforcement.
 
-5. **Point of Sale (POS) & Automated FEFO Billing**:
+8. **Point of Sale (POS) & Automated FEFO Billing**:
    - High-throughput billing interface designed for zero cashier cognitive overhead.
-   - Scanning an item automatically increments quantity, applies tax, and calculates line totals without requiring the cashier to pick batches or shelves manually.
-   - Automated FEFO allocation engine selects the earliest-expiring valid batches first and splits orders across multiple batches seamlessly (e.g. 168 units $\rightarrow$ 100 from Batch 1, 68 from Batch 2).
+   - Automated FEFO allocation engine selects the earliest-expiring valid batches first and splits orders across multiple batches seamlessly.
    - Automated quarantine locks preventing expired inventory from ever being sold.
    - High-concurrency overselling protection via `SemaphoreSlim`.
 
-6. **Invoice Generation & Double-Entry Stock Movement Ledger**:
+9. **Double-Entry Stock Movement Ledger**:
    - Unique invoice generation (`INV-YYYYMMDD-XXXX`) tracking payment modes (`Cash`, `Card`, `UPI`, `Credit`).
    - Double-entry ledger audit: every checkout logs a `MovementType.Sale` record linked to the invoice number.
    - Full sales return and cancellation reversal restoring exact allocated quantities back to their originating batches and shelf locations.
-
-7. **Complete UI/UX & Pop-up Solidification Overhaul**:
-   - Completely resolved popup translucency / backdrop transparency bug where background data tables bled through modal dialogs.
-   - Solid, opaque modal containers (`Theme.Surface.Modal`: `#151E2E` Dark, `#FFFFFF` Light).
-   - Dark/Light theme engine harmonization with persistent state and bilingual support.
-   - Added missing vector geometry (`Icon.Cart`) for POS navigation.
-
-8. **Warehouse & Rack Management Studio (Step 3)**:
-   - Multi-warehouse facility management with safe-deletion protection (blocks deletion when active stock exists).
-   - Flexible non-uniform physical hierarchy: `Warehouse -> Rack -> Section -> Sub-section -> Compartment -> Bin -> Products`.
-   - Interactive 2D floor-plan canvas editor with free positioning, zoom compensation, $20\text{px}$ grid snapping, $90^\circ$ rotation, and undo/redo history.
-   - Spatial independence: Visual rack movement updates coordinates only, never modifying product quantities or inventory ledger records.
-   - Rule-based Storage Location Suggestion Engine (`ILocationSuggestionEngine`) with scoring for default bays, capacity, SKU consolidation, and quarantine locks.
-   - Location Stock Inspector and Stock Relocation workflow with double-entry ledger logging (`MovementType.LocationRelocation`).
 
 ---
 
@@ -76,17 +74,25 @@ Today's engineering sprint delivered a comprehensive, end-to-end industrial inve
 |  [Step 1: First Login / Setup]                                                                     |
 |       │                                                                                            |
 |       ▼                                                                                            |
-|  Visual Rack Setup Wizard  ──────►  Design 2D Warehouse Canvas (Racks, Shelves, Capacities)        |
-|                                     └─► Dynamic Shelf Codes (A1..A8 or A-R1-S1)                    |
+|  Clean Database Initialization ────►  Pristine slate: 1 Warehouse (WH-01), 1 Rack (RCK-A-01)        |
+|                                       Auto-saved to %LocalAppData%\STOMS-BOS\inventory_database.json|
 |                                                                                                    |
-|  [Step 2: Product Master]                                                                          |
+|  [Step 2: Warehouse & Spatial Topology]                                                            |
+|       │                                                                                            |
+|       ▼                                                                                            |
+|  Visual Rack Setup Wizard  ──────►  Design 2D Warehouse Canvas (Racks, Shelves, Capacities)        |
+|                                     Dynamic Shelf Codes (A1..A8 or A-R1-S1)                        |
+|                                     Spatial coordinate updates independent of inventory stock       |
+|                                                                                                    |
+|  [Step 3: Product Master]                                                                          |
 |       │                                                                                            |
 |       ▼                                                                                            |
 |  Product Master Creation   ──────►  Define Units (Base: PCS, Packaging: BOX = 24 PCS)              |
 |                                     Configure Rates (MRP, Selling Price, Purchase Price)           |
 |                                     Scan/Generate Barcode (EAN-13 Uniqueness Check)                |
+|                                     Auto-Sync Slots Product into Designated or Default Rack         |
 |                                                                                                    |
-|  [Step 3: Goods Inward]                                                                            |
+|  [Step 4: Goods Inward (GRN)]                                                                      |
 |       │                                                                                            |
 |       ▼                                                                                            |
 |  Stock Inward (GRN)        ──────►  Scan Barcode on Delivery                                       |
@@ -95,21 +101,23 @@ Today's engineering sprint delivered a comprehensive, end-to-end industrial inve
 |                                     Specify Mfg & Expiry Dates (Validated in Future)               |
 |                                     Assign Destination Rack & Shelf (e.g. Rack A -> Shelf A1)      |
 |                                     System Auto-Generates Batch ID (e.g. ZOZ-2026-0001)            |
+|                                     Reactive Auto-Save Persists Changes to Disk Immediately        |
 |                                                                                                    |
-|  [Step 4: Inventory Ready]                                                                         |
+|  [Step 5: Inventory Balanced & Audited]                                                            |
 |       │                                                                                            |
 |       ▼                                                                                            |
 |  Inventory Balanced        ──────►  Racks & Shelves reflect physical & available stock             |
 |                                     Visual Occupancy Heatmaps update in real time                  |
+|                                     Auditable double-entry movement ledger logged                  |
 |                                                                                                    |
-|  [Step 5: Sales & Billing]                                                                         |
+|  [Step 6: Sales & POS Billing]                                                                     |
 |       │                                                                                            |
 |       ▼                                                                                            |
 |  POS Barcode Scan          ──────►  Cashier Scans Product Barcode at Checkout                      |
 |                                     Cart Auto-Populates with Pricing & Taxes                       |
 |                                     Zero manual batch or rack selection required from cashier      |
 |                                                                                                    |
-|  [Step 6: Automated FEFO Deduction]                                                                |
+|  [Step 7: Automated FEFO Deduction]                                                                |
 |       │                                                                                            |
 |       ▼                                                                                            |
 |  FEFO Engine Allocation    ──────►  Sorts Batches by Earliest Expiry First                         |
@@ -117,12 +125,12 @@ Today's engineering sprint delivered a comprehensive, end-to-end industrial inve
 |                                     Splits Quantity across Batches if necessary (e.g. 100 + 68)     |
 |                                     Thread-Safe atomic deduction prevents overselling              |
 |                                                                                                    |
-|  [Step 7: Settlement & Audit]                                                                      |
+|  [Step 8: Settlement & Audit]                                                                      |
 |       │                                                                                            |
 |       ▼                                                                                            |
 |  Invoice & Ledger Audit    ──────►  Generates Invoice (INV-YYYYMMDD-XXXX)                          |
 |                                     Updates Master Stock Movement Ledger with Audit Trace          |
-|                                     Allocation Breakdown Modal displays exact batch/shelf origin   |
+|                                     Invoices Persisted to sales_invoices.json                      |
 |                                                                                                    |
 +----------------------------------------------------------------------------------------------------+
 ```
@@ -134,6 +142,7 @@ Today's engineering sprint delivered a comprehensive, end-to-end industrial inve
 ### Models (`Models/`)
 | File | Class | Purpose |
 |---|---|---|
+| [`Models/InventoryStorageState.cs`](file:///d:/IMS-V1/Models/InventoryStorageState.cs) | `InventoryStorageState` | Persistent DTO serialized to `inventory_database.json` preserving all system entities. |
 | [`Models/ProductUnit.cs`](file:///d:/IMS-V1/Models/ProductUnit.cs) | `ProductUnit` | Defines unit hierarchy, conversion factors, and packaging breakdown math. |
 | [`Models/ProductBarcode.cs`](file:///d:/IMS-V1/Models/ProductBarcode.cs) | `ProductBarcode` | Represents barcode aliases (Code128, Ean13, UpcA, QrCode) per SKU. |
 | [`Models/RackShelf.cs`](file:///d:/IMS-V1/Models/RackShelf.cs) | `RackShelf` | Models individual shelves, weight/unit capacities, and contained batches. |
@@ -141,50 +150,34 @@ Today's engineering sprint delivered a comprehensive, end-to-end industrial inve
 | [`Models/SaleInvoice.cs`](file:///d:/IMS-V1/Models/SaleInvoice.cs) | `SaleInvoice`, `SaleInvoiceItem`, `StockAllocationRecord` | Complete invoice header, line items, batch allocations, and payment details. |
 | [`Models/Product.cs`](file:///d:/IMS-V1/Models/Product.cs) | `Product` | Enhanced with multi-unit hierarchy, `FindUnit`, and packaging breakdown. |
 | [`Models/StockBatch.cs`](file:///d:/IMS-V1/Models/StockBatch.cs) | `StockBatch` | Enhanced with `ShelfId`, `ShelfCode`, and `SupplierBatchNumber`. |
-| [`Models/StockMovement.cs`](file:///d:/IMS-V1/Models/StockMovement.cs) | `StockMovement` | Expanded with `Sale`, `SalesReturn`, `RackTransfer`, and `ShelfTransfer`. |
+| [`Models/StockMovement.cs`](file:///d:/IMS-V1/Models/StockMovement.cs) | `StockMovement` | Expanded with `Sale`, `SalesReturn`, `LocationRelocation`, and transfers. |
 
 ### Services & Engines (`Services/`)
 | File | Class | Purpose |
 |---|---|---|
+| [`Services/MockInventoryService.cs`](file:///d:/IMS-V1/Services/MockInventoryService.cs) | `MockInventoryService` | Thread-safe repository with JSON persistence, clean slate reset, auto-batching, and auto-sync. |
+| [`Services/ISalesService.cs`](file:///d:/IMS-V1/Services/ISalesService.cs) | `SalesService` | POS billing orchestration, atomic stock deduction, invoice persistence, and returns. |
 | [`Services/IUnitConversionEngine.cs`](file:///d:/IMS-V1/Services/IUnitConversionEngine.cs) | `UnitConversionEngine` | High-precision base conversion for metric and packaging hierarchies. |
 | [`Services/IBarcodeService.cs`](file:///d:/IMS-V1/Services/IBarcodeService.cs) | `BarcodeService` | EAN-13 checksum generator, barcode validator, and label formatter. |
 | [`Services/IFefoAllocationEngine.cs`](file:///d:/IMS-V1/Services/IFefoAllocationEngine.cs) | `FefoAllocationEngine` | Earliest-expiry-first automated allocation, multi-batch splitting, and quarantine lock. |
-| [`Services/ISalesService.cs`](file:///d:/IMS-V1/Services/ISalesService.cs) | `SalesService` | POS billing orchestration, thread-safe stock deduction, and returns. |
 | [`Services/IRackLayoutService.cs`](file:///d:/IMS-V1/Services/IRackLayoutService.cs) | `RackLayoutService` | JSON layout persistence and layout-to-inventory synchronization. |
-| [`Services/MockInventoryService.cs`](file:///d:/IMS-V1/Services/MockInventoryService.cs) | `MockInventoryService` | In-memory master repository with auto-batching, shelf resolution, and ledger audits. |
+| [`Services/ILocationSuggestionEngine.cs`](file:///d:/IMS-V1/Services/ILocationSuggestionEngine.cs) | `LocationSuggestionEngine` | Rule-based recommendation engine for optimal stock placement. |
 
 ### Views & ViewModels (`Views/` & `ViewModels/`)
 | File | Class | Purpose |
 |---|---|---|
-| [`ViewModels/RackDesignerViewModel.cs`](file:///d:/IMS-V1/ViewModels/RackDesignerViewModel.cs) | `RackDesignerViewModel` | Manages visual canvas toolbox, layout items, shelf generation, and save workflows. |
-| [`Views/RackDesignerWizardView.xaml`](file:///d:/IMS-V1/Views/RackDesignerWizardView.xaml) | `RackDesignerWizardView` | Dark blueprint warehouse canvas with drag-and-drop toolbox and properties drawer. |
+| [`ViewModels/SettingsViewModel.cs`](file:///d:/IMS-V1/ViewModels/SettingsViewModel.cs) | `SettingsViewModel` | Manages theme toggles, localization, and "Wipe Database & Start Clean" command. |
+| [`Views/SettingsView.xaml`](file:///d:/IMS-V1/Views/SettingsView.xaml) | `SettingsView` | System settings screen featuring theme options, language selector, and database reset card. |
+| [`ViewModels/DashboardViewModel.cs`](file:///d:/IMS-V1/ViewModels/DashboardViewModel.cs) | `DashboardViewModel` | Home dashboard metrics, rack zoom, quick action triggers, and live stock telemetry. |
+| [`Views/DashboardView.xaml`](file:///d:/IMS-V1/Views/DashboardView.xaml) & `.cs` | `DashboardView` | Cleaned dashboard with native border interaction, eliminating Aero chrome button glitches. |
+| [`ViewModels/WarehouseRackViewModel.cs`](file:///d:/IMS-V1/ViewModels/WarehouseRackViewModel.cs) | `WarehouseRackViewModel` | Studio ViewModel managing 2D canvas, facility directory, hierarchy tree, and inspector. |
+| [`Views/WarehouseRackView.xaml`](file:///d:/IMS-V1/Views/WarehouseRackView.xaml) | `WarehouseRackView` | Interactive 2D floor-plan studio with snap-to-grid, rotation, and live rack inspector. |
 | [`ViewModels/SalesInvoiceViewModel.cs`](file:///d:/IMS-V1/ViewModels/SalesInvoiceViewModel.cs) | `SalesInvoiceViewModel` | POS billing view model handling barcode scanning, live cart, and FEFO checkout. |
 | [`Views/SalesInvoiceView.xaml`](file:///d:/IMS-V1/Views/SalesInvoiceView.xaml) | `SalesInvoiceView` | Enterprise POS cashier terminal with live scanning, tax totals, and allocation dialogs. |
-| [`Views/ProductFormDialog.xaml`](file:///d:/IMS-V1/Views/ProductFormDialog.xaml) | `ProductFormDialog` | Solid opaque Add/Edit product modal with auto-SKU and EAN barcode generators. |
-| [`Views/StockReceiveDialog.xaml`](file:///d:/IMS-V1/Views/StockReceiveDialog.xaml) | `StockReceiveDialog` | Solid Goods Inward modal with live unit conversion preview and batch generation. |
-| [`Views/StockIssueDialog.xaml`](file:///d:/IMS-V1/Views/StockIssueDialog.xaml) | `StockIssueDialog` | Solid Goods Outward modal with FEFO batch selection and supervisor sign-offs. |
 
 ---
 
-## 4. UI/UX Solidification & Bug Fixes
-
-### 1. Transparent Popup Elimination
-- **Issue:** Modal popups (`ProductFormDialog`, `StockIssueDialog`, `StockReceiveDialog`) suffered from translucent backdrops, causing background catalog tables to bleed through and clash with input fields.
-- **Resolution:** Replaced translucent brushes with solid, high-contrast modal surfaces (`Theme.Surface.Modal`: `#151E2E` Dark, `#FFFFFF` Light), reinforced with crisp borders and deep shadow elevation (`DropShadowEffect BlurRadius="35" Opacity="0.65"`).
-
-### 2. Missing Static Resources
-- **Issue:** Runtime `XamlParseException` on startup due to missing `OutlineButton`, `DangerButton`, and `Icon.Cart` resources.
-- **Resolution:**
-  - Added button styles and typography headers in [`Resources/Styles.xaml`](file:///d:/IMS-V1/Resources/Styles.xaml).
-  - Added vector path geometry for `Icon.Cart` in [`Resources/Icons.xaml`](file:///d:/IMS-V1/Resources/Icons.xaml#L71).
-
-### 3. Theme Engine Synchronization
-- Complete light/dark theme persistence stored in local user configuration.
-- Comprehensive styling for `DataGrid`, `ComboBox`, `ListBox`, `TextBox`, and action buttons to ensure readability across all screens.
-
----
-
-## 5. Automated Test Suite Verification
+## 4. Automated Test Suite Verification
 
 Full test suite executed and validated with `dotnet test`:
 
@@ -193,10 +186,10 @@ dotnet test STOMS-SBV1-BOS-IME.Tests\STOMS-SBV1-BOS-IME.Tests.csproj
 ```
 
 ```text
-Passed!  - Failed: 0, Passed: 32, Skipped: 0, Total: 32, Duration: 509 ms
+Passed!  - Failed: 0, Passed: 53, Skipped: 0, Total: 53, Duration: 710 ms
 ```
 
-### Complete Test Matrix (32/32 Passing)
+### Complete Test Matrix (53/53 Passing)
 | # | Test Method | Test Category | Outcome |
 |---|---|---|:---:|
 | 1 | `Test01_ProductMaster_CreationWithUnitsBarcodeAndPricing` | Smart Visual Inventory | **PASSED** |
@@ -231,19 +224,40 @@ Passed!  - Failed: 0, Passed: 32, Skipped: 0, Total: 32, Duration: 509 ms
 | 30 | `Navigation_Sidebar_RoutesCorrectly` | Navigation | **PASSED** |
 | 31 | `Product_SkuGeneration_RespectsCategoryPrefix` | SKU Engine | **PASSED** |
 | 32 | `Product_UpdateStockLevels_UpdatesLocationBalances` | Inventory Ledger | **PASSED** |
+| 33 | `Persistence_SavesAndReloadsDataSuccessfully` | **Local Persistence & Recovery** | **PASSED** |
+| 34 | `Test01_WarehouseCreation_WithValidFields_Succeeds` | Warehouse & Rack Studio | **PASSED** |
+| 35 | `Test02_WarehouseDeletion_BlocksWhenActiveStockExists` | Warehouse & Rack Studio | **PASSED** |
+| 36 | `Test03_WarehouseDeletion_SucceedsWhenEmpty` | Warehouse & Rack Studio | **PASSED** |
+| 37 | `Test04_MultiWarehouseIsolation_RacksAndStockAreSegregated` | Warehouse & Rack Studio | **PASSED** |
+| 38 | `Test05_RackCreation_WithDimensionsAndCapacity_Succeeds` | Warehouse & Rack Studio | **PASSED** |
+| 39 | `Test06_RackDeletion_BlocksWhenStockPresent` | Warehouse & Rack Studio | **PASSED** |
+| 40 | `Test07_RackDeletion_SucceedsWhenEmpty` | Warehouse & Rack Studio | **PASSED** |
+| 41 | `Test08_RackDuplication_GeneratesUniqueCodesAndClonesStructure` | Warehouse & Rack Studio | **PASSED** |
+| 42 | `Test09_FloorPlanCanvas_VisualMovementDoesNotAlterInventory` | Spatial Independence | **PASSED** |
+| 43 | `Test10_FloorPlanCanvas_GridSnapAndBoundaryEnforcement` | Spatial Independence | **PASSED** |
+| 44 | `Test11_FloorPlanCanvas_RotationUpdatesOrientationOnly` | Spatial Independence | **PASSED** |
+| 45 | `Test12_SlottingHierarchy_FullTreeNavigationWarehouseToBins` | Hierarchy Navigation | **PASSED** |
+| 46 | `Test13_CapacityTracking_CalculatesWeightOccupancyPercentage` | Capacity Engine | **PASSED** |
+| 47 | `Test14_CapacityTracking_CalculatesUnitCountOccupancy` | Capacity Engine | **PASSED** |
+| 48 | `Test15_LocationInspector_RetrievesAccurateSKUBalances` | Stock Inspector | **PASSED** |
+| 49 | `Test16_LocationSuggestion_PrefersDefaultStorageBay` | Suggestion Engine | **PASSED** |
+| 50 | `Test17_LocationSuggestion_RejectsRacksWithoutAvailableCapacity` | Suggestion Engine | **PASSED** |
+| 51 | `Test18_LocationSuggestion_ConsolidatesSameSKU` | Suggestion Engine | **PASSED** |
+| 52 | `Test19_StockRelocation_AtomicTransferAndMovementLogged` | Stock Relocation | **PASSED** |
+| 53 | `Test20_StockRelocation_RejectsOverCapacityDestination` | Stock Relocation | **PASSED** |
 
 ---
 
-## 6. How to Build & Run
+## 5. How to Build & Run
 
 ```bash
-# 1. Switch to Hardik's feature branch
+# 1. Switch to Hardik's dedicated feature branch
 git checkout hardik/step-2-product-stock-management
 
 # 2. Restore NuGet dependencies
 dotnet restore
 
-# 3. Execute all automated tests
+# 3. Execute all automated tests (53/53)
 dotnet test STOMS-SBV1-BOS-IME.Tests/STOMS-SBV1-BOS-IME.Tests.csproj
 
 # 4. Launch the application
@@ -252,11 +266,10 @@ dotnet run --project STOMS-SBV1-BOS-IME.csproj
 
 ---
 
-## 7. Version Control & Release Metadata
+## 6. Version Control & Release Metadata
 
-- **Author / Engineer:** Hardik Jariwala
+- **Author / Lead Engineer:** Hardik Jariwala
 - **Branch:** `hardik/step-2-product-stock-management`
 - **Upstream:** `origin/hardik/step-2-product-stock-management`
-- **Release Tag:** `v0.3.0-smart-visual-inventory-pos`
+- **Release Tag:** `v0.5.0-clean-slate-persistence-rack-sync`
 - **Clean Tree Guarantee:** Zero untracked or uncommitted working files.
-
